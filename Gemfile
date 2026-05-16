@@ -18,7 +18,13 @@ gem "stimulus-rails"
 gem "tailwindcss-rails"
 
 # Use Active Model has_secure_password [https://guides.rubyonrails.org/active_model_basics.html#securepassword]
-# gem "bcrypt", "~> 3.1.7"
+gem "bcrypt", "~> 3.1.7"
+
+# Romanian (and other) locale translations for Rails
+gem "rails-i18n", "~> 8.0"
+
+# Rack middleware for throttling and blocking abusive requests
+gem "rack-attack", "~> 6.7"
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem "tzinfo-data", platforms: %i[ windows jruby ]
