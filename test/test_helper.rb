@@ -5,6 +5,9 @@ require "rails/test_help"
 require "aws-sdk-s3"
 Aws.config[:stub_responses] = true
 
+require_relative "helpers/ebook_fixtures"
+EbookFixtures.generate_all
+
 module ActiveSupport
   class TestCase
     # Run tests in parallel with specified workers

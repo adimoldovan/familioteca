@@ -37,6 +37,9 @@
 /app/assets/builds/*
 !/app/assets/builds/.keep
 
+# Generated EPUB fixtures — rebuilt via test/helpers/ebook_fixtures.rb
+/test/fixtures/files/ebooks/*.epub
+
 # Node / Playwright
 /node_modules/
 /playwright-report/
