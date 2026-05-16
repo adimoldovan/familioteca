@@ -46,7 +46,7 @@ jobs:
           should_deploy=false
           while IFS= read -r file; do
             case "$file" in
-              *.md|LICENSE|.github/*|.circleci/*|test/*|.rubocop.yml|.ruby-version|.gitignore|.gitattributes|.dockerignore|.kamal/*|Procfile.dev|script/*) ;;
+              *.md|LICENSE|.github/*|.circleci/*|test/*|.rubocop.yml|.ruby-version|.gitignore|.gitattributes|.dockerignore|Procfile.dev|script/*) ;;
               *) should_deploy=true; break ;;
             esac
           done <<< "$CHANGED"
