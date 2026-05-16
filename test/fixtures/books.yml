@@ -1,0 +1,2 @@
+# Books are created inline by tests. Fixtures here would need sort_title /
+# searchable hand-populated, which defeats the point of the callback.

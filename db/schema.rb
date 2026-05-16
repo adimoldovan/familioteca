@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_05_16_215346) do
+ActiveRecord::Schema[8.1].define(version: 2026_05_16_220500) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -37,6 +37,29 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_16_215346) do
     t.bigint "blob_id", null: false
     t.string "variation_digest", null: false
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
+  end
+
+  create_table "books", force: :cascade do |t|
+    t.string "author"
+    t.datetime "created_at", null: false
+    t.text "description"
+    t.integer "file_size"
+    t.string "format", null: false
+    t.datetime "ingested_at", null: false
+    t.string "isbn"
+    t.string "language"
+    t.datetime "missing_since"
+    t.string "object_key", null: false
+    t.text "parse_error"
+    t.integer "published_year"
+    t.string "publisher"
+    t.text "searchable", null: false
+    t.string "sort_title", null: false
+    t.string "title", null: false
+    t.datetime "updated_at", null: false
+    t.index ["missing_since"], name: "index_books_on_missing_since"
+    t.index ["object_key"], name: "index_books_on_object_key", unique: true
+    t.index ["sort_title"], name: "index_books_on_sort_title"
   end
 
   create_table "members", force: :cascade do |t|
