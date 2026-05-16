@@ -1,7 +1,7 @@
 module Admin
   class MembersController < BaseController
     def index
-      head :ok
+      @members = Member.order(:name)
     end
   end
 end
