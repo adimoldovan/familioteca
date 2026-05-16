@@ -1,0 +1,34 @@
+ro:
+  app:
+    name: "Familioteca"
+    tagline: "Biblioteca de cărți a familiei"
+
+  sessions:
+    new:
+      title: "Autentificare"
+      email: "Email"
+      password: "Parolă"
+      submit: "Intră în cont"
+      invalid: "Email sau parolă greșite."
+    destroy:
+      link: "Deconectare"
+
+  books:
+    index:
+      title: "Bibliotecă"
+      empty: "Niciun titlu disponibil"
+
+  admin:
+    members:
+      index:
+        title: "Membri"
+        name: "Nume"
+        email: "Email"
+        kindle_email: "Email Kindle"
+        role: "Rol"
+        admin: "Administrator"
+        member: "Membru"
+
+  navigation:
+    catalog: "Bibliotecă"
+    admin: "Administrare"
