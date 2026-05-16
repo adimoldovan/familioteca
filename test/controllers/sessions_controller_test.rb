@@ -41,11 +41,4 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to sign_in_path
     assert_nil cookies[:session_token].presence
   end
-
-  private
-
-  def sign_in_as(member)
-    session = member.sessions.create!
-    cookies[:session_token] = session.token
-  end
 end

@@ -13,3 +13,12 @@ module ActiveSupport
     # Add more helper methods to be used by all tests here...
   end
 end
+
+module ActionDispatch
+  class IntegrationTest
+    def sign_in_as(member)
+      session = member.sessions.create!
+      cookies[:session_token] = session.token
+    end
+  end
+end
