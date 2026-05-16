@@ -36,4 +36,55 @@ class MemberTest < ActiveSupport::TestCase
       duplicate.save(validate: false)
     end
   end
+
+  test "email is required" do
+    member = Member.new(password: "secret123", name: "Ana")
+    refute member.valid?
+    assert_includes member.errors[:email], "nu poate fi necompletat"
+  end
+
+  test "email must be unique" do
+    duplicate = Member.new(email: "ana@example.com", password: "secret123", name: "Other")
+    refute duplicate.valid?
+    assert_includes duplicate.errors[:email], "este deja folosit"
+  end
+
+  test "email must match a basic email format" do
+    member = Member.new(email: "not-an-email", password: "secret123", name: "Ana")
+    refute member.valid?
+    assert_includes member.errors[:email], "este invalid"
+  end
+
+  test "password must be at least 8 characters" do
+    member = Member.new(email: "new@example.com", password: "short", name: "Ana")
+    refute member.valid?
+    assert_includes member.errors[:password], "este prea scurt (minimum de caractere este 8)"
+  end
+
+  test "name is required" do
+    member = Member.new(email: "new@example.com", password: "secret123")
+    refute member.valid?
+    assert_includes member.errors[:name], "nu poate fi necompletat"
+  end
+
+  test "kindle_email format is validated when present" do
+    member = Member.new(
+      email: "new@example.com",
+      password: "secret123",
+      name: "Ana",
+      kindle_email: "not-an-email"
+    )
+    refute member.valid?
+    assert_includes member.errors[:kindle_email], "este invalid"
+  end
+
+  test "kindle_email may be blank" do
+    member = Member.new(
+      email: "new@example.com",
+      password: "secret123",
+      name: "Ana",
+      kindle_email: ""
+    )
+    assert member.valid?
+  end
 end
