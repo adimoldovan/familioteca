@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Boot a fresh Rails server for the Playwright e2e suite.
+# Usage: bin/e2e-server <port>
+# Invoked from playwright.config.ts `webServer.command`.
+
+PORT="${1:?port required}"
+
+export RAILS_ENV=e2e
+
+rm -f storage/e2e.sqlite3 storage/e2e.sqlite3-shm storage/e2e.sqlite3-wal
+bundle exec rails db:prepare
+bundle exec rails tailwindcss:build
+exec bundle exec rails server -p "${PORT}"

@@ -36,3 +36,18 @@
 
 /app/assets/builds/*
 !/app/assets/builds/.keep
+
+# Node / Playwright
+/node_modules/
+/playwright-report/
+/test-results/
+/.playwright/
+/.playwright-cli/
+/.playwright-mcp/
+
+# Superpowers planning notes (transient — not committed)
+/docs/superpowers/
+/docs/ignore
+
+# Claude local settings
+.claude/settings.local.json

@@ -1,0 +1,70 @@
+name: Deploy
+
+on:
+  workflow_run:
+    workflows: ["CI"]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      force:
+        description: "Force deploy (skip change check)"
+        required: false
+        type: boolean
+        default: false
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 2
+
+      - name: Check for deploy-worthy changes
+        id: check
+        env:
+          FORCE_DEPLOY: ${{ inputs.force }}
+        run: |
+          if [ "$FORCE_DEPLOY" = "true" ]; then
+            echo "Force deploy requested — skipping change check"
+            echo "should_deploy=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          CHANGED=$(git diff --name-only HEAD~1 HEAD)
+          echo "Changed files:"
+          echo "$CHANGED"
+
+          should_deploy=false
+          while IFS= read -r file; do
+            case "$file" in
+              *.md|LICENSE|.github/*|.circleci/*|test/*|.rubocop.yml|.ruby-version|.gitignore|.gitattributes|.dockerignore|.kamal/*|Procfile.dev|script/*) ;;
+              *) should_deploy=true; break ;;
+            esac
+          done <<< "$CHANGED"
+
+          echo "should_deploy=$should_deploy" >> "$GITHUB_OUTPUT"
+          if [ "$should_deploy" = "false" ]; then
+            echo "Skipping deploy — only non-deployable files changed"
+          fi
+
+      - name: Set up Fly.io CLI
+        if: ${{ steps.check.outputs.should_deploy == 'true' }}
+        uses: superfly/flyctl-actions/setup-flyctl@ed8efb33836e8b2096c7fd3ba1c8afe303ebbff1
+        with:
+          version: 0.4.41
+
+      - name: Deploy to Fly.io
+        if: ${{ steps.check.outputs.should_deploy == 'true' }}
+        env:
+          COMMIT_SHA: ${{ github.sha }}
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+        run: flyctl deploy --remote-only --build-arg COMMIT_SHA="$COMMIT_SHA"

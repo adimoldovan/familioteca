@@ -1,0 +1,174 @@
+version: 2.1
+
+orbs:
+  ruby: circleci/ruby@2.3.0
+  node: circleci/node@7.1.0
+  browser-tools: circleci/browser-tools@1.4.8
+
+jobs:
+  changes:
+    docker:
+      - image: cimg/base:current
+    steps:
+      - checkout
+      - run:
+          name: Check for CI-worthy changes
+          command: |
+            CHANGED=$(git diff --name-only HEAD~1 HEAD)
+            echo "Changed files:"
+            echo "$CHANGED"
+
+            should_run=false
+            echo "$CHANGED" | while IFS= read -r file; do
+              case "$file" in
+                *.md|LICENSE|.github/*) ;;
+                *) echo "true" > /tmp/should_run; break ;;
+              esac
+            done
+
+            if [ -f /tmp/should_run ]; then
+              should_run=true
+            fi
+
+            if [ "$should_run" = "false" ]; then
+              echo "Skipping CI — only non-CI-relevant files changed"
+              circleci-agent step halt
+            fi
+
+  scan_ruby:
+    docker:
+      - image: cimg/ruby:3.4
+    steps:
+      - checkout
+      - ruby/install-deps
+      - run:
+          name: Scan for common Rails security vulnerabilities
+          command: bin/brakeman --no-pager
+
+  scan_js:
+    docker:
+      - image: cimg/ruby:3.4
+    steps:
+      - checkout
+      - ruby/install-deps
+      - run:
+          name: Scan for security vulnerabilities in JavaScript dependencies
+          command: |
+            echo 'Running importmap audit...'
+            bin/importmap audit
+
+  lint:
+    docker:
+      - image: cimg/ruby:3.4
+    steps:
+      - checkout
+      - ruby/install-deps
+      # - node/install:
+      #     install-yarn: false
+      # - node/install-packages:
+      #     pkg-manager: npm
+      - run:
+          name: Lint Ruby code for consistent style
+          command: bin/rubocop
+      # - run:
+      #     name: Lint e2e tests
+      #     command: npm run lint
+      # - run:
+      #     name: Type-check e2e tests
+      #     command: npm run typecheck
+
+  test:
+    docker:
+      - image: cimg/ruby:3.4
+    steps:
+      - checkout
+      - ruby/install-deps
+      - run:
+          name: Prepare test database
+          command: bin/rails db:test:prepare
+          environment:
+            RAILS_ENV: test
+      - run:
+          name: Run tests
+          command: bin/rails test
+          environment:
+            RAILS_ENV: test
+
+  # test_js:
+  #   docker:
+  #     - image: cimg/node:22.20
+  #   steps:
+  #     - checkout
+  #     - node/install-packages:
+  #         pkg-manager: npm
+  #     - run:
+  #         name: Run JavaScript unit tests
+  #         command: npm run test:js
+
+  # e2e:
+  #   docker:
+  #     - image: cimg/ruby:3.4-browsers
+  #   steps:
+  #     - checkout
+  #     - ruby/install-deps
+  #     - node/install:
+  #         install-yarn: false
+  #     - node/install-packages:
+  #         pkg-manager: npm
+  #     - restore_cache:
+  #         name: Restore Playwright browser cache
+  #         keys:
+  #           - playwright-v2-{{ checksum "package-lock.json" }}
+  #     - run:
+  #         name: Install Playwright browsers
+  #         command: npx playwright install chromium
+  #     - save_cache:
+  #         name: Save Playwright browser cache
+  #         key: playwright-v2-{{ checksum "package-lock.json" }}
+  #         paths:
+  #           - ~/.cache/ms-playwright
+  #     - run:
+  #         name: Run e2e tests
+  #         command: npm run test:e2e
+  #         environment:
+  #           RAILS_ENV: test
+  #           CI: "true"
+  #         no_output_timeout: 10m
+  #     - store_artifacts:
+  #         path: playwright-report
+  #         destination: playwright-report
+
+  trigger-deploy:
+    docker:
+      - image: cimg/base:current
+    steps:
+      - run:
+          name: Trigger GitHub deploy workflow
+          command: |
+            curl -X POST \
+              -H "Authorization: token $GITHUB_TOKEN" \
+              -H "Accept: application/vnd.github.v3+json" \
+              "https://api.github.com/repos/adimoldovan/familioteca/actions/workflows/deploy.yml/dispatches" \
+              -d '{"ref":"main"}'
+
+workflows:
+  ci:
+    jobs:
+      - changes
+      - scan_ruby:
+          requires: [changes]
+      - scan_js:
+          requires: [changes]
+      - lint:
+          requires: [changes]
+      - test:
+          requires: [changes]
+      # - test_js:
+      #     requires: [changes]
+      # - e2e:
+      #     requires: [changes]
+      - trigger-deploy:
+          requires: [scan_ruby, scan_js, lint, test]
+          filters:
+            branches:
+              only: main

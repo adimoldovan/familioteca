@@ -1,16 +1,37 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
+set -euo pipefail
 
-if ! gem list foreman -i --silent; then
-  echo "Installing foreman..."
-  gem install foreman
+PORT="${PORT:-3005}"
+BIND="${BIND:-127.0.0.1}"
+DEV_URL="http://localhost:$PORT/"
+DEMO_LOGIN="demo@familioteca.local / password"
+
+if [ -t 1 ]; then
+  c_bar='\033[2m▎\033[0m'
+  c_label='\033[37m'
+  c_url='\033[96m'
+  c_reset='\033[0m'
+else
+  c_bar='▎'
+  c_label=''
+  c_url=''
+  c_reset=''
 fi
 
-# Default to port 3000 if not specified
-export PORT="${PORT:-3000}"
+printf "\n"
+printf " %b %bURL%b     %b%s%b\n" "$c_bar" "$c_label" "$c_reset" "$c_url" "$DEV_URL" "$c_reset"
+printf " %b %bLogin%b   %s\n" "$c_bar" "$c_label" "$c_reset" "$DEMO_LOGIN"
+printf "\n"
 
-# Let the debug gem allow remote connections,
-# but avoid loading until `debugger` is called
-export RUBY_DEBUG_OPEN="true"
-export RUBY_DEBUG_LAZY="true"
+bin/rails tailwindcss:watch &
+TAILWIND_PID=$!
+cleanup() {
+  trap - EXIT INT TERM
+  kill "$TAILWIND_PID" 2>/dev/null || true
+  wait "$TAILWIND_PID" 2>/dev/null || true
+}
+trap 'cleanup; exit 130' INT
+trap 'cleanup; exit 143' TERM
+trap cleanup EXIT
 
-exec foreman start -f Procfile.dev "$@"
+bin/rails server -b "$BIND" -p "$PORT"
