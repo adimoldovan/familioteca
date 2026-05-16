@@ -1,0 +1,24 @@
+<div class="mx-auto max-w-md w-full py-12">
+  <h1 class="text-3xl font-bold mb-6"><%= t("sessions.new.title") %></h1>
+
+  <% if flash[:error] %>
+    <p id="sign-in-error" class="flash-error"><%= flash[:error] %></p>
+  <% end %>
+
+  <%= form_with url: session_path, method: :post, class: "space-y-4" do |f| %>
+    <div>
+      <%= f.label :email, t("sessions.new.email"), class: "block text-sm font-medium" %>
+      <%= f.email_field :email, id: "sign-in-email", required: true, autofocus: true,
+            class: "mt-1 block w-full rounded border-gray-300" %>
+    </div>
+
+    <div>
+      <%= f.label :password, t("sessions.new.password"), class: "block text-sm font-medium" %>
+      <%= f.password_field :password, id: "sign-in-password", required: true,
+            class: "mt-1 block w-full rounded border-gray-300" %>
+    </div>
+
+    <%= f.submit t("sessions.new.submit"), id: "sign-in-submit",
+          class: "rounded bg-indigo-600 px-4 py-2 text-white" %>
+  <% end %>
+</div>

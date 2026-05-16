@@ -1,1 +1,8 @@
 @import "tailwindcss";
+
+@layer components {
+  .flash-error {
+    color: var(--color-red-600);
+    margin-bottom: var(--spacing-4, 1rem);
+  }
+}
