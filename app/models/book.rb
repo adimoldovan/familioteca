@@ -10,6 +10,19 @@ class Book < ApplicationRecord
 
   before_validation :populate_search_columns
 
+  scope :visible,        -> { where(missing_since: nil).where(parse_error: nil) }
+  scope :needs_metadata, -> { where.not(parse_error: nil) }
+
+  scope :search, ->(query) {
+    folded = DiacriticFolding.fold(query.to_s.strip)
+    next all if folded.blank?
+    where("searchable LIKE ?", "%#{sanitize_sql_like(folded)}%")
+  }
+
+  def missing?
+    missing_since.present?
+  end
+
   private
 
   def populate_search_columns

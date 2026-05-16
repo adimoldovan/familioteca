@@ -82,4 +82,40 @@ class BookTest < ActiveSupport::TestCase
     assert_equal "tara", book.sort_title
     assert_includes book.searchable, "tara"
   end
+
+  test "visible scope excludes books that are missing or have parse errors" do
+    shown   = Book.create!(title: "Shown",   format: "epub", object_key: "k1", ingested_at: Time.current)
+    missing = Book.create!(title: "Missing", format: "epub", object_key: "k2", ingested_at: Time.current,
+                            missing_since: Time.current)
+    broken  = Book.create!(title: "Broken",  format: "epub", object_key: "k3", ingested_at: Time.current,
+                            parse_error: "Could not read EPUB metadata")
+    visible = Book.visible
+    assert_includes visible, shown
+    refute_includes visible, missing
+    refute_includes visible, broken
+  end
+
+  test "needs_metadata scope returns books with parse_error" do
+    good = Book.create!(title: "Good", format: "epub", object_key: "k1", ingested_at: Time.current)
+    bad  = Book.create!(title: "bad.epub", format: "epub", object_key: "k2", ingested_at: Time.current,
+                         parse_error: "Could not read EPUB metadata")
+    needs = Book.needs_metadata
+    assert_includes needs, bad
+    refute_includes needs, good
+  end
+
+  test "search scope matches diacritic-insensitively" do
+    Book.create!(title: "Bizanț", format: "epub", object_key: "k1", ingested_at: Time.current)
+    Book.create!(title: "Cluj",   format: "epub", object_key: "k2", ingested_at: Time.current)
+    results = Book.search("bizant")
+    assert_equal 1, results.count
+    assert_equal "Bizanț", results.first.title
+  end
+
+  test "search scope returns all books when query is blank" do
+    Book.create!(title: "A", format: "epub", object_key: "k1", ingested_at: Time.current)
+    Book.create!(title: "B", format: "epub", object_key: "k2", ingested_at: Time.current)
+    assert_equal 2, Book.search("").count
+    assert_equal 2, Book.search(nil).count
+  end
 end
