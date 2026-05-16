@@ -5,5 +5,9 @@ Rails.application.routes.draw do
   post "session", to: "sessions#create", as: :session
   delete "session", to: "sessions#destroy"
 
+  namespace :admin do
+    resources :members, only: [ :index ]
+  end
+
   root "books#index"
 end

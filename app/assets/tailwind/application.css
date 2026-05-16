@@ -5,4 +5,54 @@
     color: var(--color-red-600);
     margin-bottom: var(--spacing-4, 1rem);
   }
+
+  .site-header {
+    background-color: var(--color-white);
+    border-bottom: 1px solid var(--color-gray-200);
+  }
+
+  .site-header__bar {
+    margin-inline: auto;
+    max-width: 64rem;
+    padding-inline: var(--spacing-4, 1rem);
+    padding-block: var(--spacing-3, 0.75rem);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-4, 1rem);
+  }
+
+  .site-header__brand {
+    font-weight: 700;
+    font-size: 1.125rem;
+  }
+
+  .site-header__nav {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-4, 1rem);
+    font-size: 0.875rem;
+  }
+
+  .site-header__account {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-4, 1rem);
+    font-size: 0.875rem;
+  }
+
+  .site-header__current-member {
+    color: var(--color-gray-500);
+  }
+
+  .site-header__sign-out {
+    text-decoration: underline;
+  }
+
+  .site-main {
+    margin-inline: auto;
+    max-width: 64rem;
+    padding-inline: var(--spacing-4, 1rem);
+    padding-block: var(--spacing-6, 1.5rem);
+  }
 }

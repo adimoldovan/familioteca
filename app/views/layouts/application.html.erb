@@ -1,30 +1,47 @@
 <!DOCTYPE html>
-<html>
+<html lang="ro">
   <head>
-    <title><%= content_for(:title) || "Familioteca" %></title>
+    <title><%= content_for(:title) || t("app.name") %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="application-name" content="Familioteca">
+    <meta name="application-name" content="<%= t("app.name") %>">
     <meta name="mobile-web-app-capable" content="yes">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
 
     <%= yield :head %>
 
-    <%# Enable PWA manifest for installable apps (make sure to enable in config/routes.rb too!) %>
-    <%#= tag.link rel: "manifest", href: pwa_manifest_path(format: :json) %>
-
     <link rel="icon" href="/icon.png" type="image/png">
     <link rel="icon" href="/icon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="/icon.png">
 
-    <%# Includes all stylesheet files in app/assets/stylesheets %>
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
   </head>
 
   <body>
-    <main class="container mx-auto mt-28 px-5 flex">
+    <% if signed_in? %>
+      <header class="site-header">
+        <div class="site-header__bar">
+          <%= link_to t("app.name"), root_path, id: "site-header-brand", class: "site-header__brand" %>
+          <nav class="site-header__nav" aria-label="<%= t("navigation.primary") %>">
+            <%= link_to t("navigation.catalog"), root_path, id: "nav-catalog" %>
+            <% if current_member.admin? %>
+              <%= link_to t("navigation.admin"), admin_members_path, id: "nav-admin" %>
+            <% end %>
+          </nav>
+          <div class="site-header__account">
+            <span class="site-header__current-member" id="current-member-name"><%= current_member.name %></span>
+            <%= button_to t("sessions.destroy.link"), session_path, method: :delete,
+                  form: { id: "sign-out-form" },
+                  class: "site-header__sign-out",
+                  id: "nav-sign-out" %>
+          </div>
+        </div>
+      </header>
+    <% end %>
+
+    <main class="site-main">
       <%= yield %>
     </main>
   </body>

@@ -20,4 +20,10 @@ class LocaleKeysTest < ActiveSupport::TestCase
   test "empty catalog key exists" do
     assert_equal "Niciun titlu disponibil", I18n.t("books.index.empty", locale: :ro)
   end
+
+  test "navigation keys exist" do
+    assert_equal "Navigare principală", I18n.t("navigation.primary", locale: :ro)
+    assert_equal "Bibliotecă", I18n.t("navigation.catalog", locale: :ro)
+    assert_equal "Administrare", I18n.t("navigation.admin", locale: :ro)
+  end
 end
