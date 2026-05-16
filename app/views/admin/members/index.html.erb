@@ -1,23 +1,21 @@
-<h1 id="members-heading" class="text-3xl font-bold mb-6"><%= t(".title") %></h1>
+<h1 id="members-heading" class="t-headline"><%= t(".title") %></h1>
 
-<table class="min-w-full divide-y divide-gray-200" aria-labelledby="members-heading">
-  <thead class="bg-gray-50">
+<table class="data-table" aria-labelledby="members-heading">
+  <thead>
     <tr>
-      <th scope="col" class="px-4 py-2 text-left"><%= t(".name") %></th>
-      <th scope="col" class="px-4 py-2 text-left"><%= t(".email") %></th>
-      <th scope="col" class="px-4 py-2 text-left"><%= t(".kindle_email") %></th>
-      <th scope="col" class="px-4 py-2 text-left"><%= t(".role") %></th>
+      <th scope="col"><%= t(".name") %></th>
+      <th scope="col"><%= t(".email") %></th>
+      <th scope="col"><%= t(".kindle_email") %></th>
+      <th scope="col"><%= t(".role") %></th>
     </tr>
   </thead>
-  <tbody class="bg-white divide-y divide-gray-200">
+  <tbody>
     <% @members.each do |member| %>
       <tr>
-        <td class="px-4 py-2"><%= member.name %></td>
-        <td class="px-4 py-2"><%= member.email %></td>
-        <td class="px-4 py-2"><%= member.kindle_email || "—" %></td>
-        <td class="px-4 py-2">
-          <%= member.admin? ? t(".admin") : t(".member") %>
-        </td>
+        <td><%= member.name %></td>
+        <td><%= member.email %></td>
+        <td><%= member.kindle_email || "—" %></td>
+        <td><%= member.admin? ? t(".admin") : t(".member") %></td>
       </tr>
     <% end %>
   </tbody>

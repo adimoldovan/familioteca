@@ -17,9 +17,24 @@
 
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
+
+    <script nonce="<%= content_security_policy_nonce %>">
+      (function () {
+        try {
+          var theme = localStorage.getItem("theme");
+          if (theme === "dark") {
+            document.documentElement.classList.add("dark");
+          } else if (theme === null && window.matchMedia("(prefers-color-scheme: dark)").matches) {
+            document.documentElement.classList.add("dark");
+          }
+        } catch (e) {}
+      })();
+    </script>
   </head>
 
   <body>
+    <%= render "shared/flash" %>
+
     <% if signed_in? %>
       <header class="site-header">
         <div class="site-header__bar">
@@ -36,13 +51,16 @@
                   form: { id: "sign-out-form" },
                   class: "site-header__sign-out",
                   id: "nav-sign-out" %>
+            <%= render "shared/theme_toggle" %>
           </div>
         </div>
       </header>
-    <% end %>
 
-    <main class="site-main">
+      <main class="site-main">
+        <%= yield %>
+      </main>
+    <% else %>
       <%= yield %>
-    </main>
+    <% end %>
   </body>
 </html>

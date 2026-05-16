@@ -1,0 +1,7 @@
+<% flash.each do |key, message| %>
+  <% next if key.to_sym == :error %>
+  <% level = key.to_sym == :notice ? "notice" : "alert" %>
+  <div class="flash flash--<%= level %>" role="<%= level == "notice" ? "status" : "alert" %>">
+    <%= message %>
+  </div>
+<% end %>

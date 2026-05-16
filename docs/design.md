@@ -43,7 +43,12 @@ Used sparingly: links, current-state indicators, accent rails on callouts.
 
 ### Status
 
-`--ok` `#5C7A4A` (moss green) &middot; `--warn` `#B8863A` (amber).
+| Variable | Light | Dark |
+| --- | --- | --- |
+| `--ok` | `#5C7A4A` (moss green) | `#7CA860` |
+| `--warn` | `#B8863A` (amber) | `#D4A055` |
+
+Dark values lift the lightness to meet WCAG AA contrast on dark paper.
 
 ### Font-size scale
 
@@ -81,6 +86,40 @@ tighter visual match to Source Serif 4 / Inter / JetBrains Mono, we would
 self-host them under `app/assets/fonts/` and extend the stack with
 `@font-face` — not reintroduce a CDN.
 
+### Spacing
+
+A numeric scale in 4px increments. Use these tokens for any padding, margin,
+or gap value — don't reach for raw `rem`s or Tailwind's `var(--spacing-N)`.
+
+| Variable | Value |
+| --- | --- |
+| `--space-1` | 0.25rem (4px) |
+| `--space-2` | 0.5rem (8px) |
+| `--space-3` | 0.75rem (12px) |
+| `--space-4` | 1rem (16px) |
+| `--space-5` | 1.25rem (20px) |
+| `--space-6` | 1.5rem (24px) |
+| `--space-8` | 2rem (32px) |
+| `--space-10` | 2.5rem (40px) |
+| `--space-12` | 3rem (48px) |
+| `--space-16` | 4rem (64px) |
+
+### Layout
+
+| Variable | Value | Role |
+| --- | --- | --- |
+| `--layout-max-width` | 64rem | Signed-in page max-width (header bar, main) |
+| `--auth-minimal-width` | 460px | Sign-in/sign-up centred column |
+| `--auth-frame-inner-width` | 400px | Form column inside `.auth-frame__body` |
+| `--flash-min-width` | 280px | Min width of `.flash` toast |
+| `--flash-max-width` | 480px | Max width of `.flash` toast |
+
+### Effects
+
+| Variable | Value | Role |
+| --- | --- | --- |
+| `--shadow-card` | `0 4px 12px rgba(0,0,0,0.08)` light / `(…,0.4)` dark | Floating surfaces (`.flash`, future popovers) |
+
 ## Typography
 
 | Class | Use |
@@ -88,8 +127,8 @@ self-host them under `app/assets/fonts/` and extend the stack with
 | `.serif` / `.sans` / `.mono` | Family helpers |
 | `.t-eyebrow` | Small mono-caps label above a section ("§ Sign in") |
 | `.t-eyebrow--accent` | Modifier — same, coloured terracotta for marker eyebrows |
-| `.t-headline` | 38px serif page heading |
-| `.t-headline--xl` | 40px variant for landing hero |
+| `.t-headline` | 32px serif page heading (`--fs-headline`) |
+| `.t-headline--xl` | 40px variant for landing hero (`--fs-hero`) |
 | `.t-lede` | Italic serif subtitle paragraph |
 | `.t-lede--lg` | 17px variant |
 
@@ -135,17 +174,30 @@ wrapping the input in a `<label>`). Implicit labelling breaks when the
 header row also contains an interactive element like a "Forgot?" link —
 `<a>` inside `<label>` is invalid HTML.
 
+Single-line inline errors (e.g. authentication failures, where there's one
+message rather than a list) render as `<p class="flash-error">`. Mono
+caption text in `--accent-ink`. Use `.error-summary` (below) when surfacing
+per-field validation failures.
+
 ### Flash messages
 
 Rendered automatically by `shared/_flash` from the layout. Appears fixed at
 top-centre. Levels: `notice` (ok-green rail), `alert` (accent rail). Unknown
-flash keys are rendered as `alert` (the defensive fallback).
+flash keys are rendered as `alert` (the defensive fallback). The partial
+intentionally skips `:error` — those are rendered inline by views (see
+`flash-error` above) so the user sees the message next to the form they
+failed.
 
 Controller code stays standard Rails:
 
 ```ruby
 redirect_to new_session_path, notice: "Password has been reset"
 ```
+
+Multiple simultaneous flash messages stack visually at the same fixed
+position; the current usage is one message at a time. If a flow ever fires
+both `:notice` and `:alert` in the same response, add a stacking offset to
+the component.
 
 ### Error summary (inline form errors)
 
@@ -261,12 +313,61 @@ the count is zero — the column only appears when it has a signal to carry.
 
 - `.rule-fill` — horizontal divider that expands to fill remaining flex space (used in the dateline)
 
+### Data table
+
+Plain editorial table for admin views (member list, future audit logs).
+Mono eyebrow headers, sans-serif body cells, hairline `--rule-soft` row
+separators. No zebra stripes — the rules carry the rhythm.
+
+```erb
+<table class="data-table" aria-labelledby="members-heading">
+  <thead>
+    <tr>
+      <th scope="col">Nume</th>
+      <th scope="col">Email</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><td>Ana</td><td>ana@example.com</td></tr>
+  </tbody>
+</table>
+```
+
+### Empty state
+
+Used when a collection view (catalog, future shelf views) has nothing to
+display. Big serif display headline + italic serif lede, centred, with
+generous vertical breathing room (`--space-16`).
+
+```erb
+<div class="empty-state">
+  <h1 class="empty-state__title">Bibliotecă</h1>
+  <p class="empty-state__body">Niciun titlu disponibil</p>
+</div>
+```
+
+### Theme toggle
+
+Single icon-button that flips `.dark` on `<html>` and persists the choice
+to `localStorage` under the key `theme` (`light` / `dark`). On first visit
+with no stored preference, the system's `prefers-color-scheme` decides.
+Rendered from `shared/_theme_toggle` in both the site header and the
+`.auth-minimal__nav`. FOUC is prevented by an inline `<script>` in
+`application.html.erb` that reads `localStorage` and applies the class
+before the body parses.
+
+```erb
+<%= render "shared/theme_toggle" %>
+```
+
 ## Dark mode
 
-Toggle by adding the `.dark` class on `<body>` or any ancestor. All tokens
+Toggle by adding the `.dark` class on `<html>` or any ancestor. All tokens
 re-resolve. No separate component classes needed.
 
-A theme switcher isn't wired to UI yet — add it when the reader lands.
+The UI toggle lives in `app/views/shared/_theme_toggle.html.erb` and is
+backed by the Stimulus controller `app/javascript/controllers/theme_controller.js`.
+See the *Theme toggle* component above.
 
 ## Adding to the system
 

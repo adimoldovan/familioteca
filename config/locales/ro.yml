@@ -33,3 +33,6 @@ ro:
     primary: "Navigare principală"
     catalog: "Bibliotecă"
     admin: "Administrare"
+
+  theme:
+    toggle: "Schimbă tema"
