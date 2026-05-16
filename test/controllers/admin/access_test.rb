@@ -1,7 +1,7 @@
 require "test_helper"
 
-class Admin::MembersControllerTest < ActionDispatch::IntegrationTest
-  test "admin can reach /admin/members" do
+class Admin::AccessTest < ActionDispatch::IntegrationTest
+  test "admin reaches /admin/members successfully" do
     sign_in_as members(:admin)
     get admin_members_path
     assert_response :success

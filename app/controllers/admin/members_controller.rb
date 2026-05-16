@@ -1,7 +1,5 @@
 module Admin
-  class MembersController < ApplicationController
-    before_action :require_admin
-
+  class MembersController < BaseController
     def index
       head :ok
     end
