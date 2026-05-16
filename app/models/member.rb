@@ -2,6 +2,7 @@ class Member < ApplicationRecord
   EMAIL_FORMAT = URI::MailTo::EMAIL_REGEXP
 
   has_secure_password
+  has_many :sessions, dependent: :destroy
 
   normalizes :email, with: ->(e) { e.strip.downcase }
   normalizes :kindle_email, with: ->(e) { e.blank? ? nil : e.strip.downcase }

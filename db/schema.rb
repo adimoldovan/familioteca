@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_05_16_170544) do
+ActiveRecord::Schema[8.1].define(version: 2026_05_16_184602) do
   create_table "members", force: :cascade do |t|
     t.boolean "admin", default: false, null: false
     t.datetime "created_at", null: false
@@ -21,4 +21,17 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_16_170544) do
     t.datetime "updated_at", null: false
     t.index ["email"], name: "index_members_on_email", unique: true
   end
+
+  create_table "sessions", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "ip_address"
+    t.integer "member_id", null: false
+    t.string "token", null: false
+    t.datetime "updated_at", null: false
+    t.string "user_agent"
+    t.index ["member_id"], name: "index_sessions_on_member_id"
+    t.index ["token"], name: "index_sessions_on_token", unique: true
+  end
+
+  add_foreign_key "sessions", "members"
 end
