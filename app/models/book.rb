@@ -7,4 +7,15 @@ class Book < ApplicationRecord
   validates :object_key, presence: true, uniqueness: true
   validates :format, presence: true, inclusion: { in: FORMATS }
   validates :ingested_at, presence: true
+
+  before_validation :populate_search_columns
+
+  private
+
+  def populate_search_columns
+    self.sort_title = DiacriticFolding.fold(title.to_s)
+    self.searchable = DiacriticFolding.fold(
+      [ title, author, description ].compact_blank.join(" ")
+    )
+  end
 end
