@@ -4,6 +4,7 @@ set -euo pipefail
 PORT="${PORT:-3005}"
 BIND="${BIND:-127.0.0.1}"
 DEV_URL="http://localhost:$PORT/"
+ADMIN_LOGIN="${FAMILIOTECA_ADMIN_EMAIL:-admin@familioteca.local} / ${FAMILIOTECA_ADMIN_PASSWORD:-changeme123}"
 DEMO_LOGIN="demo@familioteca.local / password"
 
 if [ -t 1 ]; then
@@ -20,7 +21,8 @@ fi
 
 printf "\n"
 printf " %b %bURL%b     %b%s%b\n" "$c_bar" "$c_label" "$c_reset" "$c_url" "$DEV_URL" "$c_reset"
-printf " %b %bLogin%b   %s\n" "$c_bar" "$c_label" "$c_reset" "$DEMO_LOGIN"
+printf " %b %bAdmin%b   %s\n" "$c_bar" "$c_label" "$c_reset" "$ADMIN_LOGIN"
+printf " %b %bDemo%b    %s\n" "$c_bar" "$c_label" "$c_reset" "$DEMO_LOGIN"
 printf "\n"
 
 bin/rails tailwindcss:watch &
