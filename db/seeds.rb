@@ -11,3 +11,11 @@ Member.find_or_create_by!(email: admin_email) do |m|
   m.name = admin_name
   m.admin = true
 end
+
+unless Rails.env.production?
+  Member.find_or_create_by!(email: "demo@familioteca.local") do |m|
+    m.password = "password"
+    m.name = "Demo"
+    m.admin = false
+  end
+end
