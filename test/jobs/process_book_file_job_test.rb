@@ -86,6 +86,50 @@ class ProcessBookFileJobTest < ActiveJob::TestCase
     assert_equal "Doi Ani de Vacanță", book.title
   end
 
+  test "does not retry programming errors" do
+    with_default_storage(->(_) { raise NoMethodError, "boom" }) do
+      perform_enqueued_jobs do
+        assert_raises(NoMethodError) do
+          ProcessBookFileJob.perform_later("any/key.epub")
+        end
+      end
+    end
+  end
+
+  test "retries transient S3 networking errors" do
+    attempts = 0
+    downloader = ->(_) {
+      attempts += 1
+      raise Seahorse::Client::NetworkingError.new(IOError.new("connection reset"))
+    }
+
+    with_default_storage(downloader) do
+      perform_enqueued_jobs do
+        assert_raises(Seahorse::Client::NetworkingError) do
+          ProcessBookFileJob.perform_later("any/key.epub")
+        end
+      end
+    end
+    assert_equal 3, attempts
+  end
+
+  test "does not retry permanent S3 errors like NoSuchKey" do
+    attempts = 0
+    downloader = ->(_) {
+      attempts += 1
+      raise Aws::S3::Errors::NoSuchKey.new(nil, "object missing")
+    }
+
+    with_default_storage(downloader) do
+      perform_enqueued_jobs do
+        assert_raises(Aws::S3::Errors::NoSuchKey) do
+          ProcessBookFileJob.perform_later("missing/key.epub")
+        end
+      end
+    end
+    assert_equal 1, attempts
+  end
+
   test "is idempotent — re-running clears missing_since but does not duplicate" do
     storage = stub_storage("k/a.epub", FIXTURES.join("well-tagged.epub"))
 
@@ -101,6 +145,18 @@ class ProcessBookFileJobTest < ActiveJob::TestCase
   end
 
   private
+
+  def with_default_storage(downloader)
+    fake = Object.new
+    fake.define_singleton_method(:download) { |key| downloader.call(key) }
+    original = BookStorage.method(:default)
+    BookStorage.define_singleton_method(:default) { fake }
+    begin
+      yield
+    ensure
+      BookStorage.define_singleton_method(:default, original)
+    end
+  end
 
   # Returns a stub that copies the fixture into a fresh tempfile per call.
   # Two reasons we don't return the fixture path directly:

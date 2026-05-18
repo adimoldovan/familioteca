@@ -1,7 +1,17 @@
 class ProcessBookFileJob < ApplicationJob
   queue_as :default
 
-  retry_on StandardError, wait: :polynomially_longer, attempts: 3
+  # Only retry transient infrastructure failures. Programming errors
+  # (NoMethodError, ArgumentError, etc.) and permanent S3 errors
+  # (NoSuchKey, AccessDenied) should fail fast and surface in logs rather
+  # than burn three queue slots before giving up.
+  retry_on Seahorse::Client::NetworkingError,
+           Aws::S3::Errors::RequestTimeout,
+           Aws::S3::Errors::ServiceUnavailable,
+           Aws::S3::Errors::SlowDown,
+           Aws::S3::Errors::InternalError,
+           wait: :polynomially_longer,
+           attempts: 3
 
   # SVG is intentionally excluded — Active Storage can serve allowed image
   # types inline, and inline SVG can execute embedded scripts. Anything not
