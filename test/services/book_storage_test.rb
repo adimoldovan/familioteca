@@ -39,4 +39,56 @@ class BookStorageTest < ActiveSupport::TestCase
     assert_kind_of String, url
     assert_includes url, "a.epub"
   end
+
+  test ".bucket_name uses FAMILIOTECA_BUCKET_NAME when set" do
+    with_env("FAMILIOTECA_BUCKET_NAME" => "explicit-bucket") do
+      assert_equal "explicit-bucket", BookStorage.bucket_name
+    end
+  end
+
+  test ".bucket_name falls back to familioteca-<env> outside production when env var is unset" do
+    with_env("FAMILIOTECA_BUCKET_NAME" => nil) do
+      assert_equal "familioteca-test", BookStorage.bucket_name
+    end
+  end
+
+  test ".bucket_name raises in production when env var is unset" do
+    with_env("FAMILIOTECA_BUCKET_NAME" => nil) do
+      with_rails_env("production") do
+        error = assert_raises(RuntimeError) { BookStorage.bucket_name }
+        assert_match(/FAMILIOTECA_BUCKET_NAME is required/, error.message)
+      end
+    end
+  end
+
+  test ".bucket_name raises in production when env var is empty string" do
+    with_env("FAMILIOTECA_BUCKET_NAME" => "") do
+      with_rails_env("production") do
+        error = assert_raises(RuntimeError) { BookStorage.bucket_name }
+        assert_match(/FAMILIOTECA_BUCKET_NAME is required/, error.message)
+      end
+    end
+  end
+
+  private
+
+  def with_env(values)
+    original = values.each_key.to_h { |k| [ k, ENV.key?(k) ? ENV[k] : :__unset__ ] }
+    values.each { |k, v| v.nil? ? ENV.delete(k) : ENV[k] = v }
+    yield
+  ensure
+    original.each do |k, v|
+      v == :__unset__ ? ENV.delete(k) : ENV[k] = v
+    end
+  end
+
+  # Safe only under process-based parallelism (the default). Rails.env is
+  # process-global; do not use with :threads parallelism.
+  def with_rails_env(env)
+    original = Rails.env
+    Rails.env = env
+    yield
+  ensure
+    Rails.env = original
+  end
 end

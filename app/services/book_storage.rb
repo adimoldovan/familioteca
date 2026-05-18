@@ -11,7 +11,10 @@ class BookStorage
   end
 
   def self.bucket_name
-    ENV["FAMILIOTECA_BUCKET_NAME"] || "familioteca-#{Rails.env}"
+    name = ENV["FAMILIOTECA_BUCKET_NAME"].presence
+    return name if name
+    raise "FAMILIOTECA_BUCKET_NAME is required in production" if Rails.env.production?
+    "familioteca-#{Rails.env}"
   end
 
   def initialize(bucket:, client: Aws::S3::Client.new)
