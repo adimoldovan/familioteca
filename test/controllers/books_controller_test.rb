@@ -22,6 +22,9 @@ class BooksControllerTest < ActionDispatch::IntegrationTest
     get root_path
     titles = css_select(".book-card__title").map(&:text)
     assert_equal [ "Bizanț", "Țara" ], titles
+
+    get root_path(q: "   ")
+    assert_select ".book-card__title", count: 2
   end
 
   test "excludes books with missing_since set" do
@@ -42,5 +45,35 @@ class BooksControllerTest < ActionDispatch::IntegrationTest
 
     get root_path
     assert_select ".book-card__title", count: 1, text: "Visible"
+  end
+
+  test "search filters books by diacritic-insensitive match" do
+    sign_in_as members(:ana)
+    Book.create!(title: "Bizanț", format: "epub", object_key: "k1", ingested_at: Time.current)
+    Book.create!(title: "Cluj",   format: "epub", object_key: "k2", ingested_at: Time.current)
+
+    get root_path(q: "bizant")
+    assert_select ".book-card__title", count: 1, text: "Bizanț"
+  end
+
+  test "search renders a no-results message when nothing matches" do
+    sign_in_as members(:ana)
+    Book.create!(title: "Bizanț", format: "epub", object_key: "k1", ingested_at: Time.current)
+
+    get root_path(q: "xxnomatchxx")
+    assert_select ".empty-state", text: /xxnomatchxx/
+  end
+
+  test "search preserves the query in the input field" do
+    sign_in_as members(:ana)
+    get root_path(q: "verne")
+    assert_select "input[type=search][value=?]", "verne"
+  end
+
+  test "search escapes HTML in the query in the no-results message" do
+    sign_in_as members(:ana)
+    get root_path(q: "<script>alert(1)</script>")
+    assert_select ".empty-state__body"
+    assert_no_match(/<script>/, response.body)
   end
 end

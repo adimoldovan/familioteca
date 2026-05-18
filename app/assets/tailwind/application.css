@@ -655,6 +655,40 @@ html, body {
     margin-bottom: var(--space-6);
   }
 
+  .catalog-search {
+    display: flex;
+    align-items: flex-end;
+    gap: var(--space-3);
+    margin-top: var(--space-4);
+  }
+
+  .catalog-search__label {
+    font-family: var(--mono);
+    font-size: var(--fs-eyebrow);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--ink-3);
+  }
+
+  .catalog-search__input {
+    flex: 1;
+    font-family: var(--serif);
+    font-size: var(--fs-lede);
+    color: var(--ink);
+    background-color: transparent;
+    border: none;
+    border-bottom: 1px solid var(--rule);
+    padding-block: var(--space-2);
+    outline: none;
+    transition: border-color 120ms ease;
+  }
+
+  .catalog-search__input:focus {
+    border-bottom-color: var(--accent);
+    outline: 2px solid transparent;
+    outline-offset: 2px;
+  }
+
   .book-grid {
     list-style: none;
     padding: 0;

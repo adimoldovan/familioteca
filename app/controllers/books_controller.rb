@@ -1,5 +1,6 @@
 class BooksController < ApplicationController
   def index
-    @books = Book.visible.with_attached_cover.order(:sort_title)
+    @query = params[:q].to_s.strip
+    @books = Book.visible.with_attached_cover.search(@query).order(:sort_title)
   end
 end
