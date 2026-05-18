@@ -50,8 +50,21 @@ ro:
           missing: "Lipsește din arhivă"
           needs_metadata: "Date incomplete"
         edit_link: "Editează"
+      edit:
+        title: "Editează cartea"
+        cancel: "Anulează"
+        submit: "Salvează"
+        errors_title: "Erori"
       update:
         success: "Carte actualizată."
+      fields:
+        title: "Titlu"
+        author: "Autor"
+        language: "Limbă"
+        publisher: "Editură"
+        published_year: "An apariție"
+        isbn: "ISBN"
+        description: "Descriere"
 
   navigation:
     primary: "Navigare principală"

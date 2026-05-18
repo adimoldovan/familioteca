@@ -639,4 +639,15 @@ html, body {
     color: var(--accent);
     border-bottom-color: var(--accent);
   }
+
+  .admin-book-form {
+    max-width: 640px;
+  }
+
+  .admin-book-form__actions {
+    display: flex;
+    gap: var(--space-3);
+    justify-content: flex-end;
+    margin-top: var(--space-6);
+  }
 }
