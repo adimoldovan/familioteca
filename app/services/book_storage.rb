@@ -1,0 +1,60 @@
+require "aws-sdk-s3"
+require "tempfile"
+
+class BookStorage
+  # Memoized at the class level — fine because the underlying Aws::S3::Client
+  # is thread-safe and tests inject their own stub via the `storage:` kwarg
+  # on jobs rather than touching `.default`. If a future test calls `.default`
+  # directly, reset with `BookStorage.instance_variable_set(:@default, nil)`.
+  def self.default
+    @default ||= new(bucket: bucket_name)
+  end
+
+  def self.bucket_name
+    ENV["FAMILIOTECA_BUCKET_NAME"] || "familioteca-#{Rails.env}"
+  end
+
+  def initialize(bucket:, client: Aws::S3::Client.new)
+    @bucket = bucket
+    @client = client
+  end
+
+  def list
+    keys = []
+    continuation = nil
+    loop do
+      params = { bucket: @bucket }
+      params[:continuation_token] = continuation if continuation
+      response = @client.list_objects_v2(**params)
+      response.contents.each { |obj| keys << obj.key }
+      break unless response.is_truncated
+      continuation = response.next_continuation_token
+    end
+    keys
+  end
+
+  # Returns a path. The caller owns the file and must delete it.
+  # We detach Tempfile's GC finalizer so the file survives until the caller
+  # cleans up explicitly (jobs do this in an `ensure` block).
+  def download(key)
+    file = Tempfile.new([ "familioteca-", File.extname(key) ])
+    file.binmode
+    ObjectSpace.undefine_finalizer(file)
+    @client.get_object(bucket: @bucket, key: key) do |chunk|
+      file.write(chunk)
+    end
+    file.close
+    file.path
+  end
+
+  def presigned_url(key, expires_in:)
+    signer = Aws::S3::Presigner.new(client: @client)
+    signer.presigned_url(:get_object, bucket: @bucket, key: key, expires_in: expires_in)
+  end
+
+  private
+
+  # Test seam: lets specs reach the underlying client via `send(:client)`
+  # to install `stub_responses` without exposing it publicly.
+  attr_reader :client
+end
