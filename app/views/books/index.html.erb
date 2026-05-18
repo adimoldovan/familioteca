@@ -1,4 +1,15 @@
-<div class="empty-state">
-  <h1 class="empty-state__title"><%= t("books.index.title") %></h1>
-  <p class="empty-state__body"><%= t("books.index.empty") %></p>
-</div>
+<header class="catalog-header">
+  <h1 class="t-headline"><%= t(".title") %></h1>
+</header>
+
+<% if @books.empty? %>
+  <div class="empty-state">
+    <p class="empty-state__body"><%= t(".empty") %></p>
+  </div>
+<% else %>
+  <ul class="book-grid">
+    <% @books.each do |book| %>
+      <li class="book-grid__item"><%= render "card", book: book %></li>
+    <% end %>
+  </ul>
+<% end %>

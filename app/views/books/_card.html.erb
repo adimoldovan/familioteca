@@ -1,0 +1,17 @@
+<div class="book-card" id="book-card-<%= book.id %>">
+  <div class="book-card__cover">
+    <% if book.cover.attached? %>
+      <%= image_tag book.cover, class: "book-card__cover-img", alt: "" %>
+    <% else %>
+      <div class="book-card__cover-placeholder" aria-hidden="true">
+        <span class="book-card__cover-glyph">📖</span>
+      </div>
+    <% end %>
+  </div>
+  <div class="book-card__body">
+    <p class="book-card__title"><%= book.title %></p>
+    <% if book.author.present? %>
+      <p class="book-card__author"><%= book.author %></p>
+    <% end %>
+  </div>
+</div>
