@@ -10,6 +10,6 @@ CI.run do
   step "Security: Brakeman code analysis", "bin/brakeman --quiet --no-pager --exit-on-warn --exit-on-error"
   # step "Docs: OpenAPI spec up to date and valid", "bin/rails openapi:check"
   step "Tests: Rails", "bin/rails test"
-  # step "Tests: JavaScript", "npm run test:js"
+  step "Tests: JavaScript", "npm run test:js"
   step "Tests: End-to-End", "npm run test:e2e"
 end

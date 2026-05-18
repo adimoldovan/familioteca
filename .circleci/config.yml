@@ -94,16 +94,16 @@ jobs:
           environment:
             RAILS_ENV: test
 
-  # test_js:
-  #   docker:
-  #     - image: cimg/node:22.20
-  #   steps:
-  #     - checkout
-  #     - node/install-packages:
-  #         pkg-manager: npm
-  #     - run:
-  #         name: Run JavaScript unit tests
-  #         command: npm run test:js
+  test_js:
+    docker:
+      - image: cimg/node:22.20
+    steps:
+      - checkout
+      - node/install-packages:
+          pkg-manager: npm
+      - run:
+          name: Run JavaScript unit tests
+          command: npm run test:js
 
   e2e:
     docker:
@@ -160,12 +160,12 @@ workflows:
           requires: [changes]
       - test:
           requires: [changes]
-      # - test_js:
-      #     requires: [changes]
+      - test_js:
+          requires: [changes]
       - e2e:
           requires: [changes]
       - trigger-deploy:
-          requires: [scan_ruby, scan_js, lint, test, e2e]
+          requires: [scan_ruby, scan_js, lint, test, test_js, e2e]
           filters:
             branches:
               only: main

@@ -1,6 +1,6 @@
 import { Controller } from "@hotwired/stimulus"
 
-const STORAGE_KEY = "theme"
+export const STORAGE_KEY = "theme"
 const DARK = "dark"
 const LIGHT = "light"
 
