@@ -22,6 +22,17 @@ ro:
         placeholder: "Titlu, autor, descriere…"
         submit: "Caută"
         no_results: 'Niciun rezultat pentru „%{query}".'
+    show:
+      back_to_catalog: "← Înapoi la bibliotecă"
+      meta:
+        author: "Autor"
+        publisher: "Editură"
+        published_year: "An apariție"
+        language: "Limbă"
+        format: "Format"
+        isbn: "ISBN"
+      description_title: "Descriere"
+      no_description: "Nicio descriere disponibilă."
 
   admin:
     ingestions:

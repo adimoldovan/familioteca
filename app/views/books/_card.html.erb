@@ -1,4 +1,4 @@
-<div class="book-card" id="book-card-<%= book.id %>">
+<%= link_to book_path(book), class: "book-card", id: "book-card-#{book.id}" do %>
   <div class="book-card__cover">
     <% if book.cover.attached? %>
       <%= image_tag book.cover, class: "book-card__cover-img", alt: "" %>
@@ -14,4 +14,4 @@
       <p class="book-card__author"><%= book.author %></p>
     <% end %>
   </div>
-</div>
+<% end %>

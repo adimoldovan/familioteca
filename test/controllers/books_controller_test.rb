@@ -76,4 +76,42 @@ class BooksControllerTest < ActionDispatch::IntegrationTest
     assert_select ".empty-state__body"
     assert_no_match(/<script>/, response.body)
   end
+
+  test "shows a book's full metadata" do
+    sign_in_as members(:ana)
+    book = Book.create!(
+      title: "Doi Ani de Vacanță",
+      author: "Jules Verne",
+      publisher: "Editura Test",
+      published_year: 1888,
+      language: "ro",
+      isbn: "9781234567890",
+      description: "Un grup de elevi naufragiază pe o insulă.",
+      format: "epub",
+      object_key: "k",
+      ingested_at: Time.current
+    )
+
+    get book_path(book)
+    assert_response :success
+    assert_select "h1", text: /Doi Ani de Vacanță/
+    assert_select "dt", text: "Autor"
+    assert_select "dd", text: "Jules Verne"
+    assert_select "dd", text: "1888"
+    assert_select "dd", text: "EPUB"
+  end
+
+  test "show is protected by auth" do
+    book = Book.create!(title: "T", format: "epub", object_key: "k", ingested_at: Time.current)
+    get book_path(book)
+    assert_redirected_to sign_in_path
+  end
+
+  test "show returns 404 for a non-visible book" do
+    sign_in_as members(:ana)
+    book = Book.create!(title: "Hidden", format: "epub", object_key: "k",
+                        ingested_at: Time.current, missing_since: Time.current)
+    get book_path(book)
+    assert_response :not_found
+  end
 end

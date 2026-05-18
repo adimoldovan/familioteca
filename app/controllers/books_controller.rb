@@ -3,4 +3,8 @@ class BooksController < ApplicationController
     @query = params[:q].to_s.strip
     @books = Book.visible.with_attached_cover.search(@query).order(:sort_title)
   end
+
+  def show
+    @book = Book.visible.with_attached_cover.find(params[:id])
+  end
 end

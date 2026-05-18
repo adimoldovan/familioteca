@@ -1,0 +1,51 @@
+<%= link_to t(".back_to_catalog"), root_path, class: "book-show__back" %>
+
+<article class="book-show">
+  <aside class="book-show__cover">
+    <% if @book.cover.attached? %>
+      <%= image_tag @book.cover, class: "book-show__cover-img", alt: @book.title %>
+    <% else %>
+      <div class="book-show__cover-placeholder" aria-hidden="true">
+        <span>📖</span>
+      </div>
+    <% end %>
+  </aside>
+
+  <div class="book-show__body">
+    <h1 class="t-headline"><%= @book.title %></h1>
+
+    <dl class="book-show__meta">
+      <% if @book.author.present? %>
+        <dt><%= t(".meta.author") %></dt>
+        <dd><%= @book.author %></dd>
+      <% end %>
+      <% if @book.publisher.present? %>
+        <dt><%= t(".meta.publisher") %></dt>
+        <dd><%= @book.publisher %></dd>
+      <% end %>
+      <% if @book.published_year.present? %>
+        <dt><%= t(".meta.published_year") %></dt>
+        <dd><%= @book.published_year %></dd>
+      <% end %>
+      <% if @book.language.present? %>
+        <dt><%= t(".meta.language") %></dt>
+        <dd><%= @book.language %></dd>
+      <% end %>
+      <% if @book.isbn.present? %>
+        <dt><%= t(".meta.isbn") %></dt>
+        <dd><%= @book.isbn %></dd>
+      <% end %>
+      <dt><%= t(".meta.format") %></dt>
+      <dd><%= @book.format.upcase %></dd>
+    </dl>
+
+    <section class="book-show__description">
+      <h2 class="t-eyebrow"><%= t(".description_title") %></h2>
+      <% if @book.description.present? %>
+        <%= simple_format(@book.description) %>
+      <% else %>
+        <p class="t-lede"><%= t(".no_description") %></p>
+      <% end %>
+    </section>
+  </div>
+</article>
