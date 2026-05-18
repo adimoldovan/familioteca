@@ -8,6 +8,7 @@ Rails.application.routes.draw do
   namespace :admin do
     resources :members, only: [ :index ]
     resources :ingestions, only: [ :create ]
+    resources :books, only: [ :index, :edit, :update ]
   end
 
   root "books#index"

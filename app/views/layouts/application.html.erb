@@ -42,7 +42,7 @@
           <nav class="site-header__nav" aria-label="<%= t("navigation.primary") %>">
             <%= link_to t("navigation.catalog"), root_path, id: "nav-catalog" %>
             <% if current_member.admin? %>
-              <%= link_to t("navigation.admin"), admin_members_path, id: "nav-admin" %>
+              <%= link_to t("navigation.admin"), admin_books_path, id: "nav-admin" %>
             <% end %>
           </nav>
           <div class="site-header__account">

@@ -21,7 +21,7 @@ class LayoutTest < ActionDispatch::IntegrationTest
   test "layout shows admin link for admins" do
     sign_in_as members(:admin)
     get root_path
-    assert_select "a", I18n.t("navigation.admin")
+    assert_select "a#nav-admin[href=?]", admin_books_path, text: I18n.t("navigation.admin")
   end
 
   test "layout shows sign-out button when signed in" do

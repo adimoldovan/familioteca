@@ -32,6 +32,26 @@ ro:
         role: "Rol"
         admin: "Administrator"
         member: "Membru"
+    books:
+      index:
+        title: "Toate cărțile"
+        filter:
+          label: "Filtre"
+          all: "Toate"
+          needs_metadata: "Necesită metadate"
+        table:
+          title: "Titlu"
+          author: "Autor"
+          format: "Format"
+          status: "Stare"
+          actions: "Acțiuni"
+        status:
+          ok: "OK"
+          missing: "Lipsește din arhivă"
+          needs_metadata: "Date incomplete"
+        edit_link: "Editează"
+      update:
+        success: "Carte actualizată."
 
   navigation:
     primary: "Navigare principală"

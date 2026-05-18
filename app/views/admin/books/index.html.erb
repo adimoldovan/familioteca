@@ -1,0 +1,43 @@
+<%= render "admin/scan_button" %>
+
+<h1 id="books-heading" class="t-headline"><%= t(".title") %></h1>
+
+<nav class="admin-filter" aria-label="<%= t(".filter.label") %>">
+  <%= link_to t(".filter.all"), admin_books_path,
+        class: "admin-filter__link #{'admin-filter__link--active' if @filter.blank?}" %>
+  <%= link_to t(".filter.needs_metadata"), admin_books_path(filter: "needs_metadata"),
+        class: "admin-filter__link #{'admin-filter__link--active' if @filter == 'needs_metadata'}" %>
+</nav>
+
+<table class="data-table" aria-labelledby="books-heading">
+  <thead>
+    <tr>
+      <th scope="col"><%= t(".table.title") %></th>
+      <th scope="col"><%= t(".table.author") %></th>
+      <th scope="col"><%= t(".table.format") %></th>
+      <th scope="col"><%= t(".table.status") %></th>
+      <th scope="col"><%= t(".table.actions") %></th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @books.each do |book| %>
+      <tr>
+        <td><%= book.title %></td>
+        <td><%= book.author || "—" %></td>
+        <td><%= book.format.upcase %></td>
+        <td>
+          <% if book.missing? %>
+            <%= t(".status.missing") %>
+          <% elsif book.parse_error.present? %>
+            <%= t(".status.needs_metadata") %>
+          <% else %>
+            <%= t(".status.ok") %>
+          <% end %>
+        </td>
+        <td>
+          <%= link_to t(".edit_link"), edit_admin_book_path(book), class: "link-accent" %>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
