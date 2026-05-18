@@ -19,6 +19,10 @@ ro:
       empty: "Niciun titlu disponibil"
 
   admin:
+    ingestions:
+      scan_now: "Scanează acum"
+      scanning: "Se scanează…"
+      queued: "Scanare în curs. Cărțile noi vor apărea când sunt procesate."
     members:
       index:
         title: "Membri"

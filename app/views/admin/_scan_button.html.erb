@@ -1,0 +1,12 @@
+<div id="admin-scan-button" class="scan-button">
+  <% if local_assigns[:scanning] %>
+    <span class="scan-button__status"><%= t("admin.ingestions.scanning") %></span>
+  <% else %>
+    <%= button_to t("admin.ingestions.scan_now"), admin_ingestions_path,
+          method: :post,
+          class: "btn btn-secondary",
+          id: "scan-now-button",
+          data: { turbo_submits_with: t("admin.ingestions.scanning") },
+          form: { data: { turbo_stream: true } } %>
+  <% end %>
+</div>

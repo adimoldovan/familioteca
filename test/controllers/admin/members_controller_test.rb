@@ -18,5 +18,6 @@ class Admin::MembersControllerTest < ActionDispatch::IntegrationTest
     assert_select "td", text: "Membru", count: 1
     assert_select "tbody tr td:nth-child(3)", text: "ana@kindle.com", count: 1
     assert_select "tbody tr td:nth-child(3)", text: "—", count: 1
+    assert_select "#admin-scan-button #scan-now-button"
   end
 end
