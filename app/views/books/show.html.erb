@@ -2,7 +2,7 @@
 
 <article class="book-show">
   <aside class="book-show__cover">
-    <% if @book.cover.attached? %>
+    <% if @book.cover.attached? && @book.cover.variable? %>
       <%= image_tag @book.cover, class: "book-show__cover-img", alt: @book.title %>
     <% else %>
       <div class="book-show__cover-placeholder" aria-hidden="true">

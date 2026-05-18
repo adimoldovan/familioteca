@@ -3,6 +3,17 @@ class ProcessBookFileJob < ApplicationJob
 
   retry_on StandardError, wait: :polynomially_longer, attempts: 3
 
+  # SVG is intentionally excluded — Active Storage can serve allowed image
+  # types inline, and inline SVG can execute embedded scripts. Anything not
+  # in this table is downgraded to application/octet-stream + .bin so the
+  # blob is served as a download rather than rendered.
+  COVER_EXTENSION_BY_CONTENT_TYPE = {
+    "image/png"  => ".png",
+    "image/jpeg" => ".jpg",
+    "image/gif"  => ".gif",
+    "image/webp" => ".webp"
+  }.freeze
+
   def perform(object_key, storage: BookStorage.default)
     path = storage.download(object_key)
     result = Ebook::Parser.call(path, object_key: object_key)
@@ -25,14 +36,31 @@ class ProcessBookFileJob < ApplicationJob
     )
     book.save!
 
-    if result[:cover_io] && !book.cover.attached?
-      book.cover.attach(
-        io: result[:cover_io],
-        filename: "#{book.id}-cover.png",
-        content_type: "image/png"
-      )
-    end
+    attach_cover(book, result) if result[:cover_io] && !book.cover.attached?
   ensure
     File.delete(path) if path && File.exist?(path)
+  end
+
+  private
+
+  def attach_cover(book, result)
+    declared  = result[:cover_content_type].presence
+    extension = COVER_EXTENSION_BY_CONTENT_TYPE[declared]
+    if extension
+      content_type = declared
+    else
+      content_type = "application/octet-stream"
+      extension    = ".bin"
+    end
+    # identify: false so Active Storage trusts the type we chose. Otherwise
+    # Marcel would re-sniff the bytes and could promote a malicious cover
+    # (e.g. SVG mislabelled as image/png by the EPUB) back to an
+    # executable type that gets served inline.
+    book.cover.attach(
+      io: result[:cover_io],
+      filename: "#{book.id}-cover#{extension}",
+      content_type: content_type,
+      identify: false
+    )
   end
 end

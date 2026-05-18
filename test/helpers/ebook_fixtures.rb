@@ -28,6 +28,10 @@ module EbookFixtures
     png_chunk("IEND", "".b)
   ).freeze
 
+  # JFIF header + EOI. Enough for Marcel/libmagic to sniff as image/jpeg
+  # without needing a full decodable JPEG (we never render these in tests).
+  COVER_JPEG = "\xFF\xD8\xFF\xE0\x00\x10JFIF\x00\x01\x01\x00\x00\x01\x00\x01\x00\x00\xFF\xD9".b.freeze
+
   def self.generate_all
     FileUtils.mkdir_p(DIR)
 
@@ -56,6 +60,14 @@ module EbookFixtures
       # language, description, publisher, ISBN are intentionally omitted.
       book.identifier = "id:bare"
       book.title      = "Untitled"
+      book.ordered { book.add_item("ch1.xhtml", content: StringIO.new("<html><body>x</body></html>")) }
+    end
+
+    write("jpeg-cover.epub") do |book|
+      book.identifier = "id:jpg-cover"
+      book.title      = "Carte cu Copertă JPEG"
+      book.creator    = "Autor Test"
+      book.add_item("cover.jpg", content: StringIO.new(COVER_JPEG)).cover_image
       book.ordered { book.add_item("ch1.xhtml", content: StringIO.new("<html><body>x</body></html>")) }
     end
 

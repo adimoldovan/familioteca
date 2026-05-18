@@ -1,7 +1,7 @@
 <%= link_to book_path(book), class: "book-card", id: "book-card-#{book.id}" do %>
   <div class="book-card__cover">
-    <% if book.cover.attached? %>
-      <%= image_tag book.cover_thumbnail, class: "book-card__cover-img", alt: book.title, loading: "lazy" %>
+    <% if (thumb = book.cover_thumbnail) %>
+      <%= image_tag thumb, class: "book-card__cover-img", alt: book.title, loading: "lazy" %>
     <% else %>
       <div class="book-card__cover-placeholder" aria-hidden="true">
         <span class="book-card__cover-glyph">📖</span>

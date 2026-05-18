@@ -16,8 +16,44 @@ class ProcessBookFileJobTest < ActiveJob::TestCase
     assert_equal "Jules Verne", book.author
     assert_equal "epub", book.format
     assert book.cover.attached?
+    assert_equal "image/png", book.cover.blob.content_type
+    assert_equal "#{book.id}-cover.png", book.cover.blob.filename.to_s
     refute_nil book.ingested_at
     assert_nil book.parse_error
+  end
+
+  test "attaches JPEG covers with the right content_type and extension" do
+    storage = stub_storage("test/jpeg.epub", FIXTURES.join("jpeg-cover.epub"))
+
+    ProcessBookFileJob.new.perform("test/jpeg.epub", storage: storage)
+
+    book = Book.find_by!(object_key: "test/jpeg.epub")
+    assert book.cover.attached?
+    assert_equal "image/jpeg", book.cover.blob.content_type
+    assert_equal "#{book.id}-cover.jpg", book.cover.blob.filename.to_s
+  end
+
+  test "downgrades unsupported cover content_types to octet-stream + .bin" do
+    book = Book.create!(object_key: "test/k", title: "t", format: "epub", ingested_at: Time.current)
+    result = {
+      cover_io: StringIO.new("anything"),
+      cover_content_type: "image/svg+xml"
+    }
+
+    ProcessBookFileJob.new.send(:attach_cover, book, result)
+
+    assert_equal "application/octet-stream", book.cover.blob.content_type
+    assert_equal "#{book.id}-cover.bin", book.cover.blob.filename.to_s
+  end
+
+  test "falls back to octet-stream + .bin when cover_content_type is missing" do
+    book = Book.create!(object_key: "test/k2", title: "t", format: "epub", ingested_at: Time.current)
+    result = { cover_io: StringIO.new("anything"), cover_content_type: nil }
+
+    ProcessBookFileJob.new.send(:attach_cover, book, result)
+
+    assert_equal "application/octet-stream", book.cover.blob.content_type
+    assert_equal "#{book.id}-cover.bin", book.cover.blob.filename.to_s
   end
 
   test "stores parse_error when EPUB is unreadable, deriving title from object_key" do

@@ -15,12 +15,20 @@ module Ebook
       assert_match(/elevi naufragiază/, attrs[:description])
       assert_equal "9781234567890",       attrs[:isbn]
       refute_nil result[:cover_io]
+      assert_equal "image/png", result[:cover_content_type]
+    end
+
+    test "returns the real cover media_type for JPEG covers" do
+      result = EpubParser.call(FIXTURES.join("jpeg-cover.epub").to_s)
+      refute_nil result[:cover_io]
+      assert_equal "image/jpeg", result[:cover_content_type]
     end
 
     test "parses EPUB without cover" do
       result = EpubParser.call(FIXTURES.join("no-cover.epub").to_s)
       assert_equal "Fără Copertă", result[:attributes][:title]
       assert_nil result[:cover_io]
+      assert_nil result[:cover_content_type]
     end
 
     test "parses EPUB with only the bare-minimum metadata" do

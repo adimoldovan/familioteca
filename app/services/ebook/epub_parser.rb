@@ -22,7 +22,7 @@ module Ebook
         description: first_string(book.description)
       }.compact
 
-      { attributes: attrs, cover_io: extract_cover(book) }
+      { attributes: attrs }.merge(extract_cover(book))
     rescue ParseError
       raise
     rescue StandardError => e
@@ -52,10 +52,10 @@ module Ebook
 
     def self.extract_cover(book)
       item = book.items.values.find { |i| i.properties&.include?("cover-image") }
-      return nil unless item
-      StringIO.new(item.content)
+      return {} unless item
+      { cover_io: StringIO.new(item.content), cover_content_type: first_string(item.media_type) }
     rescue StandardError
-      nil
+      {}
     end
   end
 end

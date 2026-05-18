@@ -26,7 +26,7 @@ class Book < ApplicationRecord
   end
 
   def cover_thumbnail
-    return nil unless cover.attached?
+    return nil unless cover.attached? && cover.variable?
     cover.variant(:thumbnail)
   end
 

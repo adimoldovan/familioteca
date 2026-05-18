@@ -135,4 +135,17 @@ class BookTest < ActiveSupport::TestCase
     refute_nil variant
     assert_kind_of ActiveStorage::VariantWithRecord, variant
   end
+
+  test "cover_thumbnail is nil when the attached cover is not variable" do
+    book = Book.create!(title: "T", format: "epub", object_key: "k3", ingested_at: Time.current)
+    book.cover.attach(
+      io: StringIO.new("opaque-bytes"),
+      filename: "#{book.id}-cover.bin",
+      content_type: "application/octet-stream",
+      identify: false
+    )
+
+    assert book.cover.attached?
+    assert_nil book.cover_thumbnail
+  end
 end
