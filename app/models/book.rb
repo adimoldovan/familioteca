@@ -1,7 +1,9 @@
 class Book < ApplicationRecord
   FORMATS = %w[epub mobi pdf].freeze
 
-  has_one_attached :cover
+  has_one_attached :cover do |attachable|
+    attachable.variant :thumbnail, resize_to_limit: [ 360, 540 ], format: :webp, saver: { quality: 85 }
+  end
 
   validates :title, presence: true
   validates :object_key, presence: true, uniqueness: true
@@ -21,6 +23,11 @@ class Book < ApplicationRecord
 
   def missing?
     missing_since.present?
+  end
+
+  def cover_thumbnail
+    return nil unless cover.attached?
+    cover.variant(:thumbnail)
   end
 
   private

@@ -118,4 +118,21 @@ class BookTest < ActiveSupport::TestCase
     assert_equal 2, Book.search("").count
     assert_equal 2, Book.search(nil).count
   end
+
+  test "cover_thumbnail is nil without a cover, and a variant once one is attached" do
+    book = Book.create!(title: "T", format: "epub", object_key: "k", ingested_at: Time.current)
+    assert_nil book.cover_thumbnail
+
+    # EPUB fixture is reused as the cover blob; identify: false keeps the declared
+    # content_type so the variant is requestable without a real image fixture.
+    book.cover.attach(
+      io: File.open(Rails.root.join("test/fixtures/files/ebooks/well-tagged.epub")),
+      filename: "cover.png",
+      content_type: "image/png",
+      identify: false
+    )
+    variant = book.cover_thumbnail
+    refute_nil variant
+    assert_kind_of ActiveStorage::VariantWithRecord, variant
+  end
 end
