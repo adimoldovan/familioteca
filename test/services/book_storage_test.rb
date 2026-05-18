@@ -34,6 +34,22 @@ class BookStorageTest < ActiveSupport::TestCase
     File.delete(path)
   end
 
+  test "#download deletes the tempfile and re-raises if get_object raises mid-stream" do
+    tempfile = Tempfile.new([ "familioteca-leak-test-", ".epub" ])
+    tempfile.binmode
+    path = tempfile.path
+
+    @client.stub_responses(:get_object, RuntimeError.new("network drop"))
+
+    error = with_tempfile_new_returning(tempfile) do
+      assert_raises(RuntimeError) { @storage.download("a.epub") }
+    end
+
+    assert_equal "network drop", error.message,
+      "rescue must re-raise the original exception unchanged"
+    refute File.exist?(path), "tempfile was not deleted after mid-stream error"
+  end
+
   test "#presigned_url returns a string URL containing the key" do
     url = @storage.presigned_url("a.epub", expires_in: 60)
     assert_kind_of String, url
@@ -71,6 +87,16 @@ class BookStorageTest < ActiveSupport::TestCase
   end
 
   private
+
+  # Safe only under process-based parallelism (the default). Tempfile's
+  # singleton class is process-global; do not use with :threads parallelism.
+  def with_tempfile_new_returning(tempfile)
+    original = Tempfile.singleton_class.instance_method(:new)
+    Tempfile.singleton_class.define_method(:new) { |*_, **_| tempfile }
+    yield
+  ensure
+    Tempfile.singleton_class.define_method(:new, original)
+  end
 
   def with_env(values)
     original = values.each_key.to_h { |k| [ k, ENV.key?(k) ? ENV[k] : :__unset__ ] }

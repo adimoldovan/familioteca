@@ -38,7 +38,9 @@ class BookStorage
 
   # Returns a path. The caller owns the file and must delete it.
   # We detach Tempfile's GC finalizer so the file survives until the caller
-  # cleans up explicitly (jobs do this in an `ensure` block).
+  # cleans up explicitly (jobs do this in an `ensure` block). If streaming
+  # raises mid-download, we clean up here ourselves before re-raising —
+  # otherwise the caller never gets a path and the partial file leaks.
   def download(key)
     file = Tempfile.new([ "familioteca-", File.extname(key) ])
     file.binmode
@@ -48,6 +50,12 @@ class BookStorage
     end
     file.close
     file.path
+  rescue StandardError
+    if file
+      file.close unless file.closed?
+      File.delete(file.path) if File.exist?(file.path)
+    end
+    raise
   end
 
   def presigned_url(key, expires_in:)
