@@ -130,6 +130,34 @@ class ProcessBookFileJobTest < ActiveJob::TestCase
     assert_equal 1, attempts
   end
 
+  test "re-running replaces the cover when the source EPUB cover changes" do
+    png_storage = stub_storage("k/c.epub", FIXTURES.join("well-tagged.epub"))
+    ProcessBookFileJob.new.perform("k/c.epub", storage: png_storage)
+    book = Book.find_by!(object_key: "k/c.epub")
+    assert_equal "image/png", book.cover.blob.content_type
+    original_blob_id = book.cover.blob.id
+
+    jpeg_storage = stub_storage("k/c.epub", FIXTURES.join("jpeg-cover.epub"))
+    ProcessBookFileJob.new.perform("k/c.epub", storage: jpeg_storage)
+
+    book.reload
+    assert book.cover.attached?
+    assert_equal "image/jpeg", book.cover.blob.content_type
+    refute_equal original_blob_id, book.cover.blob.id
+  end
+
+  test "re-running purges the cover when the new EPUB has none" do
+    with_cover = stub_storage("k/d.epub", FIXTURES.join("well-tagged.epub"))
+    ProcessBookFileJob.new.perform("k/d.epub", storage: with_cover)
+    book = Book.find_by!(object_key: "k/d.epub")
+    assert book.cover.attached?
+
+    without_cover = stub_storage("k/d.epub", FIXTURES.join("no-cover.epub"))
+    ProcessBookFileJob.new.perform("k/d.epub", storage: without_cover)
+
+    refute book.reload.cover.attached?
+  end
+
   test "is idempotent — re-running clears missing_since but does not duplicate" do
     storage = stub_storage("k/a.epub", FIXTURES.join("well-tagged.epub"))
 

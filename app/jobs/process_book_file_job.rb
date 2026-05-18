@@ -46,12 +46,22 @@ class ProcessBookFileJob < ApplicationJob
     )
     book.save!
 
-    attach_cover(book, result) if result[:cover_io] && !book.cover.attached?
+    sync_cover(book, result)
   ensure
     File.delete(path) if path && File.exist?(path)
   end
 
   private
+
+  # Cover tracks the source file so re-ingesting a replaced EPUB stays
+  # consistent — without this, every Book field refreshes except the cover.
+  def sync_cover(book, result)
+    if result[:cover_io]
+      attach_cover(book, result)
+    elsif book.cover.attached?
+      book.cover.purge_later
+    end
+  end
 
   def attach_cover(book, result)
     declared  = result[:cover_content_type].presence
