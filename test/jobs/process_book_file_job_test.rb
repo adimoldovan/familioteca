@@ -72,7 +72,12 @@ class ProcessBookFileJobTest < ActiveJob::TestCase
   #      fixture path would wipe the on-disk fixture for every subsequent test.
   #   2. The idempotent test calls perform twice, so download must succeed
   #      more than once with the same key.
+  #
+  # We keep references to the Tempfile objects on @tempfiles so GC doesn't
+  # finalize them (and unlink the files) before the job reads them.
   def stub_storage(key, fixture_path)
+    @tempfiles ||= []
+    tempfiles = @tempfiles
     storage = Object.new
     storage.define_singleton_method(:download) do |k|
       raise ArgumentError, "unexpected key: #{k.inspect}" unless k == key
@@ -80,6 +85,7 @@ class ProcessBookFileJobTest < ActiveJob::TestCase
       tmp.binmode
       tmp.write(File.binread(fixture_path.to_s))
       tmp.close
+      tempfiles << tmp
       tmp.path
     end
     storage.define_singleton_method(:list) { [] }

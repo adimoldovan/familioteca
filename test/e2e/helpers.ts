@@ -13,12 +13,15 @@ import { Page } from '@playwright/test';
 export interface SeedUserOptions {
   email?: string;
   password?: string;
+  name?: string;
+  admin?: boolean;
 }
 
 export interface SeedUserResult {
   id: number;
   email: string;
   password: string;
+  admin: boolean;
 }
 
 // POST /e2e/seed_user — creates a user and signs them in. The response sets a
@@ -29,10 +32,33 @@ export async function seedUser(page: Page, options: SeedUserOptions = {}): Promi
     ?? `test-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}@familioteca.local`;
   const password = options.password ?? 'password123';
   const response = await page.request.post('/e2e/seed_user', {
-    data: { email, password },
+    data: { email, password, name: options.name, admin: options.admin ?? false },
   });
   if (!response.ok()) {
     throw new Error(`seedUser failed: ${response.status()} ${await response.text()}`);
+  }
+  return await response.json();
+}
+
+export interface SeedBookOptions {
+  title?: string;
+  author?: string;
+  description?: string;
+  object_key?: string;
+}
+
+export interface SeedBookResult {
+  id: number;
+  title: string;
+}
+
+// POST /e2e/seed_book — creates a Book record directly (no S3 upload). Pass
+// `object_key` if a spec needs deterministic keys; otherwise a random one is
+// generated server-side.
+export async function seedBook(page: Page, options: SeedBookOptions = {}): Promise<SeedBookResult> {
+  const response = await page.request.post('/e2e/seed_book', { data: options });
+  if (!response.ok()) {
+    throw new Error(`seedBook failed: ${response.status()} ${await response.text()}`);
   }
   return await response.json();
 }

@@ -14,5 +14,12 @@ Rails.application.routes.draw do
   resources :books, only: [ :show ]
   get "books/:id/download", to: "downloads#show", as: :download_book
 
+  constraints ->(_) { Rails.env.e2e? } do
+    namespace :e2e do
+      post "seed_user", to: "seed_user#create"
+      post "seed_book", to: "seed_book#create"
+    end
+  end
+
   root "books#index"
 end

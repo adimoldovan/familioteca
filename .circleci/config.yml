@@ -63,19 +63,19 @@ jobs:
     steps:
       - checkout
       - ruby/install-deps
-      # - node/install:
-      #     install-yarn: false
-      # - node/install-packages:
-      #     pkg-manager: npm
+      - node/install:
+          install-yarn: false
+      - node/install-packages:
+          pkg-manager: npm
       - run:
           name: Lint Ruby code for consistent style
           command: bin/rubocop
-      # - run:
-      #     name: Lint e2e tests
-      #     command: npm run lint
-      # - run:
-      #     name: Type-check e2e tests
-      #     command: npm run typecheck
+      - run:
+          name: Lint e2e tests
+          command: npm run lint
+      - run:
+          name: Type-check e2e tests
+          command: npm run typecheck
 
   test:
     docker:
@@ -105,38 +105,35 @@ jobs:
   #         name: Run JavaScript unit tests
   #         command: npm run test:js
 
-  # e2e:
-  #   docker:
-  #     - image: cimg/ruby:3.4-browsers
-  #   steps:
-  #     - checkout
-  #     - ruby/install-deps
-  #     - node/install:
-  #         install-yarn: false
-  #     - node/install-packages:
-  #         pkg-manager: npm
-  #     - restore_cache:
-  #         name: Restore Playwright browser cache
-  #         keys:
-  #           - playwright-v2-{{ checksum "package-lock.json" }}
-  #     - run:
-  #         name: Install Playwright browsers
-  #         command: npx playwright install chromium
-  #     - save_cache:
-  #         name: Save Playwright browser cache
-  #         key: playwright-v2-{{ checksum "package-lock.json" }}
-  #         paths:
-  #           - ~/.cache/ms-playwright
-  #     - run:
-  #         name: Run e2e tests
-  #         command: npm run test:e2e
-  #         environment:
-  #           RAILS_ENV: test
-  #           CI: "true"
-  #         no_output_timeout: 10m
-  #     - store_artifacts:
-  #         path: playwright-report
-  #         destination: playwright-report
+  e2e:
+    docker:
+      - image: cimg/ruby:3.4-browsers
+    steps:
+      - checkout
+      - ruby/install-deps
+      - node/install:
+          install-yarn: false
+      - node/install-packages:
+          pkg-manager: npm
+      - restore_cache:
+          name: Restore Playwright browser cache
+          keys:
+            - playwright-v2-{{ checksum "package-lock.json" }}
+      - run:
+          name: Install Playwright browsers
+          command: npx playwright install chromium
+      - save_cache:
+          name: Save Playwright browser cache
+          key: playwright-v2-{{ checksum "package-lock.json" }}
+          paths:
+            - ~/.cache/ms-playwright
+      - run:
+          name: Run e2e tests
+          command: npm run test:e2e
+          no_output_timeout: 10m
+      - store_artifacts:
+          path: playwright-report
+          destination: playwright-report
 
   trigger-deploy:
     docker:
@@ -165,10 +162,10 @@ workflows:
           requires: [changes]
       # - test_js:
       #     requires: [changes]
-      # - e2e:
-      #     requires: [changes]
+      - e2e:
+          requires: [changes]
       - trigger-deploy:
-          requires: [scan_ruby, scan_js, lint, test]
+          requires: [scan_ruby, scan_js, lint, test, e2e]
           filters:
             branches:
               only: main

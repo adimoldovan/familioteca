@@ -16,7 +16,7 @@ export default class extends Controller {
     const isDark = root.classList.toggle(DARK)
     try {
       localStorage.setItem(STORAGE_KEY, isDark ? DARK : LIGHT)
-    } catch (e) {
+    } catch {
       // Storage unavailable (Safari private mode etc.) — preference is per-session only.
     }
     this.syncIcon()
