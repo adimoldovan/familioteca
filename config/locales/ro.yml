@@ -24,6 +24,7 @@ ro:
         no_results: 'Niciun rezultat pentru „%{query}".'
     show:
       back_to_catalog: "← Înapoi la bibliotecă"
+      download: "Descarcă fișierul"
       meta:
         author: "Autor"
         publisher: "Editură"

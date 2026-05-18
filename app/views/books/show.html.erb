@@ -39,6 +39,10 @@
       <dd><%= @book.format.upcase %></dd>
     </dl>
 
+    <%= link_to t(".download"), download_book_path(@book),
+          class: "btn btn-primary book-show__download",
+          id: "book-download-link" %>
+
     <section class="book-show__description">
       <h2 class="t-eyebrow"><%= t(".description_title") %></h2>
       <% if @book.description.present? %>

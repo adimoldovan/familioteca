@@ -820,6 +820,12 @@ html, body {
     margin: 0;
   }
 
+  .book-show__download {
+    width: auto;
+    display: inline-flex;
+    margin-bottom: var(--space-4);
+  }
+
   .book-show__description h2 {
     margin-bottom: var(--space-2);
   }

@@ -12,6 +12,7 @@ Rails.application.routes.draw do
   end
 
   resources :books, only: [ :show ]
+  get "books/:id/download", to: "downloads#show", as: :download_book
 
   root "books#index"
 end
