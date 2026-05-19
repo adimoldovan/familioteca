@@ -9,6 +9,11 @@ Rails.application.configure do
   config.consider_all_requests_local = true
   config.action_dispatch.show_exceptions = :rescuable
 
+  # Rails treats any non-test custom env as production-like and requires a
+  # secret_key_base. CI has no master key to decrypt credentials, so set a
+  # hardcoded dummy — this env only serves Playwright runs.
+  config.secret_key_base = "e2e_secret_key_base_not_a_real_secret"
+
   config.action_mailer.delivery_method = :test
   config.action_mailer.default_url_options = { host: "localhost" }
 
