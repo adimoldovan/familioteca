@@ -1,6 +1,6 @@
 <div id="admin-scan-button" class="scan-button">
   <% if local_assigns[:scanning] %>
-    <span class="scan-button__status"><%= t("admin.ingestions.scanning") %></span>
+    <span id="scan-status" class="scan-button__status"><%= t("admin.ingestions.scanning") %></span>
   <% else %>
     <%= button_to t("admin.ingestions.scan_now"), admin_ingestions_path,
           method: :post,

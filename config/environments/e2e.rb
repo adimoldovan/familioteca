@@ -17,6 +17,10 @@ Rails.application.configure do
   config.action_mailer.delivery_method = :test
   config.action_mailer.default_url_options = { host: "localhost" }
 
+  # Propshaft only mounts its asset server for development and test by default.
+  # Playwright drives a real browser, so JS/CSS must be served — enable it here.
+  config.assets.server = true
+
   # AWS SDK is stubbed in this env too — the seed_book endpoint creates Books
   # directly so no real bucket call is needed.
   config.after_initialize do
