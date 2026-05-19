@@ -17,6 +17,14 @@ Rails.application.configure do
   config.action_mailer.delivery_method = :test
   config.action_mailer.default_url_options = { host: "localhost" }
 
+  # ActiveJob only picks the :test adapter when Rails.env.test?; in e2e it
+  # would fall back to :async and run jobs in background threads. That makes
+  # specs racy — IngestBookJob (triggered by the admin scan spec) would mark
+  # every seeded book as missing because the stubbed S3 returns an empty
+  # remote listing, breaking parallel catalog specs. Queue jobs without
+  # executing them.
+  config.active_job.queue_adapter = :test
+
   # Propshaft only mounts its asset server for development and test by default.
   # Playwright drives a real browser, so JS/CSS must be served — enable it here.
   config.assets.server = true
