@@ -1,5 +1,12 @@
 import { Page } from '@playwright/test';
 
+// A short, per-call random tag for namespacing seeded records. The e2e DB is
+// shared across the suite (see `bin/e2e-server`) and tests run in parallel —
+// use this to keep titles, emails, or queries from colliding between tests.
+export function uniqueSuffix(): string {
+  return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
+}
+
 // Seed-API helpers. Each helper POSTs to a `/e2e/<name>` endpoint that the
 // Rails app exposes only in `RAILS_ENV=e2e`. The endpoints create domain
 // records directly (skipping UI flows) so specs can start in a known state.
@@ -28,8 +35,7 @@ export interface SeedUserResult {
 // session cookie on `page`'s browser context, so subsequent navigations are
 // authenticated without driving the sign-up form.
 export async function seedUser(page: Page, options: SeedUserOptions = {}): Promise<SeedUserResult> {
-  const email = options.email
-    ?? `test-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}@familioteca.local`;
+  const email = options.email ?? `test-${uniqueSuffix()}@familioteca.local`;
   const password = options.password ?? 'password123';
   const response = await page.request.post('/e2e/seed_user', {
     data: { email, password, name: options.name, admin: options.admin ?? false },
