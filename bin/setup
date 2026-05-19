@@ -12,7 +12,13 @@ FileUtils.chdir APP_ROOT do
   # This script is idempotent, so that you can run it at any time and get an expectable outcome.
   # Add necessary setup steps to this file.
 
-  puts "== Installing dependencies =="
+  puts "== Checking system dependencies =="
+  unless system("command -v vips > /dev/null 2>&1")
+    hint = RUBY_PLATFORM.include?("darwin") ? "brew install vips" : "apt-get install libvips (or your distro's equivalent)"
+    abort "libvips not found. Active Storage cover thumbnails need it.\n  Install and re-run bin/setup:\n    #{hint}"
+  end
+
+  puts "\n== Installing dependencies =="
   system("bundle check") || system!("bundle install")
   system! "npm install --silent --no-audit --no-fund"
 
