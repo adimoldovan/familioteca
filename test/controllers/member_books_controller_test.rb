@@ -33,6 +33,40 @@ class MemberBooksControllerTest < ActionDispatch::IntegrationTest
     assert_equal "mi_a_placut", MemberBook.find_by!(member: members(:ana), book: @book).rating
   end
 
+  test "setting a rating automatically marks the book as read" do
+    sign_in_as members(:ana)
+    freeze_time do
+      patch book_member_book_path(@book), params: { rating: "mi_a_placut" }
+      mb = MemberBook.find_by!(member: members(:ana), book: @book)
+      assert_equal Time.current, mb.read_at
+    end
+  end
+
+  test "toggling a rating off does not clear read status" do
+    sign_in_as members(:ana)
+    patch book_member_book_path(@book), params: { rating: "mi_a_placut" }
+    patch book_member_book_path(@book), params: { rating: "mi_a_placut" }
+    mb = MemberBook.find_by!(member: members(:ana), book: @book)
+    assert_nil mb.rating
+    assert_not_nil mb.read_at
+  end
+
+  test "rating does not overwrite an existing read_at" do
+    sign_in_as members(:ana)
+    earlier = 1.day.ago
+    MemberBook.create!(member: members(:ana), book: @book, read_at: earlier)
+    patch book_member_book_path(@book), params: { rating: "asa_si_asa" }
+    assert_in_delta earlier, MemberBook.find_by!(member: members(:ana), book: @book).read_at, 1
+  end
+
+  test "explicit read=false overrides auto-read from rating" do
+    sign_in_as members(:ana)
+    patch book_member_book_path(@book), params: { rating: "mi_a_placut", read: "false" }
+    mb = MemberBook.find_by!(member: members(:ana), book: @book)
+    assert_equal "mi_a_placut", mb.rating
+    assert_nil mb.read_at
+  end
+
   test "submitting read=true sets read_at" do
     sign_in_as members(:ana)
     freeze_time do

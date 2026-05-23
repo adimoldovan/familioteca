@@ -24,7 +24,10 @@ class MemberBooksController < ApplicationController
     attempts = 0
     begin
       mb = current_member.member_books.find_or_initialize_by(book: book)
-      mb.rating = toggle_rating(mb.rating, params[:rating]) if params.key?(:rating)
+      if params.key?(:rating)
+        mb.rating = toggle_rating(mb.rating, params[:rating])
+        mb.read_at ||= Time.current if mb.rating.present?
+      end
       mb.read_at = ActiveModel::Type::Boolean.new.cast(params[:read]) ? Time.current : nil if params.key?(:read)
       mb.save!
       mb
