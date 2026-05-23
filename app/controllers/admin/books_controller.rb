@@ -16,7 +16,7 @@ module Admin
     def update
       @book = Book.find(params[:id])
       if @book.update(book_params)
-        redirect_to admin_books_path, notice: I18n.t("admin.books.update.success")
+        redirect_to admin_books_path, notice: t("admin.books.update.success")
       else
         render :edit, status: :unprocessable_entity
       end
@@ -30,6 +30,12 @@ module Admin
         format.turbo_stream
         format.html { redirect_to admin_books_path, notice: t("admin.books.rescan.queued") }
       end
+    end
+
+    def destroy
+      @book = Book.find(params[:id])
+      @book.destroy!
+      redirect_to admin_books_path, notice: t("admin.books.destroy.success")
     end
 
     private

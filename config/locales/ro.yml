@@ -93,6 +93,8 @@ ro:
         edit_link: "Editează"
         rescan_link: "Rescanează"
         rescanning: "Se rescanează…"
+        delete_link: "Șterge"
+        delete_confirm: 'Sigur vrei să ștergi „%{title}"? Cartea va fi readăugată la următoarea scanare.'
       rescan:
         queued: "Rescanarea a fost programată."
       edit:
@@ -100,6 +102,8 @@ ro:
         cancel: "Anulează"
         submit: "Salvează"
         errors_title: "Erori"
+      destroy:
+        success: "Carte ștearsă."
       update:
         success: "Carte actualizată."
       fields:

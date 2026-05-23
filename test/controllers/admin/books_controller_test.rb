@@ -29,4 +29,31 @@ class Admin::BooksControllerTest < ActionDispatch::IntegrationTest
     assert_select "table tbody tr", 1
     assert_select "td", text: "broken.epub"
   end
+
+  test "admin can delete a book" do
+    sign_in_as members(:admin)
+    assert_difference("Book.count", -1) do
+      delete admin_book_path(@ok)
+    end
+    assert_redirected_to admin_books_path
+    assert_equal I18n.t("admin.books.destroy.success"), flash[:notice]
+  end
+
+  test "non-admin cannot delete a book" do
+    sign_in_as members(:ana)
+    assert_no_difference("Book.count") do
+      delete admin_book_path(@ok)
+    end
+    assert_response :not_found
+  end
+
+  test "deleting a book also destroys associated member_books" do
+    sign_in_as members(:admin)
+    member = members(:ana)
+    @ok.member_books.create!(member: member)
+    assert_difference [ "Book.count", "MemberBook.count" ], -1 do
+      delete admin_book_path(@ok)
+    end
+    assert_redirected_to admin_books_path
+  end
 end

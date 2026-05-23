@@ -8,7 +8,7 @@ Rails.application.routes.draw do
   namespace :admin do
     resources :members, only: [ :index ]
     resources :ingestions, only: [ :create ]
-    resources :books, only: [ :index, :edit, :update ] do
+    resources :books, only: [ :index, :edit, :update, :destroy ] do
       post :rescan, on: :member
     end
   end

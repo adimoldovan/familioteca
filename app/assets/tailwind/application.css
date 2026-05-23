@@ -141,6 +141,16 @@ html, body {
     color: var(--accent-ink);
   }
 
+  .link-danger {
+    color: var(--danger);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  .link-danger:hover {
+    opacity: 0.8;
+  }
+
   .brand {
     display: inline-flex;
     align-items: center;
