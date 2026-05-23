@@ -22,6 +22,7 @@ export interface SeedUserOptions {
   password?: string;
   name?: string;
   admin?: boolean;
+  kindle_email?: string;
 }
 
 export interface SeedUserResult {
@@ -29,6 +30,7 @@ export interface SeedUserResult {
   email: string;
   password: string;
   admin: boolean;
+  kindle_email: string | null;
 }
 
 // POST /e2e/seed_user — creates a user and signs them in. The response sets a
@@ -38,7 +40,7 @@ export async function seedUser(page: Page, options: SeedUserOptions = {}): Promi
   const email = options.email ?? `test-${uniqueSuffix()}@familioteca.local`;
   const password = options.password ?? 'password123';
   const response = await page.request.post('/e2e/seed_user', {
-    data: { email, password, name: options.name, admin: options.admin ?? false },
+    data: { email, password, name: options.name, admin: options.admin ?? false, kindle_email: options.kindle_email },
   });
   if (!response.ok()) {
     throw new Error(`seedUser failed: ${response.status()} ${await response.text()}`);
@@ -76,8 +78,11 @@ export interface PerformJobsResult {
 // POST /e2e/perform_jobs — drains the ActiveJob test queue synchronously,
 // running each enqueued job to completion. Use to assert post-job state
 // (e.g., a KindleDelivery row transitioning from pending → sent).
-export async function performEnqueuedJobs(page: Page): Promise<PerformJobsResult> {
-  const response = await page.request.post('/e2e/perform_jobs');
+// Pass `only` to restrict which job class is drained (e.g., "SendToKindleJob").
+export async function performEnqueuedJobs(page: Page, only?: string): Promise<PerformJobsResult> {
+  const data: Record<string, string> = {};
+  if (only) data.only = only;
+  const response = await page.request.post('/e2e/perform_jobs', { data });
   if (!response.ok()) {
     throw new Error(`performEnqueuedJobs failed: ${response.status()} ${await response.text()}`);
   }

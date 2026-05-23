@@ -3,6 +3,7 @@ import {
   seedUser,
   seedBook as seedBookHelper,
   performEnqueuedJobs as performJobsHelper,
+  uniqueSuffix,
   type SeedBookOptions,
   type SeedBookResult,
   type PerformJobsResult,
@@ -20,10 +21,12 @@ type Fixtures = {
   authenticatedPage: Page;
   // Same as `authenticatedPage`, but the seeded member is an admin.
   adminPage: Page;
+  // Authenticated page with a kindle_email pre-set on the member.
+  kindleReadyPage: Page;
   // Bound helper for creating Book records inline within a spec.
   seedBook: (options?: SeedBookOptions) => Promise<SeedBookResult>;
   // Bound helper for draining the ActiveJob test queue inline within a spec.
-  performEnqueuedJobs: () => Promise<PerformJobsResult>;
+  performEnqueuedJobs: (only?: string) => Promise<PerformJobsResult>;
 };
 
 export const test = base.extend<Fixtures>({
@@ -35,11 +38,15 @@ export const test = base.extend<Fixtures>({
     await seedUser(page, { admin: true });
     await use(page);
   },
+  kindleReadyPage: async ({ page }, use) => {
+    await seedUser(page, { kindle_email: `kindle-${uniqueSuffix()}@kindle.com` });
+    await use(page);
+  },
   seedBook: async ({ page }, use) => {
     await use((options = {}) => seedBookHelper(page, options));
   },
   performEnqueuedJobs: async ({ page }, use) => {
-    await use(() => performJobsHelper(page));
+    await use((only?: string) => performJobsHelper(page, only));
   },
 });
 
