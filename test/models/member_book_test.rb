@@ -49,4 +49,31 @@ class MemberBookTest < ActiveSupport::TestCase
     refute dup.valid?
     assert_includes dup.errors[:member_id], "este deja folosit"
   end
+
+  test "member.member_books returns the rows for this member" do
+    other_member = members(:admin)
+    mine = MemberBook.create!(member: @member, book: @book)
+    other_book = Book.create!(title: "B", format: "epub", object_key: "k2", ingested_at: Time.current)
+    MemberBook.create!(member: other_member, book: other_book)
+    assert_equal [ mine ], @member.member_books.to_a
+  end
+
+  test "book.member_books returns the rows for this book" do
+    mine = MemberBook.create!(member: @member, book: @book)
+    assert_equal [ mine ], @book.member_books.to_a
+  end
+
+  test "destroying a member removes its member_books rows" do
+    MemberBook.create!(member: @member, book: @book)
+    assert_difference "MemberBook.count", -1 do
+      @member.destroy
+    end
+  end
+
+  test "destroying a book removes its member_books rows" do
+    MemberBook.create!(member: @member, book: @book)
+    assert_difference "MemberBook.count", -1 do
+      @book.destroy
+    end
+  end
 end

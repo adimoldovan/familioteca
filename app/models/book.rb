@@ -5,6 +5,8 @@ class Book < ApplicationRecord
     attachable.variant :thumbnail, resize_to_limit: [ 360, 540 ], format: :webp, saver: { quality: 85 }
   end
 
+  has_many :member_books, dependent: :destroy
+
   validates :title, presence: true
   validates :object_key, presence: true, uniqueness: true
   validates :format, presence: true, inclusion: { in: FORMATS }
@@ -20,6 +22,10 @@ class Book < ApplicationRecord
     next all if folded.blank?
     where("searchable LIKE ?", "%#{sanitize_sql_like(folded)}%")
   }
+
+  def member_book_for(member)
+    member_books.find_or_initialize_by(member: member)
+  end
 
   def missing?
     missing_since.present?

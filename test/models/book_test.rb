@@ -148,4 +148,19 @@ class BookTest < ActiveSupport::TestCase
     assert book.cover.attached?
     assert_nil book.cover_thumbnail
   end
+
+  test "member_book_for returns the existing row when present" do
+    book = Book.create!(title: "A", format: "epub", object_key: "k", ingested_at: Time.current)
+    existing = MemberBook.create!(member: members(:ana), book: book, rating: :mi_a_placut)
+    assert_equal existing, book.member_book_for(members(:ana))
+  end
+
+  test "member_book_for returns a fresh, unpersisted row when none exists" do
+    book = Book.create!(title: "A", format: "epub", object_key: "k", ingested_at: Time.current)
+    mb = book.member_book_for(members(:ana))
+    refute_nil mb
+    assert mb.new_record?
+    assert_equal members(:ana), mb.member
+    assert_equal book, mb.book
+  end
 end
