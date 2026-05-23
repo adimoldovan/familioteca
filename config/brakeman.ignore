@@ -1,0 +1,25 @@
+{
+  "ignored_warnings": [
+    {
+      "warning_type": "File Access",
+      "warning_code": 16,
+      "fingerprint": "357ec8d13eda0302261768155d986f0b7057e528c42ca1c4204c4f29a40d4588",
+      "check_name": "FileAccess",
+      "message": "Model attribute used in file name",
+      "file": "app/jobs/send_to_kindle_job.rb",
+      "line": 31,
+      "link": "https://brakeman.readthedocs.io/en/latest/warning_types/file_access.html",
+      "code": "File.delete(storage.download(KindleDelivery.find(delivery_id).book.object_key))",
+      "render_path": null,
+      "user_input": "KindleDelivery.find(delivery_id).book.object_key",
+      "location": {
+        "type": "method",
+        "class": "SendToKindleJob",
+        "method": "perform"
+      },
+      "note": "False positive. BookStorage#download returns an OS-generated Tempfile path (see app/services/book_storage.rb#download — built via Tempfile.new); the input object_key only influences the extension. The path passed to File.delete is never derived from user-controlled input."
+    }
+  ],
+  "updated": "2026-05-23",
+  "brakeman_version": "8.0.4"
+}
