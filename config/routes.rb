@@ -11,7 +11,9 @@ Rails.application.routes.draw do
     resources :books, only: [ :index, :edit, :update ]
   end
 
-  resources :books, only: [ :show ]
+  resources :books, only: [ :show ] do
+    resource :member_book, only: [ :update ], controller: "member_books"
+  end
   get "books/:id/download", to: "downloads#show", as: :download_book
 
   constraints ->(_) { Rails.env.e2e? } do

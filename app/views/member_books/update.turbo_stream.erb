@@ -1,0 +1,6 @@
+<%= turbo_stream.replace "book-rating",
+      partial: "books/rating",
+      locals: { book: @book, member_book: @member_book } %>
+<%= turbo_stream.replace "book-read-toggle",
+      partial: "books/read_toggle",
+      locals: { book: @book, member_book: @member_book } %>
