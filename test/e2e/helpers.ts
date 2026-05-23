@@ -68,3 +68,18 @@ export async function seedBook(page: Page, options: SeedBookOptions = {}): Promi
   }
   return await response.json();
 }
+
+export interface PerformJobsResult {
+  drained: number;
+}
+
+// POST /e2e/perform_jobs — drains the ActiveJob test queue synchronously,
+// running each enqueued job to completion. Use to assert post-job state
+// (e.g., a KindleDelivery row transitioning from pending → sent).
+export async function performEnqueuedJobs(page: Page): Promise<PerformJobsResult> {
+  const response = await page.request.post('/e2e/perform_jobs');
+  if (!response.ok()) {
+    throw new Error(`performEnqueuedJobs failed: ${response.status()} ${await response.text()}`);
+  }
+  return await response.json();
+}

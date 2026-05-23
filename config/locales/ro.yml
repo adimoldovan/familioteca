@@ -3,6 +3,18 @@ ro:
     name: "Familioteca"
     tagline: "Biblioteca de cărți a familiei"
 
+  account:
+    show:
+      title: "Contul meu"
+      name: "Nume"
+      email: "Email"
+      kindle_email: "Email Kindle"
+      errors_title: "Erori"
+      cancel: "Anulează"
+      submit: "Salvează"
+    update:
+      success: "Cont actualizat."
+
   sessions:
     new:
       title: "Autentificare"
@@ -104,6 +116,7 @@ ro:
   navigation:
     primary: "Navigare principală"
     catalog: "Bibliotecă"
+    account: "Contul meu"
     admin: "Administrare"
 
   theme:

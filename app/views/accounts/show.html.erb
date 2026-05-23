@@ -1,0 +1,40 @@
+<h1 id="account-heading" class="t-headline"><%= t("account.show.title") %></h1>
+
+<%= form_with model: @member, url: account_path, method: :patch, id: "account-form", class: "content-form" do |f| %>
+  <% if @member.errors.any? %>
+    <div class="error-summary">
+      <h2 class="error-summary__title"><%= t("account.show.errors_title") %></h2>
+      <ul class="error-summary__list">
+        <% @member.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="form-field">
+    <div class="form-field__header">
+      <%= f.label :name, t("account.show.name"), class: "form-field__label" %>
+    </div>
+    <%= f.text_field :name, class: "form-field__input", required: true, id: "account-name" %>
+  </div>
+
+  <div class="form-field">
+    <div class="form-field__header">
+      <span class="form-field__label"><%= t("account.show.email") %></span>
+    </div>
+    <p class="form-field__hint" id="account-email"><%= @member.email %></p>
+  </div>
+
+  <div class="form-field">
+    <div class="form-field__header">
+      <%= f.label :kindle_email, t("account.show.kindle_email"), class: "form-field__label" %>
+    </div>
+    <%= f.email_field :kindle_email, class: "form-field__input", id: "account-kindle-email" %>
+  </div>
+
+  <div class="content-form__actions">
+    <%= link_to t("account.show.cancel"), root_path, class: "btn btn-secondary" %>
+    <%= f.submit t("account.show.submit"), class: "btn btn-primary", id: "account-submit" %>
+  </div>
+<% end %>

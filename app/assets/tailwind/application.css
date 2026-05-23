@@ -642,11 +642,11 @@ html, body {
     border-bottom-color: var(--accent);
   }
 
-  .admin-book-form {
+  .content-form {
     max-width: 640px;
   }
 
-  .admin-book-form__actions {
+  .content-form__actions {
     display: flex;
     gap: var(--space-3);
     justify-content: flex-end;

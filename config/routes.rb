@@ -11,6 +11,8 @@ Rails.application.routes.draw do
     resources :books, only: [ :index, :edit, :update ]
   end
 
+  resource :account, only: [ :show, :update ]
+
   resources :books, only: [ :show ] do
     resource :member_book, only: [ :update ], controller: "member_books"
     resources :kindle_deliveries, only: [ :create ]
@@ -21,6 +23,7 @@ Rails.application.routes.draw do
     namespace :e2e do
       post "seed_user", to: "seed_user#create"
       post "seed_book", to: "seed_book#create"
+      post "perform_jobs", to: "perform_jobs#create"
     end
   end
 

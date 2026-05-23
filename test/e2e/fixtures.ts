@@ -2,8 +2,10 @@ import { test as base, expect, type Page } from "@playwright/test";
 import {
   seedUser,
   seedBook as seedBookHelper,
+  performEnqueuedJobs as performJobsHelper,
   type SeedBookOptions,
   type SeedBookResult,
+  type PerformJobsResult,
 } from "./helpers";
 
 // Custom Playwright fixtures. Tests opt into a fixture by naming it in the
@@ -20,6 +22,8 @@ type Fixtures = {
   adminPage: Page;
   // Bound helper for creating Book records inline within a spec.
   seedBook: (options?: SeedBookOptions) => Promise<SeedBookResult>;
+  // Bound helper for draining the ActiveJob test queue inline within a spec.
+  performEnqueuedJobs: () => Promise<PerformJobsResult>;
 };
 
 export const test = base.extend<Fixtures>({
@@ -33,6 +37,9 @@ export const test = base.extend<Fixtures>({
   },
   seedBook: async ({ page }, use) => {
     await use((options = {}) => seedBookHelper(page, options));
+  },
+  performEnqueuedJobs: async ({ page }, use) => {
+    await use(() => performJobsHelper(page));
   },
 });
 

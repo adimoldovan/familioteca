@@ -41,6 +41,7 @@
           <%= link_to t("app.name"), root_path, id: "site-header-brand", class: "site-header__brand" %>
           <nav class="site-header__nav" aria-label="<%= t("navigation.primary") %>">
             <%= link_to t("navigation.catalog"), root_path, id: "nav-catalog" %>
+            <%= link_to t("navigation.account"), account_path, id: "nav-account" %>
             <% if current_member.admin? %>
               <%= link_to t("navigation.admin"), admin_books_path, id: "nav-admin" %>
             <% end %>
