@@ -14,4 +14,9 @@ module DiacriticFolding
     return nil if string.nil?
     string.unicode_normalize(:nfc).gsub(PATTERN, MAP).downcase
   end
+
+  def self.ascii_fold(string)
+    return nil if string.nil?
+    string.unicode_normalize(:nfc).gsub(PATTERN, MAP)
+  end
 end

@@ -28,4 +28,16 @@ class DiacriticFoldingTest < ActiveSupport::TestCase
     assert_nil DiacriticFolding.fold(nil)
     assert_equal "", DiacriticFolding.fold("")
   end
+
+  test "ascii_fold strips diacritics but preserves case" do
+    assert_equal "Bizant", DiacriticFolding.ascii_fold("Bizanț")
+    assert_equal "Tara de Dincolo", DiacriticFolding.ascii_fold("Țara de Dincolo")
+    assert_equal "Lucian Boia", DiacriticFolding.ascii_fold("Lucian Boia")
+    assert_equal "Ana sI Bogdan", DiacriticFolding.ascii_fold("Ana șI Bogdan")
+  end
+
+  test "ascii_fold handles nil and empty string" do
+    assert_nil DiacriticFolding.ascii_fold(nil)
+    assert_equal "", DiacriticFolding.ascii_fold("")
+  end
 end
