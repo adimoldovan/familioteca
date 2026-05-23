@@ -39,11 +39,56 @@ Production serves everything in `public/` with `cache-control: public, max-age=1
 
 Set in production via `fly secrets set` (or, for `FLY_API_TOKEN`, as a GitHub Actions secret).
 
-- `RAILS_MASTER_KEY` — required to decrypt credentials.
-- `APP_HOST` — mailer host (defaults to `familioteca.fly.dev`).
-- `FLY_API_TOKEN` — used by GitHub Actions to deploy.
-- `SENTRY_DSN` — Sentry project DSN for error tracking. Optional; if unset, Sentry is skipped.
-- `AWS_ENDPOINT_URL_S3`, `BUCKET_NAME`, `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_REGION` — Tigris (S3-compatible) credentials. Used for Litestream continuous SQLite replication. Provision with `fly storage create`, which creates the bucket and sets all five secrets on the app automatically. When `AWS_ENDPOINT_URL_S3` is unset, the entrypoint runs the server without Litestream — useful for local docker runs.
+### Application
+
+| Variable | Required | Default | Description |
+|---|---|---|---|
+| `FAMILIOTECA_FROM_EMAIL` | **yes** | — | Sender address for all outgoing email |
+| `FAMILIOTECA_GMAIL_USER` | production, dev | — | Gmail address for SMTP authentication |
+| `FAMILIOTECA_GMAIL_APP_PASSWORD` | production, dev | — | Gmail app-specific password for SMTP |
+| `FAMILIOTECA_HOST` | no | `familioteca.fly.dev` | Host for URLs generated in mailer templates |
+| `FAMILIOTECA_BUCKET_ENDPOINT` | production | — | S3-compatible endpoint URL for book storage |
+| `FAMILIOTECA_BUCKET_NAME` | production | `familioteca-{env}` | Bucket name for book storage |
+| `FAMILIOTECA_BUCKET_KEY_ID` | production | — | S3 access key ID |
+| `FAMILIOTECA_BUCKET_SECRET` | production | — | S3 secret access key |
+| `FAMILIOTECA_BUCKET_REGION` | no | `auto` | S3 bucket region |
+
+### Seeding
+
+Used by `db:seed` to create the initial admin account. In dev/test these have defaults; in production `FAMILIOTECA_ADMIN_PASSWORD` is required.
+
+| Variable | Default (dev/test) |
+|---|---|
+| `FAMILIOTECA_ADMIN_EMAIL` | `admin@familioteca.local` |
+| `FAMILIOTECA_ADMIN_PASSWORD` | `changeme123` |
+| `FAMILIOTECA_ADMIN_NAME` | `Administrator` |
+
+### Rails / server tuning
+
+| Variable | Default | Description |
+|---|---|---|
+| `RAILS_MASTER_KEY` | — | Decrypts `config/credentials.yml.enc` |
+| `RAILS_ENV` | `development` | Rails environment |
+| `RAILS_LOG_LEVEL` | `info` (production) | Log verbosity |
+| `RAILS_MAX_THREADS` | `3` | Puma threads; also sizes the DB connection pool |
+| `PORT` | `3000` | Puma listen port |
+| `WEB_CONCURRENCY` | `1` | Puma worker processes |
+| `JOB_CONCURRENCY` | `1` | Solid Queue worker processes |
+| `SOLID_QUEUE_IN_PUMA` | — | When set, runs Solid Queue inside Puma |
+| `PIDFILE` | — | Custom PID file path for Puma |
+
+### Infrastructure / deploy
+
+| Variable | Description |
+|---|---|
+| `FLY_API_TOKEN` | GitHub Actions secret for `fly deploy` |
+| `AWS_ENDPOINT_URL_S3` | Tigris endpoint for Litestream replication |
+| `BUCKET_NAME` | Tigris bucket for Litestream |
+| `AWS_ACCESS_KEY_ID` | Tigris access key |
+| `AWS_SECRET_ACCESS_KEY` | Tigris secret key |
+| `AWS_REGION` | Tigris region |
+
+The five `AWS_*` / `BUCKET_NAME` vars are for Litestream SQLite replication only — book storage uses the `FAMILIOTECA_BUCKET_*` vars above. Provision Litestream credentials with `fly storage create`, which sets all five secrets on the app automatically.
 
 ## Backup & Restore
 
