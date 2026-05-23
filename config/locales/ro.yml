@@ -38,6 +38,14 @@ ro:
         label: "Stare lectură"
         mark: "Marchează ca citită"
         unmark: "Marchează ca necitită"
+      kindle:
+        send: "Trimite pe Kindle"
+        sending: "Se trimite…"
+        sent: "Trimisă ✓"
+        sent_with_time: "Trimisă ✓ %{when}"
+        failed: "Eșuat — reîncearcă"
+        no_kindle_email: "Adaugă un Email Kindle în cont pentru a trimite cărți."
+        oversize: "Cartea depășește 24MB și nu poate fi trimisă pe Kindle."
 
   admin:
     ingestions:

@@ -27,8 +27,8 @@
     <% end %>
 
     <div class="book-show__interactions">
-      <%= render "rating", book: @book, member_book: @member_book %>
-      <%= render "read_toggle", book: @book, member_book: @member_book %>
+      <%= render "books/rating", book: @book, member_book: @member_book %>
+      <%= render "books/read_toggle", book: @book, member_book: @member_book %>
     </div>
 
     <%= link_to t(".download"), download_book_path(@book),

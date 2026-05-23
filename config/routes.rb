@@ -13,6 +13,7 @@ Rails.application.routes.draw do
 
   resources :books, only: [ :show ] do
     resource :member_book, only: [ :update ], controller: "member_books"
+    resources :kindle_deliveries, only: [ :create ]
   end
   get "books/:id/download", to: "downloads#show", as: :download_book
 
