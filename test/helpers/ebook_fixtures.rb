@@ -63,6 +63,16 @@ module EbookFixtures
       book.ordered { book.add_item("ch1.xhtml", content: StringIO.new("<html><body>x</body></html>")) }
     end
 
+    write("oldstyle-cover.epub") do |book|
+      book.version    = "2.0"
+      book.identifier = "id:oldstyle-cover"
+      book.title      = "Carte EPUB 2"
+      book.creator    = "Autor Test"
+      book.add_item("cover.png", content: StringIO.new(COVER_PNG), id: "cover-img")
+      book.metadata.add_oldstyle_meta(nil, "name" => "cover", "content" => "cover-img")
+      book.ordered { book.add_item("ch1.xhtml", content: StringIO.new("<html><body>x</body></html>")) }
+    end
+
     write("jpeg-cover.epub") do |book|
       book.identifier = "id:jpg-cover"
       book.title      = "Carte cu Copertă JPEG"

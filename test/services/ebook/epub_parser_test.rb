@@ -24,6 +24,13 @@ module Ebook
       assert_equal "image/jpeg", result[:cover_content_type]
     end
 
+    test "extracts EPUB 2 cover declared via oldstyle meta" do
+      result = EpubParser.call(FIXTURES.join("oldstyle-cover.epub").to_s)
+      refute_nil result[:cover_io]
+      assert_operator result[:cover_io].size, :>, 0
+      assert_equal "image/png", result[:cover_content_type]
+    end
+
     test "parses EPUB without cover" do
       result = EpubParser.call(FIXTURES.join("no-cover.epub").to_s)
       assert_equal "Fără Copertă", result[:attributes][:title]

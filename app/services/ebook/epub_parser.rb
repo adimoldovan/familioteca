@@ -51,11 +51,23 @@ module Ebook
     end
 
     def self.extract_cover(book)
-      item = book.items.values.find { |i| i.properties&.include?("cover-image") }
+      item = find_cover_item(book)
       return {} unless item
       { cover_io: StringIO.new(item.content), cover_content_type: first_string(item.media_type) }
     rescue StandardError
       {}
+    end
+
+    # EPUB 3 marks the cover with properties="cover-image" on the manifest
+    # item. EPUB 2 declares it via <meta name="cover" content="<item-id>"/>
+    # in metadata and the manifest item itself carries no marker.
+    def self.find_cover_item(book)
+      epub3 = book.items.values.find { |i| i.properties&.include?("cover-image") }
+      return epub3 if epub3
+
+      meta = book.metadata.oldstyle_meta.find { |m| m["name"] == "cover" }
+      cover_id = meta && meta["content"]
+      cover_id.present? ? book.items[cover_id] : nil
     end
   end
 end
