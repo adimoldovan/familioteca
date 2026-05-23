@@ -27,7 +27,7 @@ gem "rails-i18n", "~> 8.0"
 gem "rack-attack", "~> 6.7"
 
 # EPUB metadata parsing
-gem "gepub", "~> 1.0"
+gem "gepub", "~> 2.0"
 
 # Object storage client (used against Cloudflare R2 via custom endpoint)
 gem "aws-sdk-s3", "~> 1.180", require: false

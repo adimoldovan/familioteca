@@ -133,9 +133,9 @@ GEM
     fugit (1.12.1)
       et-orbi (~> 1.4)
       raabro (~> 1.4)
-    gepub (1.0.17)
+    gepub (2.0.1)
       nokogiri (>= 1.8.2, < 2.0)
-      rubyzip (> 1.1.1, < 2.4)
+      rubyzip (>= 3.0, < 3.3)
     globalid (1.3.0)
       activesupport (>= 6.1)
     i18n (1.14.8)
@@ -302,7 +302,7 @@ GEM
     ruby-vips (2.3.0)
       ffi (~> 1.12)
       logger
-    rubyzip (2.3.2)
+    rubyzip (3.2.2)
     securerandom (0.4.1)
     solid_cable (3.0.12)
       actioncable (>= 7.2)
@@ -381,7 +381,7 @@ DEPENDENCIES
   bundler-audit
   debug
   dotenv-rails
-  gepub (~> 1.0)
+  gepub (~> 2.0)
   image_processing (~> 1.13)
   importmap-rails
   propshaft
