@@ -25,13 +25,8 @@ ro:
     show:
       back_to_catalog: "← Înapoi la bibliotecă"
       download: "Descarcă fișierul"
-      meta:
-        author: "Autor"
-        publisher: "Editură"
-        published_year: "An apariție"
-        language: "Limbă"
-        format: "Format"
-        isbn: "ISBN"
+      by_author: "de %{author}"
+      pills_label: "Detalii carte"
       description_title: "Descriere"
       no_description: "Nicio descriere disponibilă."
 

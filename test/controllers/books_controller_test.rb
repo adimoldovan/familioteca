@@ -95,10 +95,28 @@ class BooksControllerTest < ActionDispatch::IntegrationTest
     get book_path(book)
     assert_response :success
     assert_select "h1", text: /Doi Ani de Vacanță/
-    assert_select "dt", text: "Autor"
-    assert_select "dd", text: "Jules Verne"
-    assert_select "dd", text: "1888"
-    assert_select "dd", text: "EPUB"
+    assert_select ".book-show__by-author", text: "de Jules Verne"
+    assert_select ".book-show__pill", count: 2
+    assert_select ".book-show__pill", text: "EPUB"
+    assert_select ".book-show__pill", text: "ro"
+    assert_select ".book-show__description", text: /Un grup de elevi/
+    assert_select "dt", false
+    assert_no_match(/Editura Test/, response.body)
+    assert_no_match(/1888/, response.body)
+    assert_no_match(/9781234567890/, response.body)
+  end
+
+  test "show omits the language pill and by-author line when those fields are blank" do
+    sign_in_as members(:ana)
+    book = Book.create!(
+      title: "T", format: "epub", object_key: "k", ingested_at: Time.current
+    )
+
+    get book_path(book)
+    assert_response :success
+    assert_select ".book-show__pill", count: 1
+    assert_select ".book-show__pill", text: "EPUB"
+    assert_select ".book-show__by-author", false
   end
 
   test "show is protected by auth" do

@@ -12,32 +12,19 @@
   </aside>
 
   <div class="book-show__body">
-    <h1 class="t-headline"><%= @book.title %></h1>
+    <div class="book-show__heading">
+      <h1 class="t-headline"><%= @book.title %></h1>
+      <ul class="book-show__pills" aria-label="<%= t(".pills_label") %>">
+        <li class="book-show__pill"><%= @book.format.upcase %></li>
+        <% if @book.language.present? %>
+          <li class="book-show__pill"><%= @book.language %></li>
+        <% end %>
+      </ul>
+    </div>
 
-    <dl class="book-show__meta">
-      <% if @book.author.present? %>
-        <dt><%= t(".meta.author") %></dt>
-        <dd><%= @book.author %></dd>
-      <% end %>
-      <% if @book.publisher.present? %>
-        <dt><%= t(".meta.publisher") %></dt>
-        <dd><%= @book.publisher %></dd>
-      <% end %>
-      <% if @book.published_year.present? %>
-        <dt><%= t(".meta.published_year") %></dt>
-        <dd><%= @book.published_year %></dd>
-      <% end %>
-      <% if @book.language.present? %>
-        <dt><%= t(".meta.language") %></dt>
-        <dd><%= @book.language %></dd>
-      <% end %>
-      <% if @book.isbn.present? %>
-        <dt><%= t(".meta.isbn") %></dt>
-        <dd><%= @book.isbn %></dd>
-      <% end %>
-      <dt><%= t(".meta.format") %></dt>
-      <dd><%= @book.format.upcase %></dd>
-    </dl>
+    <% if @book.author.present? %>
+      <p class="book-show__by-author"><%= t(".by_author", author: @book.author) %></p>
+    <% end %>
 
     <%= link_to t(".download"), download_book_path(@book),
           class: "btn btn-primary book-show__download",
