@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_05_23_113226) do
+ActiveRecord::Schema[8.1].define(version: 2026_05_23_121524) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -62,6 +62,19 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_23_113226) do
     t.index ["sort_title"], name: "index_books_on_sort_title"
   end
 
+  create_table "kindle_deliveries", force: :cascade do |t|
+    t.integer "book_id", null: false
+    t.datetime "created_at", null: false
+    t.text "error"
+    t.integer "member_id", null: false
+    t.datetime "sent_at"
+    t.integer "status", default: 0, null: false
+    t.datetime "updated_at", null: false
+    t.index ["book_id"], name: "index_kindle_deliveries_on_book_id"
+    t.index ["member_id", "book_id", "created_at"], name: "index_kindle_deliveries_on_member_book_created"
+    t.index ["member_id"], name: "index_kindle_deliveries_on_member_id"
+  end
+
   create_table "member_books", force: :cascade do |t|
     t.integer "book_id", null: false
     t.datetime "created_at", null: false
@@ -98,6 +111,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_23_113226) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "kindle_deliveries", "books"
+  add_foreign_key "kindle_deliveries", "members"
   add_foreign_key "member_books", "books"
   add_foreign_key "member_books", "members"
   add_foreign_key "sessions", "members"
