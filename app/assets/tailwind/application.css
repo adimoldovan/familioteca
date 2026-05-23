@@ -850,4 +850,56 @@ html, body {
     line-height: 1.6;
     color: var(--ink-2);
   }
+
+  .book-show__interactions {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    margin-bottom: var(--space-6);
+  }
+
+  .rating__label,
+  .read-toggle__label {
+    font-family: var(--mono);
+    font-size: var(--fs-eyebrow);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--ink-3);
+    margin-bottom: var(--space-2);
+  }
+
+  .rating__group {
+    display: inline-flex;
+    border: 1px solid var(--rule);
+  }
+
+  .rating__group form {
+    margin: 0;
+  }
+
+  .rating__option {
+    appearance: none;
+    border: none;
+    border-right: 1px solid var(--rule);
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: var(--fs-body);
+    padding-inline: var(--space-4);
+    padding-block: var(--space-2);
+    cursor: pointer;
+  }
+
+  .rating__group form:last-child .rating__option {
+    border-right: none;
+  }
+
+  .rating__option:hover {
+    background: var(--paper-2);
+  }
+
+  .rating__option--active {
+    background: var(--ink);
+    color: var(--paper);
+  }
 }

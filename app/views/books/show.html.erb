@@ -26,6 +26,11 @@
       <p class="book-show__by-author"><%= t(".by_author", author: @book.author) %></p>
     <% end %>
 
+    <div class="book-show__interactions">
+      <%= render "rating", book: @book, member_book: @member_book %>
+      <%= render "read_toggle", book: @book, member_book: @member_book %>
+    </div>
+
     <%= link_to t(".download"), download_book_path(@book),
           class: "btn btn-primary book-show__download",
           id: "book-download-link" %>

@@ -1,3 +1,20 @@
-<div id="book-read-toggle">
-  <!-- real markup added in Task 4 -->
+<div id="book-read-toggle" class="read-toggle">
+  <p class="read-toggle__label"><%= t("books.show.read.label") %></p>
+  <% if member_book.read? %>
+    <%= button_to t("books.show.read.unmark"),
+          book_member_book_path(book),
+          method: :patch,
+          params: { read: "false" },
+          class: "btn btn-secondary",
+          id: "read-unmark-button",
+          form: { data: { turbo_stream: true } } %>
+  <% else %>
+    <%= button_to t("books.show.read.mark"),
+          book_member_book_path(book),
+          method: :patch,
+          params: { read: "true" },
+          class: "btn btn-secondary",
+          id: "read-mark-button",
+          form: { data: { turbo_stream: true } } %>
+  <% end %>
 </div>

@@ -29,6 +29,15 @@ ro:
       pills_label: "Detalii carte"
       description_title: "Descriere"
       no_description: "Nicio descriere disponibilă."
+      rating:
+        label: "Părerea mea"
+        nu_mi_a_placut: "Nu mi-a plăcut"
+        asa_si_asa: "Așa și așa"
+        mi_a_placut: "Mi-a plăcut"
+      read:
+        label: "Stare lectură"
+        mark: "Marchează ca citită"
+        unmark: "Marchează ca necitită"
 
   admin:
     ingestions:

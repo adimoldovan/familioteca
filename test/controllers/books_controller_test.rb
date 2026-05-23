@@ -132,4 +132,36 @@ class BooksControllerTest < ActionDispatch::IntegrationTest
     get book_path(book)
     assert_response :not_found
   end
+
+  test "show renders the rating buttons for a signed-in member" do
+    sign_in_as members(:ana)
+    book = Book.create!(title: "T", format: "epub", object_key: "k", ingested_at: Time.current)
+    get book_path(book)
+    assert_select "#book-rating .rating__option", count: 3
+    assert_select "#book-rating .rating__option--active", count: 0
+  end
+
+  test "show marks the current rating as active" do
+    sign_in_as members(:ana)
+    book = Book.create!(title: "T", format: "epub", object_key: "k", ingested_at: Time.current)
+    MemberBook.create!(member: members(:ana), book: book, rating: :mi_a_placut)
+    get book_path(book)
+    assert_select "#book-rating .rating__option--active", count: 1
+    assert_select ".rating__option--active", text: /Mi-a plăcut/
+  end
+
+  test "show renders 'mark as read' for an unread book" do
+    sign_in_as members(:ana)
+    book = Book.create!(title: "T", format: "epub", object_key: "k", ingested_at: Time.current)
+    get book_path(book)
+    assert_select "#book-read-toggle button", text: /Marchează ca citită/
+  end
+
+  test "show renders 'mark as unread' when read_at is set" do
+    sign_in_as members(:ana)
+    book = Book.create!(title: "T", format: "epub", object_key: "k", ingested_at: Time.current)
+    MemberBook.create!(member: members(:ana), book: book, read_at: Time.current)
+    get book_path(book)
+    assert_select "#book-read-toggle button", text: /Marchează ca necitită/
+  end
 end

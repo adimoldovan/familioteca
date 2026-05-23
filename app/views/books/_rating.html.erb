@@ -1,3 +1,14 @@
-<div id="book-rating">
-  <!-- real markup added in Task 4 -->
+<div id="book-rating" class="rating">
+  <p class="rating__label"><%= t("books.show.rating.label") %></p>
+  <div class="rating__group" role="group" aria-label="<%= t("books.show.rating.label") %>">
+    <% MemberBook.ratings.each_key do |level| %>
+      <%= button_to t("books.show.rating.#{level}"),
+            book_member_book_path(book),
+            method: :patch,
+            params: { rating: level },
+            class: class_names("rating__option", "rating__option--active" => member_book.rating == level),
+            id: "rating-#{level}",
+            form: { data: { turbo_stream: true } } %>
+    <% end %>
+  </div>
 </div>
