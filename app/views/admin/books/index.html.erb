@@ -34,8 +34,13 @@
             <%= t(".status.ok") %>
           <% end %>
         </td>
-        <td>
+        <td id="<%= dom_id(book, :actions) %>">
           <%= link_to t(".edit_link"), edit_admin_book_path(book), class: "link-accent" %>
+          <%= button_to t(".rescan_link"), rescan_admin_book_path(book),
+                method: :post,
+                class: "link-accent",
+                data: { turbo_submits_with: t(".rescanning") },
+                form: { class: "inline-form", data: { turbo_stream: true } } %>
         </td>
       </tr>
     <% end %>

@@ -22,6 +22,16 @@ module Admin
       end
     end
 
+    def rescan
+      @book = Book.find(params[:id])
+      ProcessBookFileJob.perform_later(@book.object_key)
+
+      respond_to do |format|
+        format.turbo_stream
+        format.html { redirect_to admin_books_path, notice: t("admin.books.rescan.queued") }
+      end
+    end
+
     private
 
     def book_params

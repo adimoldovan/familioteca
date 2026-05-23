@@ -91,6 +91,10 @@ ro:
           missing: "Lipsește din arhivă"
           needs_metadata: "Date incomplete"
         edit_link: "Editează"
+        rescan_link: "Rescanează"
+        rescanning: "Se rescanează…"
+      rescan:
+        queued: "Rescanarea a fost programată."
       edit:
         title: "Editează cartea"
         cancel: "Anulează"

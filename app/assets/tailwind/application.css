@@ -321,6 +321,10 @@ html, body {
     border-left-color: var(--accent);
   }
 
+  .inline-form {
+    display: inline;
+  }
+
   .data-table {
     width: 100%;
     border-collapse: collapse;

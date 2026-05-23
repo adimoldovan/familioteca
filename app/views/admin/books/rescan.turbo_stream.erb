@@ -1,0 +1,6 @@
+<%= turbo_stream.replace dom_id(@book, :actions) do %>
+  <td id="<%= dom_id(@book, :actions) %>">
+    <%= link_to t("admin.books.index.edit_link"), edit_admin_book_path(@book), class: "link-accent" %>
+    <span class="scan-button__status"><%= t("admin.books.index.rescanning") %></span>
+  </td>
+<% end %>
