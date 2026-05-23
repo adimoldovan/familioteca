@@ -1,8 +1,10 @@
 require "test_helper"
 require "tempfile"
+require "turbo/broadcastable/test_helper"
 
 class SendToKindleJobTest < ActiveJob::TestCase
   include ActionMailer::TestHelper
+  include Turbo::Broadcastable::TestHelper
 
   setup do
     @member = members(:ana)
@@ -74,6 +76,52 @@ class SendToKindleJobTest < ActiveJob::TestCase
     end
 
     refute File.exist?(path_seen), "tempfile should have been cleaned up"
+  end
+
+  test "broadcasts a sent-state kindle button to the (book, member) channel on success" do
+    storage = stub_storage("verne/x.epub", "epub bytes")
+
+    streams = capture_turbo_stream_broadcasts([ @book, @member, :kindle_status ]) do
+      SendToKindleJob.new.perform(@delivery.id, storage: storage)
+    end
+
+    assert_equal 1, streams.count
+    assert_equal "book-kindle", streams.first["target"]
+    assert_match(/Trimisă/, streams.first.to_s)
+  end
+
+  test "broadcasts a failed-state kindle button on non-transient error" do
+    # Point the storage at a non-existent file so File.binread inside the
+    # mailer raises Errno::ENOENT — a non-transient error that hits the
+    # rescue branch with kindle_email still set.
+    storage = Object.new
+    storage.define_singleton_method(:download) { |_key| "/tmp/familioteca-does-not-exist-#{SecureRandom.hex}.epub" }
+
+    streams = capture_turbo_stream_broadcasts([ @book, @member, :kindle_status ]) do
+      assert_raises(Errno::ENOENT) do
+        SendToKindleJob.new.perform(@delivery.id, storage: storage)
+      end
+    end
+
+    assert_equal 1, streams.count
+    assert_match(/Eșuat/, streams.first.to_s)
+  end
+
+  test "mark_delivery_failed broadcasts so retry_on exhaustion drives the UI" do
+    # retry_on's exhaustion callback invokes job.mark_delivery_failed(error)
+    # on the job instance that just failed its last attempt — so @delivery_id
+    # is set. Simulate that call shape directly.
+    job = SendToKindleJob.new
+    job.instance_variable_set(:@delivery_id, @delivery.id)
+
+    streams = capture_turbo_stream_broadcasts([ @book, @member, :kindle_status ]) do
+      job.mark_delivery_failed(Seahorse::Client::NetworkingError.new(StandardError.new("net")))
+    end
+
+    @delivery.reload
+    assert_equal "failed", @delivery.status
+    assert_equal 1, streams.count
+    assert_match(/Eșuat/, streams.first.to_s)
   end
 
   private

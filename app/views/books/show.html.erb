@@ -1,3 +1,5 @@
+<%= turbo_stream_from @book, current_member, :kindle_status %>
+
 <%= link_to t(".back_to_catalog"), root_path, class: "book-show__back" %>
 
 <article class="book-show">
@@ -31,7 +33,7 @@
       <%= render "books/read_toggle", book: @book, member_book: @member_book %>
     </div>
 
-    <%= render "books/kindle_button", book: @book, latest_delivery: @latest_delivery %>
+    <%= render "books/kindle_button", book: @book, latest_delivery: @latest_delivery, member: current_member %>
 
     <%= link_to t(".download"), download_book_path(@book),
           class: "btn btn-primary book-show__download",

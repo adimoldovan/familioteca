@@ -1,3 +1,3 @@
 <%= turbo_stream.replace "book-kindle",
       partial: "books/kindle_button",
-      locals: { book: @book, latest_delivery: @latest_delivery } %>
+      locals: { book: @book, latest_delivery: @latest_delivery, member: current_member } %>

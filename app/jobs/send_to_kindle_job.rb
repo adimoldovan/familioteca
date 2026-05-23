@@ -27,6 +27,7 @@ class SendToKindleJob < ApplicationJob
     @path = storage.download(delivery.book.object_key)
     KindleMailer.with(delivery: delivery, file_path: @path).deliver_book.deliver_now
     delivery.mark_sent!
+    broadcast_status(delivery)
   rescue StandardError => e
     mark_delivery_failed(e) unless TRANSIENT_ERRORS.any? { |k| e.is_a?(k) }
     raise
@@ -35,6 +36,26 @@ class SendToKindleJob < ApplicationJob
   end
 
   def mark_delivery_failed(error)
-    KindleDelivery.find_by(id: @delivery_id)&.mark_failed!(error.message)
+    delivery = KindleDelivery.find_by(id: @delivery_id)
+    return unless delivery
+    delivery.mark_failed!(error.message)
+    broadcast_status(delivery)
+  end
+
+  private
+
+  # Scoped per (book, member) so other members viewing the same book don't
+  # receive a render of THIS member's button state into their session.
+  def broadcast_status(delivery)
+    Turbo::StreamsChannel.broadcast_replace_to(
+      [ delivery.book, delivery.member, :kindle_status ],
+      target: "book-kindle",
+      partial: "books/kindle_button",
+      locals: { book: delivery.book, latest_delivery: delivery, member: delivery.member }
+    )
+  rescue StandardError => e
+    # A cable failure must not flip the delivery row back to failed; the user
+    # will see the final state on the next page load instead.
+    Rails.logger.warn("Kindle broadcast failed for delivery #{delivery.id}: #{e.class}: #{e.message}")
   end
 end
