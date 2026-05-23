@@ -31,6 +31,8 @@
       <%= render "books/read_toggle", book: @book, member_book: @member_book %>
     </div>
 
+    <%= render "books/kindle_button", book: @book, latest_delivery: @latest_delivery %>
+
     <%= link_to t(".download"), download_book_path(@book),
           class: "btn btn-primary book-show__download",
           id: "book-download-link" %>

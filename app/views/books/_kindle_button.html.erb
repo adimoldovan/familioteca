@@ -1,3 +1,38 @@
-<div id="book-kindle">
-  <!-- real markup added in Task 12 -->
+<div id="book-kindle" class="kindle">
+  <% if current_member.kindle_email.blank? %>
+    <p class="kindle__notice" id="kindle-no-email"><%= t("books.show.kindle.no_kindle_email") %></p>
+  <% elsif book.oversize_for_kindle? %>
+    <p class="kindle__notice" id="kindle-oversize"><%= t("books.show.kindle.oversize") %></p>
+  <% else %>
+    <% case latest_delivery&.status %>
+    <% when "pending" %>
+      <p class="kindle__status kindle__status--pending" id="kindle-status">
+        <%= t("books.show.kindle.sending") %>
+      </p>
+    <% when "sent" %>
+      <p class="kindle__status kindle__status--sent" id="kindle-status">
+        <%= t("books.show.kindle.sent_with_time", when: time_ago_in_words(latest_delivery.sent_at)) %>
+      </p>
+      <%= button_to t("books.show.kindle.send"), book_kindle_deliveries_path(book),
+            method: :post,
+            class: "btn btn-secondary",
+            id: "kindle-send-button",
+            form: { data: { turbo_stream: true } } %>
+    <% when "failed" %>
+      <p class="kindle__status kindle__status--failed" id="kindle-status">
+        <%= t("books.show.kindle.failed") %>
+      </p>
+      <%= button_to t("books.show.kindle.send"), book_kindle_deliveries_path(book),
+            method: :post,
+            class: "btn btn-primary",
+            id: "kindle-send-button",
+            form: { data: { turbo_stream: true } } %>
+    <% else %>
+      <%= button_to t("books.show.kindle.send"), book_kindle_deliveries_path(book),
+            method: :post,
+            class: "btn btn-primary",
+            id: "kindle-send-button",
+            form: { data: { turbo_stream: true } } %>
+    <% end %>
+  <% end %>
 </div>

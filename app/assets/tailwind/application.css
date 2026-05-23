@@ -18,6 +18,7 @@
 
   --ok: #5C7A4A;
   --warn: #B8863A;
+  --danger: #B00020;
 
   --fs-dot: 10px;
   --fs-eyebrow: 10.5px;
@@ -77,6 +78,7 @@
 
   --ok: #7CA860;
   --warn: #D4A055;
+  --danger: #E26073;
 
   --shadow-card: 0 4px 12px rgba(0, 0, 0, 0.4);
 }
@@ -901,5 +903,42 @@ html, body {
   .rating__option--active {
     background: var(--ink);
     color: var(--paper);
+  }
+
+  .kindle {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-2);
+    margin-bottom: var(--space-4);
+  }
+
+  .kindle__notice {
+    font-family: var(--serif);
+    font-size: var(--fs-caption);
+    color: var(--ink-3);
+    font-style: italic;
+  }
+
+  .kindle__status {
+    font-family: var(--mono);
+    font-size: var(--fs-caption);
+    padding-block: var(--space-1);
+    padding-inline: var(--space-3);
+    border: 1px solid var(--rule);
+  }
+
+  .kindle__status--pending {
+    color: var(--ink-3);
+  }
+
+  .kindle__status--sent {
+    color: var(--accent);
+    border-color: var(--accent);
+  }
+
+  .kindle__status--failed {
+    color: var(--danger);
+    border-color: var(--danger);
   }
 }

@@ -164,4 +164,68 @@ class BooksControllerTest < ActionDispatch::IntegrationTest
     get book_path(book)
     assert_select "#book-read-toggle button", text: /Marchează ca necitită/
   end
+
+  test "show renders the Kindle button when the member has a kindle_email" do
+    member = members(:ana)
+    member.update!(kindle_email: "ana@kindle.com")
+    sign_in_as member
+    book = Book.create!(title: "T", format: "epub", object_key: "k",
+                        ingested_at: Time.current, file_size: 1.megabyte)
+    get book_path(book)
+    assert_select "#book-kindle #kindle-send-button"
+  end
+
+  test "show renders the missing-kindle-email notice" do
+    member = members(:ana)
+    member.update!(kindle_email: nil)
+    sign_in_as member
+    book = Book.create!(title: "T", format: "epub", object_key: "k", ingested_at: Time.current)
+    get book_path(book)
+    assert_select "#book-kindle .kindle__notice", text: /Adaugă un Email Kindle/
+  end
+
+  test "show renders the oversize notice instead of the button" do
+    member = members(:ana)
+    member.update!(kindle_email: "ana@kindle.com")
+    sign_in_as member
+    book = Book.create!(title: "T", format: "epub", object_key: "k",
+                        ingested_at: Time.current, file_size: 25.megabytes)
+    get book_path(book)
+    assert_select "#book-kindle .kindle__notice", text: /depășește 24MB/
+  end
+
+  test "show reflects a pending delivery" do
+    member = members(:ana)
+    member.update!(kindle_email: "ana@kindle.com")
+    sign_in_as member
+    book = Book.create!(title: "T", format: "epub", object_key: "k",
+                        ingested_at: Time.current, file_size: 1.megabyte)
+    KindleDelivery.create!(member: member, book: book, status: :pending)
+    get book_path(book)
+    assert_select "#book-kindle .kindle__status", text: /Se trimite/
+  end
+
+  test "show reflects a sent delivery and allows retry" do
+    member = members(:ana)
+    member.update!(kindle_email: "ana@kindle.com")
+    sign_in_as member
+    book = Book.create!(title: "T", format: "epub", object_key: "k",
+                        ingested_at: Time.current, file_size: 1.megabyte)
+    KindleDelivery.create!(member: member, book: book, status: :sent, sent_at: 5.minutes.ago)
+    get book_path(book)
+    assert_select "#book-kindle .kindle__status", text: /Trimisă/
+    assert_select "#book-kindle #kindle-send-button"
+  end
+
+  test "show reflects a failed delivery" do
+    member = members(:ana)
+    member.update!(kindle_email: "ana@kindle.com")
+    sign_in_as member
+    book = Book.create!(title: "T", format: "epub", object_key: "k",
+                        ingested_at: Time.current, file_size: 1.megabyte)
+    KindleDelivery.create!(member: member, book: book, status: :failed, error: "SMTP timeout")
+    get book_path(book)
+    assert_select "#book-kindle .kindle__status", text: /Eșuat/
+    assert_select "#book-kindle #kindle-send-button"
+  end
 end
