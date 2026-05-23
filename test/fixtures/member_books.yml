@@ -1,0 +1,2 @@
+# Member-book interactions are created inline by tests. Fixtures would couple
+# tests to specific (member, book) pairs that the test bodies already create.
