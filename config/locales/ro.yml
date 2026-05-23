@@ -87,6 +87,12 @@ ro:
         isbn: "ISBN"
         description: "Descriere"
 
+  mailers:
+    kindle:
+      deliver_book:
+        body: "Salut! Atașat este cartea solicitată din Familioteca."
+        signature: "Familioteca"
+
   navigation:
     primary: "Navigare principală"
     catalog: "Bibliotecă"
