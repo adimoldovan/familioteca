@@ -52,4 +52,12 @@ class KindleDeliveryTest < ActiveSupport::TestCase
     kd.mark_failed!("x" * 2_000)
     assert_equal 1_000, kd.reload.error.length
   end
+
+  test "member has many kindle_deliveries and destroys them when the member is destroyed" do
+    KindleDelivery.create!(member: @member, book: @book)
+    assert_equal 1, @member.kindle_deliveries.count
+    assert_difference "KindleDelivery.count", -1 do
+      @member.destroy
+    end
+  end
 end

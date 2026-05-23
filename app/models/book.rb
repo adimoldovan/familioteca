@@ -1,11 +1,13 @@
 class Book < ApplicationRecord
   FORMATS = %w[epub mobi pdf].freeze
+  KINDLE_MAX_SIZE = 24.megabytes
 
   has_one_attached :cover do |attachable|
     attachable.variant :thumbnail, resize_to_limit: [ 360, 540 ], format: :webp, saver: { quality: 85 }
   end
 
   has_many :member_books, dependent: :destroy
+  has_many :kindle_deliveries, dependent: :destroy
 
   validates :title, presence: true
   validates :object_key, presence: true, uniqueness: true
@@ -25,6 +27,12 @@ class Book < ApplicationRecord
 
   def member_book_for(member)
     member_books.find_or_initialize_by(member: member)
+  end
+
+  # Unknown size (nil) returns false intentionally: callers should let the send attempt fail loudly.
+  def oversize_for_kindle?
+    return false if file_size.nil?
+    file_size > KINDLE_MAX_SIZE
   end
 
   def missing?

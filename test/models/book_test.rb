@@ -163,4 +163,36 @@ class BookTest < ActiveSupport::TestCase
     assert_equal members(:ana), mb.member
     assert_equal book, mb.book
   end
+
+  test "oversize_for_kindle? is true above 24MB" do
+    book = Book.create!(
+      title: "Big", format: "epub", object_key: "kindle-big", ingested_at: Time.current,
+      file_size: 25.megabytes
+    )
+    assert book.oversize_for_kindle?
+  end
+
+  test "oversize_for_kindle? is false at 24MB exactly" do
+    book = Book.create!(
+      title: "Edge", format: "epub", object_key: "kindle-edge", ingested_at: Time.current,
+      file_size: 24.megabytes
+    )
+    refute book.oversize_for_kindle?
+  end
+
+  test "oversize_for_kindle? is false when file_size is nil (unknown — let the send attempt fail loudly)" do
+    book = Book.create!(
+      title: "?", format: "epub", object_key: "kindle-nil", ingested_at: Time.current
+    )
+    refute book.oversize_for_kindle?
+  end
+
+  test "book has many kindle_deliveries and destroys them when the book is destroyed" do
+    book = Book.create!(title: "T", format: "epub", object_key: "kindle-assoc", ingested_at: Time.current)
+    KindleDelivery.create!(member: members(:ana), book: book)
+    assert_equal 1, book.kindle_deliveries.count
+    assert_difference "KindleDelivery.count", -1 do
+      book.destroy
+    end
+  end
 end
