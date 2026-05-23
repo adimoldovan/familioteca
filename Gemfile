@@ -30,7 +30,7 @@ gem "rack-attack", "~> 6.7"
 gem "gepub", "~> 1.0"
 
 # Object storage client (used against Cloudflare R2 via custom endpoint)
-gem "aws-sdk-s3", "~> 1.180", require: false
+gem "aws-sdk-s3", "~> 1.224", require: false
 
 # Image processing for Active Storage cover variants
 gem "image_processing", "~> 1.13"
