@@ -4,11 +4,13 @@ module Ebook
   module EpubParser
     class ParseError < StandardError; end
 
+    SORT_NAME_SUFFIXES = /\A(Jr|Sr|[IVX]+|Inc|LLC|Ltd|Co)\.?\z/i
+
     def self.call(path)
       book = GEPUB::Book.parse(path)
 
       title = first_string(book.title) || File.basename(path, ".*")
-      author = first_string(book.creator)
+      author = unsort_author_name(first_string(book.creator))
 
       isbn = extract_isbn(book)
 
@@ -48,6 +50,14 @@ module Ebook
         return match[1] if match
       end
       nil
+    end
+
+    # "Bocai, Iulian" → "Iulian Bocai"; leaves normal names untouched.
+    def self.unsort_author_name(name)
+      return name unless name
+      match = name.match(/\A\s*([^,]+?)\s*,\s*([^,]+?)\s*\z/)
+      return name unless match && !match[2].match?(SORT_NAME_SUFFIXES)
+      "#{match[2]} #{match[1]}"
     end
 
     def self.extract_cover(book)

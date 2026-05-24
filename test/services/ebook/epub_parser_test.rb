@@ -54,6 +54,44 @@ module Ebook
       assert_match(/mănăstiri/, result[:attributes][:description])
     end
 
+    test "reverses sort-name author to display name" do
+      result = EpubParser.call(FIXTURES.join("sort-author.epub").to_s)
+      assert_equal "Iulian Bocai", result[:attributes][:author]
+    end
+
+    test "unsort_author_name reverses Last, First" do
+      assert_equal "Iulian Bocai", EpubParser.unsort_author_name("Bocai, Iulian")
+    end
+
+    test "unsort_author_name handles compound names" do
+      assert_equal "Jules Gabriel Verne", EpubParser.unsort_author_name("Verne, Jules Gabriel")
+      assert_equal "Gabriel Garcia Marquez", EpubParser.unsort_author_name("Garcia Marquez, Gabriel")
+    end
+
+    test "unsort_author_name strips surrounding whitespace" do
+      assert_equal "Iulian Bocai", EpubParser.unsort_author_name("  Bocai, Iulian  ")
+    end
+
+    test "unsort_author_name handles comma without space" do
+      assert_equal "Iulian Bocai", EpubParser.unsort_author_name("Bocai,Iulian")
+    end
+
+    test "unsort_author_name leaves normal names unchanged" do
+      assert_equal "Jules Verne", EpubParser.unsort_author_name("Jules Verne")
+    end
+
+    test "unsort_author_name preserves names with suffixes" do
+      assert_equal "Martin Luther King, Jr.", EpubParser.unsort_author_name("Martin Luther King, Jr.")
+    end
+
+    test "unsort_author_name leaves multi-comma strings unchanged" do
+      assert_equal "King, Jr., Martin Luther", EpubParser.unsort_author_name("King, Jr., Martin Luther")
+    end
+
+    test "unsort_author_name returns nil for nil" do
+      assert_nil EpubParser.unsort_author_name(nil)
+    end
+
     test "raises on corrupt file" do
       assert_raises(Ebook::EpubParser::ParseError) do
         EpubParser.call(FIXTURES.join("corrupt.epub").to_s)
