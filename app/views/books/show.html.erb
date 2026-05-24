@@ -1,6 +1,6 @@
 <%= turbo_stream_from @book, current_member, :kindle_status %>
 
-<nav class="crumbs" aria-label="Navigare">
+<nav class="crumbs" aria-label="<%= t("navigation.breadcrumb") %>">
   <%= link_to t("navigation.catalog"), root_path %>
   <span class="crumbs__sep" aria-hidden="true">/</span>
   <span class="crumbs__current" title="<%= @book.title %>"><%= @book.title %></span>
@@ -18,13 +18,13 @@
       <% end %>
     </div>
     <div class="book-detail__actions">
+      <%= render "books/kindle_button", book: @book, latest_delivery: @latest_delivery, member: current_member %>
       <%= link_to download_book_path(@book),
-            class: "btn btn-primary book-detail__action-btn",
+            class: "btn btn-secondary book-detail__action-btn",
             id: "book-download-link" do %>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
         <%= t(".download") %>
       <% end %>
-      <%= render "books/kindle_button", book: @book, latest_delivery: @latest_delivery, member: current_member %>
     </div>
     <div class="book-detail__upload-meta">
       <span><%= t(".added_ago", when: time_ago_in_words(@book.ingested_at)) %></span>

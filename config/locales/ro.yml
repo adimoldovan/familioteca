@@ -10,7 +10,6 @@ ro:
       email: "Email"
       kindle_email: "Email Kindle"
       errors_title: "Erori"
-      cancel: "Anulează"
       submit: "Salvează"
     update:
       success: "Cont actualizat."
@@ -131,6 +130,9 @@ ro:
 
   navigation:
     primary: "Navigare principală"
+    breadcrumb: "Navigare"
+    menu: "Meniu"
+    close_menu: "Închide meniu"
     catalog: "Bibliotecă"
     account: "Contul meu"
     admin: "Administrare"

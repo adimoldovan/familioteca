@@ -12,9 +12,9 @@ class AccountsControllerTest < ActionDispatch::IntegrationTest
 
     get account_path
     assert_response :success
-    assert_select "h1", "Contul meu"
+    assert_select ".crumbs__current", "Contul meu"
     assert_select "#account-name[value=?]", member.name
-    assert_select "#account-email", member.email
+    assert_select "#account-email[value=?]", member.email
     assert_select "#account-kindle-email[value=?]", member.kindle_email
   end
 

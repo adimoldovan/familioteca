@@ -1,4 +1,8 @@
-<h1 id="account-heading" class="t-headline"><%= t("account.show.title") %></h1>
+<nav class="crumbs" aria-label="<%= t("navigation.breadcrumb") %>">
+  <%= link_to t("navigation.catalog"), root_path %>
+  <span class="crumbs__sep" aria-hidden="true">/</span>
+  <span class="crumbs__current"><%= t("account.show.title") %></span>
+</nav>
 
 <%= form_with model: @member, url: account_path, method: :patch, id: "account-form", class: "content-form" do |f| %>
   <% if @member.errors.any? %>
@@ -21,9 +25,9 @@
 
   <div class="form-field">
     <div class="form-field__header">
-      <span class="form-field__label"><%= t("account.show.email") %></span>
+      <label for="account-email" class="form-field__label"><%= t("account.show.email") %></label>
     </div>
-    <p class="form-field__hint" id="account-email"><%= @member.email %></p>
+    <input type="email" value="<%= @member.email %>" class="form-field__input" id="account-email" disabled>
   </div>
 
   <div class="form-field">
@@ -34,7 +38,6 @@
   </div>
 
   <div class="content-form__actions">
-    <%= link_to t("account.show.cancel"), root_path, class: "btn btn-secondary" %>
     <%= f.submit t("account.show.submit"), class: "btn btn-primary", id: "account-submit" %>
   </div>
 <% end %>

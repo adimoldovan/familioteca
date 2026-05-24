@@ -2,7 +2,7 @@ import { type Page, type Locator } from "@playwright/test";
 
 export class AccountPage {
   readonly page: Page;
-  readonly heading: Locator;
+  readonly breadcrumbCurrent: Locator;
   readonly nameInput: Locator;
   readonly emailDisplay: Locator;
   readonly kindleEmailInput: Locator;
@@ -12,7 +12,7 @@ export class AccountPage {
 
   constructor(page: Page) {
     this.page = page;
-    this.heading = page.locator("#account-heading");
+    this.breadcrumbCurrent = page.locator(".crumbs__current");
     this.nameInput = page.locator("#account-name");
     this.emailDisplay = page.locator("#account-email");
     this.kindleEmailInput = page.locator("#account-kindle-email");

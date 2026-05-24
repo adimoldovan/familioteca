@@ -114,10 +114,9 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
   }
 
   .site-header__logo-mark {
-    width: 40px;
-    height: 32px;
+    width: 44px;
+    height: 44px;
     flex-shrink: 0;
-    color: var(--ink);
   }
 
   .site-header__spacer { }
@@ -222,7 +221,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
   .theme-toggle {
     width: 38px;
     height: 38px;
-    border: 1px solid var(--rule-strong);
+    border: none;
     background: transparent;
     border-radius: 4px;
     cursor: pointer;
@@ -466,7 +465,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
     width: 100%;
     background: var(--chip);
     border: 1px solid transparent;
-    border-radius: 999px;
+    border-radius: 8px;
     padding: 8px 36px 8px 38px;
     font-family: var(--sans);
     font-size: 14px;
@@ -677,9 +676,9 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
   }
 
   .book-detail__eyebrow {
-    font-size: 11px;
+    font-size: 14px;
     font-weight: 500;
-    letter-spacing: 0.18em;
+    letter-spacing: 0.12em;
     text-transform: uppercase;
     color: var(--muted);
     margin: 0 0 12px;
@@ -720,15 +719,14 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
     font-size: 18px;
     line-height: 1.65;
     color: var(--ink);
-    max-width: 62ch;
   }
   .book-detail__desc-body p { margin: 0 0 1em; }
 
   /* ---- JOURNAL (rating + read toggle) ---- */
   .journal__left {
     display: flex;
-    align-items: center;
-    gap: 18px;
+    flex-direction: column;
+    gap: 8px;
   }
 
   .journal__label {
@@ -741,17 +739,17 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 
   .journal__rate-row {
     display: inline-flex;
-    gap: 4px;
+    gap: 6px;
   }
   .journal__rate-row form { margin: 0; }
 
   .journal__rate-btn {
-    width: 38px;
-    height: 38px;
-    border-radius: 50%;
-    border: 1px solid var(--rule-strong);
+    width: 36px;
+    height: 36px;
+    border-radius: 6px;
+    border: none;
     background: transparent;
-    color: var(--ink);
+    color: var(--muted);
     cursor: pointer;
     display: inline-flex;
     align-items: center;
@@ -760,19 +758,21 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
     padding: 0;
     font-family: var(--sans);
   }
-  .journal__rate-btn:hover { background: var(--chip); }
-  .journal__rate-btn svg { width: 18px; height: 18px; }
+  .journal__rate-btn:hover { color: var(--ink); }
+  .journal__rate-btn svg { width: 28px; height: 28px; }
   .journal__rate-btn.is-active {
-    background: var(--ink);
     color: var(--bg);
-    border-color: var(--ink);
+  }
+  .journal__rate-btn.is-active .rate-face {
+    fill: var(--ink);
+    stroke: var(--ink);
   }
 
   .journal__read-toggle {
     display: inline-flex;
     align-items: center;
     gap: 10px;
-    border: 1px solid var(--rule-strong);
+    border: none;
     background: transparent;
     color: var(--ink);
     padding: 8px 16px;
@@ -995,7 +995,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
   }
 
   /* ---- FORMS ---- */
-  .form-field { display: block; margin-bottom: 20px; }
+  .form-field { display: block; margin-bottom: 28px; }
 
   .form-field__header {
     display: flex;
@@ -1016,21 +1016,23 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
   .form-field__input {
     display: block;
     width: 100%;
-    font-family: var(--serif);
-    font-size: 17px;
+    max-width: 400px;
+    font-family: var(--sans);
+    font-size: 14px;
     color: var(--ink);
-    background-color: transparent;
-    border: none;
-    border-bottom: 1px solid var(--rule);
-    padding-block: 8px;
-    padding-inline: 0;
+    background: var(--chip);
+    border: 1px solid transparent;
+    border-radius: 8px;
+    padding: 8px 16px;
     outline: none;
-    transition: border-color 120ms ease;
+    transition: background 0.15s ease, border-color 0.15s ease;
   }
+  .form-field__input::placeholder { color: var(--muted); }
+  .form-field__input:disabled { color: var(--muted); cursor: default; }
+  .form-field__input:hover:not(:disabled) { background: color-mix(in srgb, var(--ink) 9%, transparent); }
   .form-field__input:focus {
-    border-bottom-color: var(--accent);
-    outline: 2px solid transparent;
-    outline-offset: 2px;
+    background: var(--surface);
+    border-color: var(--rule-strong);
   }
 
   .form-field__hint {
@@ -1074,7 +1076,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 
   .inline-form { display: inline; }
 
-  .content-form { max-width: 640px; }
+  .content-form { max-width: 100%; }
 
   .content-form__actions {
     display: flex;

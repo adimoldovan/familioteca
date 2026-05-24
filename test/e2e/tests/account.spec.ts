@@ -8,7 +8,7 @@ test.describe("Account", () => {
     await authenticatedPage.locator("#nav-account").click();
 
     const account = new AccountPage(authenticatedPage);
-    await expect(account.heading).toHaveText("Contul meu");
+    await expect(account.breadcrumbCurrent).toHaveText("Contul meu");
     await expect(account.nameInput).toBeVisible();
     await expect(account.emailDisplay).toBeVisible();
     await expect(account.kindleEmailInput).toBeVisible();
