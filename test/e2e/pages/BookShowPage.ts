@@ -23,13 +23,13 @@ export class BookShowPage {
 
   constructor(page: Page) {
     this.page = page;
-    this.heading = page.locator("h1.t-headline");
+    this.heading = page.locator("h1.book-detail__title");
     this.downloadLink = page.locator("#book-download-link");
 
     this.ratingNuMiAPlacut = page.locator("#rating-nu_mi_a_placut");
     this.ratingAsaSiAsa = page.locator("#rating-asa_si_asa");
     this.ratingMiAPlacut = page.locator("#rating-mi_a_placut");
-    this.activeRating = page.locator("#book-rating .rating__option--active");
+    this.activeRating = page.locator("#book-rating .journal__rate-btn.is-active");
 
     this.markReadButton = page.locator("#read-mark-button");
     this.markUnreadButton = page.locator("#read-unmark-button");

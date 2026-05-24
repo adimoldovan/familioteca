@@ -10,16 +10,25 @@ class BooksControllerTest < ActionDispatch::IntegrationTest
     sign_in_as members(:ana)
     get root_path
     assert_response :success
-    assert_select "h1", "Bibliotecă"
     assert_select ".empty-state"
   end
 
-  test "lists visible books sorted by sort_title" do
+  test "lists visible books sorted by recent by default" do
+    sign_in_as members(:ana)
+    Book.create!(title: "Țara",    format: "epub", object_key: "k1", ingested_at: 1.day.ago)
+    Book.create!(title: "Bizanț",  format: "epub", object_key: "k2", ingested_at: Time.current)
+
+    get root_path
+    titles = css_select(".book-card__title").map(&:text)
+    assert_equal [ "Bizanț", "Țara" ], titles
+  end
+
+  test "lists visible books sorted by title when requested" do
     sign_in_as members(:ana)
     Book.create!(title: "Țara",    format: "epub", object_key: "k1", ingested_at: Time.current)
     Book.create!(title: "Bizanț",  format: "epub", object_key: "k2", ingested_at: Time.current)
 
-    get root_path
+    get root_path(sort: "title")
     titles = css_select(".book-card__title").map(&:text)
     assert_equal [ "Bizanț", "Țara" ], titles
 
@@ -77,6 +86,32 @@ class BooksControllerTest < ActionDispatch::IntegrationTest
     assert_no_match(/<script>/, response.body)
   end
 
+  test "filter by read status" do
+    member = members(:ana)
+    sign_in_as member
+    b1 = Book.create!(title: "Read",   format: "epub", object_key: "k1", ingested_at: Time.current)
+    b2 = Book.create!(title: "Unread", format: "epub", object_key: "k2", ingested_at: Time.current)
+    MemberBook.create!(member: member, book: b1, read_at: Time.current)
+
+    get root_path(filter: "read")
+    assert_select ".book-card__title", count: 1, text: "Read"
+
+    get root_path(filter: "unread")
+    assert_select ".book-card__title", count: 1, text: "Unread"
+  end
+
+  test "sidebar shows filter counts" do
+    member = members(:ana)
+    sign_in_as member
+    b1 = Book.create!(title: "A", format: "epub", object_key: "k1", ingested_at: Time.current)
+    Book.create!(title: "B", format: "epub", object_key: "k2", ingested_at: Time.current)
+    MemberBook.create!(member: member, book: b1, read_at: Time.current)
+
+    get root_path
+    counts = css_select(".catalog-sidebar__filter-count").map(&:text)
+    assert_equal %w[2 1 1], counts
+  end
+
   test "shows a book's full metadata" do
     sign_in_as members(:ana)
     book = Book.create!(
@@ -95,18 +130,15 @@ class BooksControllerTest < ActionDispatch::IntegrationTest
     get book_path(book)
     assert_response :success
     assert_select "h1", text: /Doi Ani de Vacanță/
-    assert_select ".book-show__by-author", text: "de Jules Verne"
-    assert_select ".book-show__pill", count: 2
-    assert_select ".book-show__pill", text: "EPUB"
-    assert_select ".book-show__pill", text: "ro"
-    assert_select ".book-show__description", text: /Un grup de elevi/
+    assert_select ".book-detail__eyebrow", text: /Jules Verne/
+    assert_select ".book-detail__desc-body", text: /Un grup de elevi/
     assert_select "dt", false
     assert_no_match(/Editura Test/, response.body)
     assert_no_match(/1888/, response.body)
     assert_no_match(/9781234567890/, response.body)
   end
 
-  test "show omits the language pill and by-author line when those fields are blank" do
+  test "show omits the by-author eyebrow when author is blank" do
     sign_in_as members(:ana)
     book = Book.create!(
       title: "T", format: "epub", object_key: "k", ingested_at: Time.current
@@ -114,9 +146,7 @@ class BooksControllerTest < ActionDispatch::IntegrationTest
 
     get book_path(book)
     assert_response :success
-    assert_select ".book-show__pill", count: 1
-    assert_select ".book-show__pill", text: "EPUB"
-    assert_select ".book-show__by-author", false
+    assert_select ".book-detail__eyebrow", false
   end
 
   test "show is protected by auth" do
@@ -137,8 +167,8 @@ class BooksControllerTest < ActionDispatch::IntegrationTest
     sign_in_as members(:ana)
     book = Book.create!(title: "T", format: "epub", object_key: "k", ingested_at: Time.current)
     get book_path(book)
-    assert_select "#book-rating .rating__option", count: 3
-    assert_select "#book-rating .rating__option--active", count: 0
+    assert_select "#book-rating .journal__rate-btn", count: 3
+    assert_select "#book-rating .journal__rate-btn.is-active", count: 0
   end
 
   test "show marks the current rating as active" do
@@ -146,8 +176,7 @@ class BooksControllerTest < ActionDispatch::IntegrationTest
     book = Book.create!(title: "T", format: "epub", object_key: "k", ingested_at: Time.current)
     MemberBook.create!(member: members(:ana), book: book, rating: :mi_a_placut)
     get book_path(book)
-    assert_select "#book-rating .rating__option--active", count: 1
-    assert_select ".rating__option--active", text: /Mi-a plăcut/
+    assert_select "#book-rating .journal__rate-btn.is-active", count: 1
   end
 
   test "show renders 'mark as read' for an unread book" do
@@ -157,12 +186,12 @@ class BooksControllerTest < ActionDispatch::IntegrationTest
     assert_select "#book-read-toggle button", text: /Marchează ca citită/
   end
 
-  test "show renders 'mark as unread' when read_at is set" do
+  test "show renders 'Citită' when read_at is set" do
     sign_in_as members(:ana)
     book = Book.create!(title: "T", format: "epub", object_key: "k", ingested_at: Time.current)
     MemberBook.create!(member: members(:ana), book: book, read_at: Time.current)
     get book_path(book)
-    assert_select "#book-read-toggle button", text: /Marchează ca necitită/
+    assert_select "#book-read-toggle button", text: /Citită/
   end
 
   test "show renders the Kindle button when the member has a kindle_email" do

@@ -1,27 +1,63 @@
-<header class="catalog-header">
-  <h1 class="t-headline"><%= t(".title") %></h1>
-
-  <%= form_with url: root_path, method: :get, class: "catalog-search" do |f| %>
-    <%= f.label :q, t(".search.label"), class: "catalog-search__label" %>
-    <%= f.search_field :q, value: @query,
-          placeholder: t(".search.placeholder"),
-          class: "catalog-search__input" %>
-    <%= f.submit t(".search.submit"), class: "btn btn-secondary" %>
-  <% end %>
-</header>
-
-<% if @books.empty? %>
-  <div class="empty-state">
-    <% if @query.present? %>
-      <p class="empty-state__body"><%= t(".search.no_results", query: @query) %></p>
-    <% else %>
-      <p class="empty-state__body"><%= t(".empty") %></p>
-    <% end %>
+<div class="catalog-toolbar">
+  <div class="sort">
+    <div class="select-wrap">
+      <%= select_tag :sort,
+            options_for_select(
+              [[t(".sort.recent"), "recent"], [t(".sort.title"), "title"], [t(".sort.author"), "author"]],
+              @sort
+            ),
+            id: "sort-select",
+            data: { controller: "auto-submit" } %>
+      <svg class="select-wrap__caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
   </div>
-<% else %>
-  <ul class="book-grid">
-    <% @books.each do |book| %>
-      <li class="book-grid__item"><%= render "card", book: book %></li>
-    <% end %>
-  </ul>
-<% end %>
+</div>
+
+<div class="catalog-layout">
+  <aside class="catalog-sidebar" aria-label="<%= t(".filters.label") %>">
+    <div class="catalog-sidebar__search" data-controller="live-search">
+      <svg class="catalog-sidebar__search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <%= search_field_tag :q, @query,
+            placeholder: t(".search.placeholder"),
+            class: "catalog-sidebar__search-input",
+            id: "search-input",
+            autocomplete: "off",
+            data: { live_search_target: "input", action: "input->live-search#search" } %>
+      <button type="button" class="catalog-sidebar__search-clear" id="search-clear" data-action="live-search#clear" aria-label="<%= t(".search.clear") %>" <%= "hidden" if @query.blank? %>>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 6l12 12M18 6l-12 12"/></svg>
+      </button>
+    </div>
+
+    <div class="catalog-sidebar__section">
+      <p class="catalog-sidebar__label"><%= t(".filters.reading_status") %></p>
+      <ul class="catalog-sidebar__filters" role="group">
+        <% %w[all unread read].each do |f| %>
+          <li>
+            <%= link_to url_for(filter: f, q: @query.presence, sort: @sort == "recent" ? nil : @sort),
+                  class: class_names("catalog-sidebar__filter-item", "is-active" => @filter == f),
+                  data: { turbo_action: "replace" } do %>
+              <span><%= t(".filters.#{f}") %></span>
+              <span class="catalog-sidebar__filter-count"><%= @counts[f.to_sym] %></span>
+            <% end %>
+          </li>
+        <% end %>
+      </ul>
+    </div>
+  </aside>
+
+  <% if @books.empty? %>
+    <div class="empty-state">
+      <% if @query.present? %>
+        <p class="empty-state__body"><%= t(".search.no_results", query: @query) %></p>
+      <% else %>
+        <p class="empty-state__body"><%= t(".empty") %></p>
+      <% end %>
+    </div>
+  <% else %>
+    <ul class="book-grid" id="book-grid">
+      <% @books.each do |book| %>
+        <li class="book-grid__item"><%= render "card", book: book %></li>
+      <% end %>
+    </ul>
+  <% end %>
+</div>

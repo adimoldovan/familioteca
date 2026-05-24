@@ -1,4 +1,4 @@
-<div id="book-kindle" class="kindle">
+<div id="book-kindle">
   <% if member.kindle_email.blank? %>
     <p class="kindle__notice" id="kindle-no-email"><%= link_to t("books.show.kindle.no_kindle_email"), account_path %></p>
   <% elsif book.oversize_for_kindle? %>
@@ -13,26 +13,35 @@
       <p class="kindle__status kindle__status--sent" id="kindle-status">
         <%= t("books.show.kindle.sent_with_time", when: time_ago_in_words(latest_delivery.sent_at)) %>
       </p>
-      <%= button_to t("books.show.kindle.send"), book_kindle_deliveries_path(book),
+      <%= button_to book_kindle_deliveries_path(book),
             method: :post,
-            class: "btn btn-secondary",
+            class: "btn btn-secondary book-detail__action-btn",
             id: "kindle-send-button",
-            form: { data: { turbo_stream: true } } %>
+            form: { data: { turbo_stream: true } } do %>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="9" y1="18" x2="15" y2="18"/></svg>
+        <%= t("books.show.kindle.send") %>
+      <% end %>
     <% when "failed" %>
       <p class="kindle__status kindle__status--failed" id="kindle-status">
         <%= t("books.show.kindle.failed") %>
       </p>
-      <%= button_to t("books.show.kindle.send"), book_kindle_deliveries_path(book),
+      <%= button_to book_kindle_deliveries_path(book),
             method: :post,
-            class: "btn btn-primary",
+            class: "btn btn-primary book-detail__action-btn",
             id: "kindle-send-button",
-            form: { data: { turbo_stream: true } } %>
+            form: { data: { turbo_stream: true } } do %>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="9" y1="18" x2="15" y2="18"/></svg>
+        <%= t("books.show.kindle.send") %>
+      <% end %>
     <% else %>
-      <%= button_to t("books.show.kindle.send"), book_kindle_deliveries_path(book),
+      <%= button_to book_kindle_deliveries_path(book),
             method: :post,
-            class: "btn btn-primary",
+            class: "btn btn-secondary book-detail__action-btn",
             id: "kindle-send-button",
-            form: { data: { turbo_stream: true } } %>
+            form: { data: { turbo_stream: true } } do %>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="9" y1="18" x2="15" y2="18"/></svg>
+        <%= t("books.show.kindle.send") %>
+      <% end %>
     <% end %>
   <% end %>
 </div>

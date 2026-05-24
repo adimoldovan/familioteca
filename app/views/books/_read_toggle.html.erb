@@ -1,20 +1,23 @@
-<div id="book-read-toggle" class="read-toggle">
-  <p class="read-toggle__label"><%= t("books.show.read.label") %></p>
+<div id="book-read-toggle">
   <% if member_book.read? %>
-    <%= button_to t("books.show.read.unmark"),
-          book_member_book_path(book),
+    <%= button_to book_member_book_path(book),
           method: :patch,
           params: { read: "false" },
-          class: "btn btn-secondary",
+          class: "journal__read-toggle is-on",
           id: "read-unmark-button",
-          form: { data: { turbo_stream: true } } %>
+          form: { data: { turbo_stream: true } } do %>
+      <span class="journal__read-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+      <span><%= t("books.show.read.read_label") %></span>
+    <% end %>
   <% else %>
-    <%= button_to t("books.show.read.mark"),
-          book_member_book_path(book),
+    <%= button_to book_member_book_path(book),
           method: :patch,
           params: { read: "true" },
-          class: "btn btn-secondary",
+          class: "journal__read-toggle",
           id: "read-mark-button",
-          form: { data: { turbo_stream: true } } %>
+          form: { data: { turbo_stream: true } } do %>
+      <span class="journal__read-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+      <span><%= t("books.show.read.mark") %></span>
+    <% end %>
   <% end %>
 </div>

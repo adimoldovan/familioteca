@@ -1,14 +1,24 @@
-<div id="book-rating" class="rating">
-  <p class="rating__label"><%= t("books.show.rating.label") %></p>
-  <div class="rating__group" role="group" aria-label="<%= t("books.show.rating.label") %>">
+<%# Rating icons keyed by MemberBook rating enum %>
+<% icons = {
+  "nu_mi_a_placut" => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M17 14V2M9 11.5L6 21a3 3 0 0 1-3-3v-2l1.5-6h12V2"/></svg>',
+  "asa_si_asa"     => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><line x1="8" y1="15" x2="16" y2="15"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>',
+  "mi_a_placut"    => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M7 10v12M15 5.88L14 10h5.83a2 2 0 0 1 1.92 2.56l-2.4 8A2 2 0 0 1 17.43 22H7V10l5-8a2 2 0 0 1 2 2v1.88z"/></svg>'
+} %>
+
+<div id="book-rating" class="journal__left">
+  <span class="journal__label"><%= t("books.show.rating.label") %></span>
+  <div class="journal__rate-row" role="group" aria-label="<%= t("books.show.rating.label") %>">
     <% MemberBook.ratings.each_key do |level| %>
-      <%= button_to t("books.show.rating.#{level}"),
-            book_member_book_path(book),
+      <%= button_to book_member_book_path(book),
             method: :patch,
             params: { rating: level },
-            class: class_names("rating__option", "rating__option--active" => member_book.rating == level),
+            class: class_names("journal__rate-btn", "is-active" => member_book.rating == level),
             id: "rating-#{level}",
-            form: { data: { turbo_stream: true } } %>
+            aria: { label: t("books.show.rating.#{level}") },
+            title: t("books.show.rating.#{level}"),
+            form: { data: { turbo_stream: true } } do %>
+        <%= icons.fetch(level, "").html_safe %>
+      <% end %>
     <% end %>
   </div>
 </div>

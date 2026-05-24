@@ -4,6 +4,7 @@ import { AccountPage } from "../pages/AccountPage";
 test.describe("Account", () => {
   test("member navigates to account page via nav link", async ({ authenticatedPage }) => {
     await authenticatedPage.goto("/");
+    await authenticatedPage.locator("#user-pill-btn").click();
     await authenticatedPage.locator("#nav-account").click();
 
     const account = new AccountPage(authenticatedPage);

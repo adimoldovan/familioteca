@@ -8,7 +8,7 @@ export class CatalogPage {
 
   constructor(page: Page) {
     this.page = page;
-    this.searchInput = page.locator("input#q");
+    this.searchInput = page.locator("#search-input");
     this.bookCards = page.locator(".book-card");
     this.emptyState = page.locator(".empty-state");
   }

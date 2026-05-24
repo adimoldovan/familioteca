@@ -30,15 +30,23 @@ ro:
       title: "Bibliotecă"
       empty: "Niciun titlu disponibil"
       search:
-        label: "Caută"
-        placeholder: "Titlu, autor, descriere…"
-        submit: "Caută"
+        placeholder: "Caută…"
+        clear: "Șterge căutarea"
         no_results: 'Niciun rezultat pentru „%{query}".'
+      filters:
+        label: "Filtre"
+        reading_status: "Stare lectură"
+        all: "Toate"
+        unread: "Necitite"
+        read: "Citite"
+      sort:
+        recent: "Adăugate recent"
+        title: "Titlu A–Z"
+        author: "Autor A–Z"
     show:
-      back_to_catalog: "← Înapoi la bibliotecă"
       download: "Descarcă fișierul"
       by_author: "de %{author}"
-      pills_label: "Detalii carte"
+      added_ago: "Adăugată acum %{when}"
       description_title: "Descriere"
       no_description: "Nicio descriere disponibilă."
       rating:
@@ -49,7 +57,7 @@ ro:
       read:
         label: "Stare lectură"
         mark: "Marchează ca citită"
-        unmark: "Marchează ca necitită"
+        read_label: "Citită"
       kindle:
         send: "Trimite pe Kindle"
         sending: "Se trimite…"

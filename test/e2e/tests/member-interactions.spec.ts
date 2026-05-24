@@ -12,11 +12,11 @@ test.describe("Member interactions", () => {
     await expect(show.activeRating).toHaveCount(0);
     await show.ratingMiAPlacut.click();
     await expect(show.activeRating).toHaveCount(1);
-    await expect(show.activeRating).toContainText("Mi-a plăcut");
+    await expect(show.activeRating).toHaveAttribute("title", "Mi-a plăcut");
 
     await authenticatedPage.reload();
     await expect(show.activeRating).toHaveCount(1);
-    await expect(show.activeRating).toContainText("Mi-a plăcut");
+    await expect(show.activeRating).toHaveAttribute("title", "Mi-a plăcut");
   });
 
   test("clicking the active rating again clears it", async ({ authenticatedPage, seedBook }) => {

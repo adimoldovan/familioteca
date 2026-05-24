@@ -8,14 +8,14 @@ class LayoutTest < ActionDispatch::IntegrationTest
     assert_select "html[lang=ro]"
     assert_select "header" do
       assert_select "a", I18n.t("app.name")
-      assert_select "a", I18n.t("navigation.catalog")
     end
+    assert_select ".mobile-menu__nav a", I18n.t("navigation.catalog")
   end
 
   test "layout omits admin link for non-admins" do
     sign_in_as members(:ana)
     get root_path
-    assert_select "a", { text: I18n.t("navigation.admin"), count: 0 }
+    assert_select "a#nav-admin", count: 0
   end
 
   test "layout shows admin link for admins" do

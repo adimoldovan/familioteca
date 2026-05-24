@@ -36,26 +36,74 @@
     <%= render "shared/flash" %>
 
     <% if signed_in? %>
-      <header class="site-header">
-        <div class="site-header__bar">
-          <%= link_to t("app.name"), root_path, id: "site-header-brand", class: "site-header__brand" %>
-          <nav class="site-header__nav" aria-label="<%= t("navigation.primary") %>">
-            <%= link_to t("navigation.catalog"), root_path, id: "nav-catalog" %>
-            <%= link_to t("navigation.account"), account_path, id: "nav-account" %>
+      <div data-controller="mobile-menu">
+        <header class="site-header">
+          <div class="site-header__bar">
+            <%= link_to root_path, class: "site-header__logo", aria: { label: t("app.name") } do %>
+              <%= render "shared/logo_mark" %>
+              <span class="sr-only"><%= t("app.name") %></span>
+            <% end %>
+
+            <div class="site-header__spacer"></div>
+
+            <nav class="site-header__secondary">
+              <div class="user-menu" data-controller="dropdown">
+                <button class="user-pill" data-action="dropdown#toggle" data-dropdown-target="button" aria-haspopup="true" aria-expanded="false" id="user-pill-btn">
+                  <span class="user-pill__avatar" aria-hidden="true"><%= current_member.name.first.upcase %></span>
+                  <span class="user-pill__name"><%= current_member.name %></span>
+                  <svg class="user-pill__caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+                </button>
+                <div class="user-popover" data-dropdown-target="menu" role="menu">
+                  <%= link_to account_path, role: "menuitem", class: "user-popover__item", id: "nav-account" do %>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    <%= t("navigation.account") %>
+                  <% end %>
+                  <% if current_member.admin? %>
+                    <%= link_to admin_books_path, role: "menuitem", class: "user-popover__item", id: "nav-admin" do %>
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l8 4v6c0 5-3.5 9-8 10-4.5-1-8-5-8-10V6l8-4z"/></svg>
+                      <%= t("navigation.admin") %>
+                    <% end %>
+                  <% end %>
+                  <div class="user-popover__sep"></div>
+                  <%= button_to session_path, method: :delete, role: "menuitem", class: "user-popover__item", id: "nav-sign-out",
+                        form: { id: "sign-out-form", class: "user-popover__form" } do %>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+                    <%= t("sessions.destroy.link") %>
+                  <% end %>
+                </div>
+              </div>
+
+              <%= render "shared/theme_toggle" %>
+
+              <button class="mobile-menu-btn" data-action="mobile-menu#open" aria-label="Meniu">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+              </button>
+            </nav>
+          </div>
+        </header>
+
+        <div class="mobile-menu" data-mobile-menu-target="panel" id="mobile-menu">
+          <div class="mobile-menu__head">
+            <%= link_to root_path, class: "site-header__logo", aria: { label: t("app.name") }, data: { action: "mobile-menu#close" } do %>
+              <%= render "shared/logo_mark" %>
+            <% end %>
+            <button class="mobile-menu-btn" data-action="mobile-menu#close" aria-label="Închide meniu">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M6 6l12 12M18 6l-12 12"/></svg>
+            </button>
+          </div>
+          <nav class="mobile-menu__nav">
+            <%= link_to t("navigation.catalog"), root_path, data: { action: "mobile-menu#close" } %>
+            <%= link_to t("navigation.account"), account_path, data: { action: "mobile-menu#close" } %>
             <% if current_member.admin? %>
-              <%= link_to t("navigation.admin"), admin_books_path, id: "nav-admin" %>
+              <%= link_to t("navigation.admin"), admin_books_path, data: { action: "mobile-menu#close" } %>
             <% end %>
           </nav>
-          <div class="site-header__account">
-            <span class="site-header__current-member" id="current-member-name"><%= current_member.name %></span>
-            <%= button_to t("sessions.destroy.link"), session_path, method: :delete,
-                  form: { id: "sign-out-form" },
-                  class: "site-header__sign-out",
-                  id: "nav-sign-out" %>
-            <%= render "shared/theme_toggle" %>
+          <div class="mobile-menu__foot">
+            <span><%= current_member.name %></span>
+            <%= button_to t("sessions.destroy.link"), session_path, method: :delete %>
           </div>
         </div>
-      </header>
+      </div>
 
       <main class="site-main">
         <%= yield %>

@@ -5,10 +5,10 @@ const DARK = "dark"
 const LIGHT = "light"
 
 export default class extends Controller {
-  static targets = ["icon"]
+  static targets = ["moon", "sun"]
 
   connect() {
-    this.syncIcon()
+    this.syncIcons()
   }
 
   toggle() {
@@ -17,14 +17,14 @@ export default class extends Controller {
     try {
       localStorage.setItem(STORAGE_KEY, isDark ? DARK : LIGHT)
     } catch {
-      // Storage unavailable (Safari private mode etc.) — preference is per-session only.
+      // Storage unavailable (Safari private mode etc.)
     }
-    this.syncIcon()
+    this.syncIcons()
   }
 
-  syncIcon() {
-    if (!this.hasIconTarget) return
+  syncIcons() {
     const isDark = document.documentElement.classList.contains(DARK)
-    this.iconTarget.textContent = isDark ? "☀" : "☾"
+    if (this.hasMoonTarget) this.moonTarget.style.display = isDark ? "none" : "block"
+    if (this.hasSunTarget) this.sunTarget.style.display = isDark ? "block" : "none"
   }
 }

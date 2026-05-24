@@ -1,51 +1,57 @@
 <%= turbo_stream_from @book, current_member, :kindle_status %>
 
-<%= link_to t(".back_to_catalog"), root_path, class: "book-show__back" %>
+<nav class="crumbs" aria-label="Navigare">
+  <%= link_to t("navigation.catalog"), root_path %>
+  <span class="crumbs__sep" aria-hidden="true">/</span>
+  <span class="crumbs__current" title="<%= @book.title %>"><%= @book.title %></span>
+</nav>
 
-<article class="book-show">
-  <aside class="book-show__cover">
-    <% if @book.cover.attached? && @book.cover.variable? %>
-      <%= image_tag @book.cover, class: "book-show__cover-img", alt: @book.title %>
-    <% else %>
-      <div class="book-show__cover-placeholder" aria-hidden="true">
-        <span>📖</span>
-      </div>
-    <% end %>
-  </aside>
-
-  <div class="book-show__body">
-    <div class="book-show__heading">
-      <h1 class="t-headline"><%= @book.title %></h1>
-      <ul class="book-show__pills" aria-label="<%= t(".pills_label") %>">
-        <li class="book-show__pill"><%= @book.format.upcase %></li>
-        <% if @book.language.present? %>
-          <li class="book-show__pill"><%= @book.language %></li>
-        <% end %>
-      </ul>
+<article class="book-detail">
+  <div class="book-detail__left">
+    <div class="book-detail__cover">
+      <% if @book.cover.attached? && @book.cover.variable? %>
+        <%= image_tag @book.cover, class: "book-detail__cover-img", alt: @book.title %>
+      <% else %>
+        <div class="book-detail__cover-placeholder" aria-hidden="true">
+          <span>📖</span>
+        </div>
+      <% end %>
     </div>
+    <div class="book-detail__actions">
+      <%= link_to download_book_path(@book),
+            class: "btn btn-primary book-detail__action-btn",
+            id: "book-download-link" do %>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+        <%= t(".download") %>
+      <% end %>
+      <%= render "books/kindle_button", book: @book, latest_delivery: @latest_delivery, member: current_member %>
+    </div>
+    <div class="book-detail__upload-meta">
+      <span><%= t(".added_ago", when: time_ago_in_words(@book.ingested_at)) %></span>
+      <span><%= @book.format.upcase %><%= " · #{@book.language}" if @book.language.present? %></span>
+    </div>
+  </div>
 
+  <div class="book-detail__info">
     <% if @book.author.present? %>
-      <p class="book-show__by-author"><%= t(".by_author", author: @book.author) %></p>
+      <p class="book-detail__eyebrow"><%= t(".by_author", author: @book.author) %></p>
     <% end %>
+    <h1 class="book-detail__title"><%= @book.title %></h1>
 
-    <div class="book-show__interactions">
+    <div class="book-detail__journal" id="book-journal" role="group" aria-label="<%= t(".rating.label") %>">
       <%= render "books/rating", book: @book, member_book: @member_book %>
       <%= render "books/read_toggle", book: @book, member_book: @member_book %>
     </div>
 
-    <%= render "books/kindle_button", book: @book, latest_delivery: @latest_delivery, member: current_member %>
-
-    <%= link_to t(".download"), download_book_path(@book),
-          class: "btn btn-primary book-show__download",
-          id: "book-download-link" %>
-
-    <section class="book-show__description">
-      <h2 class="t-eyebrow"><%= t(".description_title") %></h2>
-      <% if @book.description.present? %>
-        <%= simple_format(@book.description) %>
-      <% else %>
-        <p class="t-lede"><%= t(".no_description") %></p>
-      <% end %>
+    <section class="book-detail__description">
+      <p class="book-detail__desc-label"><%= t(".description_title") %></p>
+      <div class="book-detail__desc-body">
+        <% if @book.description.present? %>
+          <%= simple_format(@book.description) %>
+        <% else %>
+          <p><%= t(".no_description") %></p>
+        <% end %>
+      </div>
     </section>
   </div>
 </article>
