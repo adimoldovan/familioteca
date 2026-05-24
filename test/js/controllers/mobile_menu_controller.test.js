@@ -114,7 +114,7 @@ describe("MobileMenuController", () => {
     expect(document.activeElement.id).toBe("close-btn");
   });
 
-  test("calling open twice does not duplicate listeners", async () => {
+  test("open is idempotent when already open", async () => {
     app = mount("mobile-menu", MobileMenuController, TEMPLATE);
     await flush();
 
@@ -161,5 +161,23 @@ describe("MobileMenuController", () => {
     document.getElementById("close-btn").click();
     expect(document.querySelector(".site-header__bar").hasAttribute("inert")).toBe(false);
     expect(document.querySelector("main.site-main").hasAttribute("inert")).toBe(false);
+  });
+
+  test("disconnect cleans up state and removes listeners", async () => {
+    app = mount("mobile-menu", MobileMenuController, TEMPLATE);
+    await flush();
+
+    trigger().click();
+
+    const nav = document.querySelector("[data-controller='mobile-menu']");
+    const ctrl = app.getControllerForElementAndIdentifier(nav, "mobile-menu");
+    ctrl.disconnect();
+
+    expect(panel().classList.contains("is-open")).toBe(false);
+    expect(panel().getAttribute("aria-hidden")).toBe("true");
+    expect(document.querySelector("main.site-main").hasAttribute("inert")).toBe(false);
+
+    document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
+    expect(panel().classList.contains("is-open")).toBe(false);
   });
 });
