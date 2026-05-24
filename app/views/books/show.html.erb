@@ -1,7 +1,7 @@
 <%= turbo_stream_from @book, current_member, :kindle_status %>
 
 <nav class="crumbs" aria-label="<%= t("navigation.breadcrumb") %>">
-  <%= link_to t("navigation.catalog"), root_path %>
+  <%= link_to t("navigation.catalog"), session[:catalog_url] || root_path %>
   <span class="crumbs__sep" aria-hidden="true">/</span>
   <span class="crumbs__current" title="<%= @book.title %>"><%= @book.title %></span>
 </nav>

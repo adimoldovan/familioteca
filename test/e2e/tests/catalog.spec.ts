@@ -37,6 +37,27 @@ test.describe("Catalog", () => {
     await expect(catalog.bookCardByTitle(matching)).toBeVisible();
   });
 
+  test("breadcrumb preserves catalog filters when navigating back", async ({ authenticatedPage, seedBook }) => {
+    const suffix = uniqueSuffix();
+    const title = `Filtered Book ${suffix}`;
+    await seedBook({ title, author: "Test Author" });
+
+    const catalog = new CatalogPage(authenticatedPage);
+    await catalog.goto();
+    await catalog.search(title);
+
+    const card = catalog.bookCardByTitle(title);
+    await expect(card).toBeVisible();
+    await card.click();
+
+    const show = new BookShowPage(authenticatedPage);
+    await expect(show.heading).toHaveText(title);
+
+    await show.breadcrumbCatalog.click();
+    await expect(catalog.searchInput).toHaveValue(title);
+    await expect(catalog.bookCardByTitle(title)).toBeVisible();
+  });
+
   test("empty search shows the no-results message", async ({ authenticatedPage, seedBook }) => {
     const suffix = uniqueSuffix();
     await seedBook({ title: `Cluj ${suffix}`, author: "Other" });

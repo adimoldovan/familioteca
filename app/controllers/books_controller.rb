@@ -26,6 +26,8 @@ class BooksController < ApplicationController
     when "author" then @books.order(Arel.sql("COALESCE(books.author, '') ASC, sort_title ASC"))
     else @books.order(ingested_at: :desc)
     end
+
+    session[:catalog_url] = request.url
   end
 
   def show

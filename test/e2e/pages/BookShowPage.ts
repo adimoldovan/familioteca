@@ -4,6 +4,7 @@ export class BookShowPage {
   readonly page: Page;
   readonly heading: Locator;
   readonly downloadLink: Locator;
+  readonly breadcrumbCatalog: Locator;
 
   // Rating
   readonly ratingNuMiAPlacut: Locator;
@@ -25,6 +26,7 @@ export class BookShowPage {
     this.page = page;
     this.heading = page.locator("h1.book-detail__title");
     this.downloadLink = page.locator("#book-download-link");
+    this.breadcrumbCatalog = page.locator("nav.crumbs a");
 
     this.ratingNuMiAPlacut = page.locator("#rating-nu_mi_a_placut");
     this.ratingAsaSiAsa = page.locator("#rating-asa_si_asa");
