@@ -75,14 +75,14 @@
 
               <%= render "shared/theme_toggle" %>
 
-              <button class="mobile-menu-btn" data-action="mobile-menu#open" aria-label="Meniu">
+              <button class="mobile-menu-btn" data-action="mobile-menu#open" data-mobile-menu-target="trigger" aria-label="Meniu" aria-expanded="false" aria-controls="mobile-menu">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
               </button>
             </nav>
           </div>
         </header>
 
-        <div class="mobile-menu" data-mobile-menu-target="panel" id="mobile-menu">
+        <div class="mobile-menu" data-mobile-menu-target="panel" id="mobile-menu" role="dialog" aria-modal="true" aria-label="Meniu" aria-hidden="true">
           <div class="mobile-menu__head">
             <%= link_to root_path, class: "site-header__logo", aria: { label: t("app.name") }, data: { action: "mobile-menu#close" } do %>
               <%= render "shared/logo_mark" %>
