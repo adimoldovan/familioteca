@@ -26,7 +26,7 @@ export class BookShowPage {
     this.page = page;
     this.heading = page.locator("h1.book-detail__title");
     this.downloadLink = page.locator("#book-download-link");
-    this.breadcrumbCatalog = page.locator("nav.crumbs a");
+    this.breadcrumbCatalog = page.getByRole("navigation", { name: /navigare/i }).getByRole("link");
 
     this.ratingNuMiAPlacut = page.locator("#rating-nu_mi_a_placut");
     this.ratingAsaSiAsa = page.locator("#rating-asa_si_asa");

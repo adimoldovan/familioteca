@@ -27,12 +27,14 @@ class BooksController < ApplicationController
     else @books.order(ingested_at: :desc)
     end
 
-    session[:catalog_url] = request.url
+    session[:catalog_url] = request.fullpath if request.format.html?
   end
 
   def show
     @book = Book.visible.with_attached_cover.find(params[:id])
     @member_book = @book.member_book_for(current_member)
     @latest_delivery = KindleDelivery.latest_for(current_member, @book)
+    url = session[:catalog_url]
+    @catalog_url = url&.match?(%r{\A/[^/]}) ? url : root_path
   end
 end

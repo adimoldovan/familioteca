@@ -112,6 +112,28 @@ class BooksControllerTest < ActionDispatch::IntegrationTest
     assert_equal %w[2 1 1], counts
   end
 
+  test "index stores the catalog path in session" do
+    sign_in_as members(:ana)
+    get root_path(q: "verne", sort: "title")
+    assert_equal "/?q=verne&sort=title", session[:catalog_url]
+  end
+
+  test "show breadcrumb links to stored catalog path" do
+    sign_in_as members(:ana)
+    get root_path(q: "verne")
+
+    book = Book.create!(title: "T", format: "epub", object_key: "k", ingested_at: Time.current)
+    get book_path(book)
+    assert_select "nav.crumbs a[href=?]", "/?q=verne"
+  end
+
+  test "show breadcrumb falls back to root when no catalog session" do
+    sign_in_as members(:ana)
+    book = Book.create!(title: "T", format: "epub", object_key: "k", ingested_at: Time.current)
+    get book_path(book)
+    assert_select "nav.crumbs a[href=?]", "/"
+  end
+
   test "shows a book's full metadata" do
     sign_in_as members(:ana)
     book = Book.create!(
