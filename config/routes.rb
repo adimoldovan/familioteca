@@ -18,6 +18,7 @@ Rails.application.routes.draw do
     resources :books, only: [ :index, :edit, :update, :destroy ] do
       post :rescan, on: :member
     end
+    resources :invite_codes, only: [ :index, :create ]
   end
 
   resource :account, only: [ :show, :update ]

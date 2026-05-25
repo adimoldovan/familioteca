@@ -1,0 +1,24 @@
+<h1 id="invite-codes-heading" class="t-headline"><%= t(".title") %></h1>
+
+<%= button_to t(".generate"), admin_invite_codes_path, method: :post, class: "btn btn-sm" %>
+
+<table class="data-table" aria-labelledby="invite-codes-heading">
+  <thead>
+    <tr>
+      <th scope="col"><%= t(".code") %></th>
+      <th scope="col"><%= t(".status") %></th>
+      <th scope="col"><%= t(".used_by") %></th>
+      <th scope="col"><%= t(".created_at") %></th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @invite_codes.each do |invite_code| %>
+      <tr>
+        <td><code><%= invite_code.code %></code></td>
+        <td><%= invite_code.available? ? t(".active") : t(".used") %></td>
+        <td><%= invite_code.used_by_member&.name || "—" %></td>
+        <td><%= l(invite_code.created_at, format: :short) %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
