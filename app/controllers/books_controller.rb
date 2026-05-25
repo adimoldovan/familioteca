@@ -1,10 +1,22 @@
 class BooksController < ApplicationController
-  SORT_OPTIONS = %w[recent title author].freeze
+  SORT_OPTIONS = %w[date title author].freeze
+  DIR_OPTIONS = %w[asc desc].freeze
+  SORT_DEFAULTS = { "date" => "desc", "title" => "asc", "author" => "asc" }.freeze
 
   def index
     @query = params[:q].to_s.strip
     @filter = params[:filter].to_s.presence || "all"
-    @sort = SORT_OPTIONS.include?(params[:sort]) ? params[:sort] : "recent"
+
+    raw_sort = params[:sort].to_s
+    @sort = if raw_sort == "recent"
+      "date"
+    elsif SORT_OPTIONS.include?(raw_sort)
+      raw_sort
+    else
+      "date"
+    end
+
+    @dir = DIR_OPTIONS.include?(params[:dir]) ? params[:dir] : SORT_DEFAULTS[@sort]
 
     base = Book.visible.with_attached_cover.search(@query)
     read_scope = current_member.member_books.where.not(read_at: nil).select(:book_id)
@@ -21,10 +33,14 @@ class BooksController < ApplicationController
     else base
     end
 
+    direction = @dir == "desc" ? :desc : :asc
+
     @books = case @sort
-    when "title"  then @books.order(:sort_title)
-    when "author" then @books.order(Arel.sql("COALESCE(books.author, '') ASC, sort_title ASC"))
-    else @books.order(ingested_at: :desc)
+    when "title"  then @books.order(sort_title: direction)
+    when "author"
+      dir_sql = @dir.upcase
+      @books.order(Arel.sql("COALESCE(books.author, '') #{dir_sql}, sort_title #{dir_sql}"))
+    else @books.order(ingested_at: direction)
     end
 
     session[:catalog_url] = request.fullpath if request.format.html?

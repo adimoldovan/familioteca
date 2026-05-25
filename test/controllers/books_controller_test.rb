@@ -13,7 +13,7 @@ class BooksControllerTest < ActionDispatch::IntegrationTest
     assert_select ".empty-state"
   end
 
-  test "lists visible books sorted by recent by default" do
+  test "lists visible books sorted by date descending by default" do
     sign_in_as members(:ana)
     Book.create!(title: "Țara",    format: "epub", object_key: "k1", ingested_at: 1.day.ago)
     Book.create!(title: "Bizanț",  format: "epub", object_key: "k2", ingested_at: Time.current)
@@ -110,6 +110,54 @@ class BooksControllerTest < ActionDispatch::IntegrationTest
     get root_path
     counts = css_select(".catalog-sidebar__filter-count").map(&:text)
     assert_equal %w[2 1 1], counts
+  end
+
+  test "sorts by date ascending when dir=asc" do
+    sign_in_as members(:ana)
+    Book.create!(title: "Old", format: "epub", object_key: "k1", ingested_at: 1.day.ago)
+    Book.create!(title: "New", format: "epub", object_key: "k2", ingested_at: Time.current)
+
+    get root_path(sort: "date", dir: "asc")
+    titles = css_select(".book-card__title").map(&:text)
+    assert_equal [ "Old", "New" ], titles
+  end
+
+  test "sorts by title descending when dir=desc" do
+    sign_in_as members(:ana)
+    Book.create!(title: "Țara",   format: "epub", object_key: "k1", ingested_at: Time.current)
+    Book.create!(title: "Bizanț", format: "epub", object_key: "k2", ingested_at: Time.current)
+
+    get root_path(sort: "title", dir: "desc")
+    titles = css_select(".book-card__title").map(&:text)
+    assert_equal [ "Țara", "Bizanț" ], titles
+  end
+
+  test "sorts by author descending when dir=desc" do
+    sign_in_as members(:ana)
+    Book.create!(title: "A", author: "Zamfir", format: "epub", object_key: "k1", ingested_at: Time.current)
+    Book.create!(title: "B", author: "Andreescu", format: "epub", object_key: "k2", ingested_at: Time.current)
+
+    get root_path(sort: "author", dir: "desc")
+    titles = css_select(".book-card__title").map(&:text)
+    assert_equal [ "A", "B" ], titles
+  end
+
+  test "backwards compat: sort=recent maps to sort=date dir=desc" do
+    sign_in_as members(:ana)
+    Book.create!(title: "Old", format: "epub", object_key: "k1", ingested_at: 1.day.ago)
+    Book.create!(title: "New", format: "epub", object_key: "k2", ingested_at: Time.current)
+
+    get root_path(sort: "recent")
+    titles = css_select(".book-card__title").map(&:text)
+    assert_equal [ "New", "Old" ], titles
+  end
+
+  test "invalid dir param falls back to sort default" do
+    sign_in_as members(:ana)
+    Book.create!(title: "A", format: "epub", object_key: "k1", ingested_at: Time.current)
+
+    get root_path(sort: "title", dir: "bogus")
+    assert_response :success
   end
 
   test "index stores the catalog path in session" do
