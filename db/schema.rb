@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_05_25_124651) do
+ActiveRecord::Schema[8.1].define(version: 2026_05_25_170525) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -63,6 +63,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_25_124651) do
     t.index ["sort_title"], name: "index_books_on_sort_title"
   end
 
+  create_table "invite_codes", force: :cascade do |t|
+    t.string "code", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.datetime "used_at"
+    t.integer "used_by_member_id"
+    t.index ["code"], name: "index_invite_codes_on_code", unique: true
+    t.index ["used_by_member_id"], name: "index_invite_codes_on_used_by_member_id"
+  end
+
   create_table "kindle_deliveries", force: :cascade do |t|
     t.integer "book_id", null: false
     t.datetime "created_at", null: false
@@ -112,6 +122,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_25_124651) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "invite_codes", "members", column: "used_by_member_id"
   add_foreign_key "kindle_deliveries", "books"
   add_foreign_key "kindle_deliveries", "members"
   add_foreign_key "member_books", "books"
