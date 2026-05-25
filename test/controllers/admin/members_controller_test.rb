@@ -20,4 +20,19 @@ class Admin::MembersControllerTest < ActionDispatch::IntegrationTest
     assert_select "tbody tr td:nth-child(3)", text: "—", count: 1
     assert_select "#admin-scan-button #scan-now-button"
   end
+
+  test "reset_link generates token and displays URL" do
+    sign_in_as members(:admin)
+    post reset_link_admin_member_path(members(:ana))
+    assert_response :success
+    assert_select "#reset-url" do |elements|
+      assert_match %r{/password_resets/[^/]+/edit}, elements.first.text
+    end
+  end
+
+  test "reset_link denied for non-admin" do
+    sign_in_as members(:ana)
+    post reset_link_admin_member_path(members(:ana))
+    assert_response :not_found
+  end
 end

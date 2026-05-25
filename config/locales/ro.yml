@@ -94,8 +94,14 @@ ro:
         email: "Email"
         kindle_email: "Email Kindle"
         role: "Rol"
+        actions: "Acțiuni"
         admin: "Administrator"
         member: "Membru"
+        reset_link: "Resetare parolă"
+      reset_link:
+        title: "Link resetare parolă — %{name}"
+        instructions: "Copiază link-ul de mai jos și trimite-l membrului. Link-ul expiră în 24 de ore."
+        back: "Înapoi la membri"
     books:
       index:
         title: "Toate cărțile"

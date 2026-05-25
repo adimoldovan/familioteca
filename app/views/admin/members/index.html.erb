@@ -9,6 +9,7 @@
       <th scope="col"><%= t(".email") %></th>
       <th scope="col"><%= t(".kindle_email") %></th>
       <th scope="col"><%= t(".role") %></th>
+      <th scope="col"><%= t(".actions") %></th>
     </tr>
   </thead>
   <tbody>
@@ -18,6 +19,7 @@
         <td><%= member.email %></td>
         <td><%= member.kindle_email || "—" %></td>
         <td><%= member.admin? ? t(".admin") : t(".member") %></td>
+        <td><%= button_to t(".reset_link"), reset_link_admin_member_path(member), class: "btn btn-sm" %></td>
       </tr>
     <% end %>
   </tbody>

@@ -1,0 +1,8 @@
+<h1 class="t-headline"><%= t(".title", name: @member.name) %></h1>
+
+<div class="generated-link">
+  <p><%= t(".instructions") %></p>
+  <code id="reset-url"><%= @reset_url %></code>
+</div>
+
+<p style="margin-top: 24px;"><%= link_to t(".back"), admin_members_path, class: "btn btn-secondary" %></p>
