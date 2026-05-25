@@ -9,6 +9,7 @@ class Member < ApplicationRecord
   has_many :sessions, dependent: :destroy
   has_many :member_books, dependent: :destroy
   has_many :kindle_deliveries, dependent: :destroy
+  has_many :used_invite_codes, class_name: "InviteCode", foreign_key: :used_by_member_id, dependent: :nullify, inverse_of: :used_by_member
 
   normalizes :email, with: ->(e) { e.strip.downcase }
   normalizes :kindle_email, with: ->(e) { e.blank? ? nil : e.strip.downcase }

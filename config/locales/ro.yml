@@ -109,6 +109,13 @@ ro:
         admin: "Administrator"
         member: "Membru"
         reset_link: "Resetare parolă"
+        delete: "Șterge"
+        delete_confirm: 'Sigur vrei să ștergi membrul „%{name}"?'
+        invite_codes_link: "Coduri de invitație"
+      destroy:
+        success: "Membrul a fost șters."
+        self_delete: "Nu te poți șterge pe tine."
+        last_admin: "Nu poți șterge ultimul administrator."
       reset_link:
         title: "Link resetare parolă — %{name}"
         instructions: "Copiază link-ul de mai jos și trimite-l membrului. Link-ul expiră în 24 de ore."

@@ -2,6 +2,10 @@
 
 <h1 id="members-heading" class="t-headline"><%= t(".title") %></h1>
 
+<p class="data-table__toolbar">
+  <%= link_to t(".invite_codes_link"), admin_invite_codes_path, class: "btn btn-sm" %>
+</p>
+
 <table class="data-table" aria-labelledby="members-heading">
   <thead>
     <tr>
@@ -19,7 +23,12 @@
         <td><%= member.email %></td>
         <td><%= member.kindle_email || "—" %></td>
         <td><%= member.admin? ? t(".admin") : t(".member") %></td>
-        <td><%= button_to t(".reset_link"), reset_link_admin_member_path(member), class: "btn btn-sm" %></td>
+        <td>
+          <%= button_to t(".reset_link"), reset_link_admin_member_path(member), class: "btn btn-sm" %>
+          <% unless member == current_member %>
+            <%= button_to t(".delete"), admin_member_path(member), method: :delete, class: "btn btn-sm btn-danger", data: { turbo_confirm: t(".delete_confirm", name: member.name) } %>
+          <% end %>
+        </td>
       </tr>
     <% end %>
   </tbody>

@@ -11,7 +11,7 @@ Rails.application.routes.draw do
   post "register/:code", to: "registrations#create"
 
   namespace :admin do
-    resources :members, only: [ :index ] do
+    resources :members, only: [ :index, :destroy ] do
       post :reset_link, on: :member
     end
     resources :ingestions, only: [ :create ]
