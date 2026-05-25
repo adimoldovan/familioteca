@@ -591,6 +591,42 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
   }
   .catalog-sidebar__filter-item.is-active .catalog-sidebar__filter-count { color: var(--ink); }
 
+  .catalog-sidebar__filter-item--checkable {
+    justify-content: flex-start;
+  }
+  .catalog-sidebar__filter-item--checkable.is-active {
+    box-shadow: none;
+  }
+  .catalog-sidebar__filter-item--checkable .catalog-sidebar__filter-count {
+    margin-left: auto;
+  }
+
+  .catalog-sidebar__checkbox {
+    position: relative;
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+    border: 1.5px solid var(--rule-strong);
+    border-radius: 3px;
+    background: transparent;
+    transition: background 0.12s ease, border-color 0.12s ease;
+  }
+  .catalog-sidebar__filter-item.is-active .catalog-sidebar__checkbox {
+    background: var(--ink);
+    border-color: var(--ink);
+  }
+  .catalog-sidebar__filter-item.is-active .catalog-sidebar__checkbox::after {
+    content: "";
+    position: absolute;
+    left: 4px;
+    top: 1px;
+    width: 5px;
+    height: 9px;
+    border: solid var(--bg);
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+  }
+
   /* ---- BOOK GRID ---- */
   .book-grid {
     list-style: none;
@@ -1380,6 +1416,8 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
       color: inherit;
       opacity: 0.85;
     }
+    .catalog-sidebar__checkbox { display: none; }
+    .catalog-sidebar__filter-item--checkable { justify-content: center; }
 
     .book-detail { grid-template-columns: 1fr; gap: 32px; }
     .book-detail__left { flex-direction: row; gap: 20px; align-items: flex-start; }

@@ -75,9 +75,11 @@
             <% toggled = @langs.include?(language) ? @langs - [language] : @langs + [language] %>
             <li>
               <%= link_to url_for(lang: toggled.presence, q: @query.presence, filter: @filter == "all" ? nil : @filter, sort: @sort, dir: @dir),
-                    class: class_names("catalog-sidebar__filter-item", "is-active" => @langs.include?(language)),
+                    class: class_names("catalog-sidebar__filter-item", "catalog-sidebar__filter-item--checkable", "is-active" => @langs.include?(language)),
                     id: "lang-filter-#{language.parameterize}",
+                    aria: { current: ("true" if @langs.include?(language)) },
                     data: { turbo_action: "replace" } do %>
+                <span class="catalog-sidebar__checkbox" aria-hidden="true"></span>
                 <span><%= language %></span>
                 <span class="catalog-sidebar__filter-count"><%= @language_counts.fetch(language, 0) %></span>
               <% end %>
