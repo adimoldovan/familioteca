@@ -160,6 +160,25 @@ class BooksControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
+  test "toolbar renders sort buttons and direction toggle" do
+    sign_in_as members(:ana)
+    Book.create!(title: "T", format: "epub", object_key: "k", ingested_at: Time.current)
+
+    get root_path
+    assert_select ".sort-btn", count: 3
+    assert_select ".sort-btn.is-active", count: 1
+    assert_select ".sort-dir", count: 1
+  end
+
+  test "toolbar marks the current sort as active" do
+    sign_in_as members(:ana)
+    Book.create!(title: "T", format: "epub", object_key: "k", ingested_at: Time.current)
+
+    get root_path(sort: "title")
+    active = css_select(".sort-btn.is-active").map(&:text).map(&:strip)
+    assert_equal [ "Titlu" ], active
+  end
+
   test "index stores the catalog path in session" do
     sign_in_as members(:ana)
     get root_path(q: "verne", sort: "title")

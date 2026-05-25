@@ -1,15 +1,25 @@
 <div class="catalog-toolbar">
   <div class="sort">
-    <div class="select-wrap">
-      <%= select_tag :sort,
-            options_for_select(
-              [[t(".sort.recent"), "recent"], [t(".sort.title"), "title"], [t(".sort.author"), "author"]],
-              @sort
-            ),
-            id: "sort-select",
-            data: { controller: "auto-submit" } %>
-      <svg class="select-wrap__caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
-    </div>
+    <% %w[date title author].each do |s| %>
+      <%= link_to t(".sort.#{s}"),
+            url_for(sort: s, dir: s == @sort ? @dir : nil, q: @query.presence, filter: @filter == "all" ? nil : @filter),
+            class: class_names("sort-btn", "is-active" => @sort == s),
+            data: { turbo_action: "replace" } %>
+    <% end %>
+
+    <span class="sort-divider" aria-hidden="true"></span>
+
+    <% flipped = @dir == "asc" ? "desc" : "asc" %>
+    <%= link_to url_for(sort: @sort, dir: flipped, q: @query.presence, filter: @filter == "all" ? nil : @filter),
+          class: "sort-dir",
+          aria: { label: flipped == "asc" ? "Crescător" : "Descrescător" },
+          data: { turbo_action: "replace" } do %>
+      <% if @dir == "asc" %>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12l7-7 7 7"/></svg>
+      <% else %>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M5 12l7 7 7-7"/></svg>
+      <% end %>
+    <% end %>
   </div>
 </div>
 
