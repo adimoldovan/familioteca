@@ -152,12 +152,24 @@ class BooksControllerTest < ActionDispatch::IntegrationTest
     assert_equal [ "New", "Old" ], titles
   end
 
-  test "invalid dir param falls back to sort default" do
+  test "invalid dir param falls back to sort default direction" do
     sign_in_as members(:ana)
-    Book.create!(title: "A", format: "epub", object_key: "k1", ingested_at: Time.current)
+    Book.create!(title: "Țara",   format: "epub", object_key: "k1", ingested_at: Time.current)
+    Book.create!(title: "Bizanț", format: "epub", object_key: "k2", ingested_at: Time.current)
 
     get root_path(sort: "title", dir: "bogus")
-    assert_response :success
+    titles = css_select(".book-card__title").map(&:text)
+    assert_equal [ "Bizanț", "Țara" ], titles
+  end
+
+  test "invalid sort param falls back to date descending" do
+    sign_in_as members(:ana)
+    Book.create!(title: "Old", format: "epub", object_key: "k1", ingested_at: 1.day.ago)
+    Book.create!(title: "New", format: "epub", object_key: "k2", ingested_at: Time.current)
+
+    get root_path(sort: "bogus")
+    titles = css_select(".book-card__title").map(&:text)
+    assert_equal [ "New", "Old" ], titles
   end
 
   test "toolbar renders sort buttons and direction toggle" do

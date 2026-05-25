@@ -33,7 +33,7 @@ class BooksController < ApplicationController
     else base
     end
 
-    direction = @dir == "desc" ? :desc : :asc
+    direction = @dir.to_sym
 
     @books = case @sort
     when "title"  then @books.order(sort_title: direction)

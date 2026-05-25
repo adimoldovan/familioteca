@@ -42,6 +42,8 @@ ro:
         date: "Dată adăugare"
         title: "Titlu"
         author: "Autor"
+        dir_asc: "Crescător"
+        dir_desc: "Descrescător"
     show:
       download: "Descarcă fișierul"
       by_author: "de %{author}"

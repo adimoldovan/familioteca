@@ -12,7 +12,7 @@
     <% flipped = @dir == "asc" ? "desc" : "asc" %>
     <%= link_to url_for(sort: @sort, dir: flipped, q: @query.presence, filter: @filter == "all" ? nil : @filter),
           class: "sort-dir",
-          aria: { label: flipped == "asc" ? "Crescător" : "Descrescător" },
+          aria: { label: t(".sort.dir_#{flipped}") },
           data: { turbo_action: "replace" } do %>
       <% if @dir == "asc" %>
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12l7-7 7 7"/></svg>
@@ -43,7 +43,7 @@
       <ul class="catalog-sidebar__filters" role="group">
         <% %w[all unread read].each do |f| %>
           <li>
-            <%= link_to url_for(filter: f, q: @query.presence, sort: @sort == "recent" ? nil : @sort),
+            <%= link_to url_for(filter: f, q: @query.presence, sort: @sort, dir: @dir),
                   class: class_names("catalog-sidebar__filter-item", "is-active" => @filter == f),
                   data: { turbo_action: "replace" } do %>
               <span><%= t(".filters.#{f}") %></span>
