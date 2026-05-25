@@ -1,11 +1,12 @@
 class BooksController < ApplicationController
   SORT_OPTIONS = %w[date title author].freeze
   DIR_OPTIONS = %w[asc desc].freeze
+  FILTER_OPTIONS = %w[all unread read].freeze
   SORT_DEFAULTS = { "date" => "desc", "title" => "asc", "author" => "asc" }.freeze
 
   def index
     @query = params[:q].to_s.strip
-    @filter = params[:filter].to_s.presence || "all"
+    @filter = FILTER_OPTIONS.include?(params[:filter]) ? params[:filter] : "all"
 
     normalized = params[:sort].to_s.then { |s| s == "recent" ? "date" : s }
     @sort = SORT_OPTIONS.include?(normalized) ? normalized : "date"
@@ -20,6 +21,8 @@ class BooksController < ApplicationController
       unread: base.where.not(id: read_scope).count,
       read: base.where(id: read_scope).count
     }
+
+    @total_count = @query.blank? ? @counts[:all] : Book.visible.count
 
     @books = case @filter
     when "read"  then base.where(id: read_scope)

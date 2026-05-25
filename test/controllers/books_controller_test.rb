@@ -100,6 +100,68 @@ class BooksControllerTest < ActionDispatch::IntegrationTest
     assert_select ".book-card__title", count: 1, text: "Unread"
   end
 
+  test "sidebar shows total book count" do
+    member = members(:ana)
+    sign_in_as member
+    Book.create!(title: "A", format: "epub", object_key: "k1", ingested_at: Time.current)
+    Book.create!(title: "B", format: "epub", object_key: "k2", ingested_at: Time.current)
+
+    get root_path
+    assert_select ".catalog-sidebar__count", text: "2 / 2"
+  end
+
+  test "sidebar count reflects filtered vs total" do
+    member = members(:ana)
+    sign_in_as member
+    Book.create!(title: "A", format: "epub", object_key: "k1", ingested_at: Time.current)
+    Book.create!(title: "B", format: "epub", object_key: "k2", ingested_at: Time.current)
+
+    get root_path(q: "A")
+    assert_select ".catalog-sidebar__count", text: "1 / 2"
+  end
+
+  test "sidebar total excludes non-visible books" do
+    sign_in_as members(:ana)
+    Book.create!(title: "A", format: "epub", object_key: "k1", ingested_at: Time.current)
+    Book.create!(title: "B", format: "epub", object_key: "k2", ingested_at: Time.current, missing_since: Time.current)
+
+    get root_path
+    assert_select ".catalog-sidebar__count", text: /1 \/ 1/
+  end
+
+  test "sidebar count reflects reading status filter" do
+    member = members(:ana)
+    sign_in_as member
+    b1 = Book.create!(title: "A", format: "epub", object_key: "k1", ingested_at: Time.current)
+    Book.create!(title: "B", format: "epub", object_key: "k2", ingested_at: Time.current)
+    MemberBook.create!(member: member, book: b1, read_at: Time.current)
+
+    get root_path(filter: "read")
+    assert_select ".catalog-sidebar__count", text: "1 / 2"
+  end
+
+  test "sidebar count total is absolute when search is active" do
+    member = members(:ana)
+    sign_in_as member
+    b1 = Book.create!(title: "A", format: "epub", object_key: "k1", ingested_at: Time.current)
+    Book.create!(title: "B", format: "epub", object_key: "k2", ingested_at: Time.current)
+    Book.create!(title: "C", format: "epub", object_key: "k3", ingested_at: Time.current)
+    MemberBook.create!(member: member, book: b1, read_at: Time.current)
+
+    get root_path(q: "A", filter: "read")
+    assert_select ".catalog-sidebar__count", text: "1 / 3"
+  end
+
+  test "invalid filter param falls back to all" do
+    sign_in_as members(:ana)
+    Book.create!(title: "A", format: "epub", object_key: "k1", ingested_at: Time.current)
+    Book.create!(title: "B", format: "epub", object_key: "k2", ingested_at: Time.current)
+
+    get root_path(filter: "bogus")
+    assert_select ".catalog-sidebar__count", text: "2 / 2"
+    assert_select ".catalog-sidebar__filter-item.is-active", count: 1
+  end
+
   test "sidebar shows filter counts" do
     member = members(:ana)
     sign_in_as member

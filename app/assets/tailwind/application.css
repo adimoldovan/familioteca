@@ -461,6 +461,16 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
     gap: 24px;
   }
 
+  .catalog-sidebar__count {
+    font-size: 22px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    color: var(--ink);
+    margin: 0;
+    padding: 0 2px;
+    letter-spacing: 0.02em;
+  }
+
   .catalog-sidebar__search {
     position: relative;
     display: flex;
@@ -1209,6 +1219,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
       margin: 0 -4px;
       gap: 12px;
     }
+    .catalog-sidebar__count { font-size: 18px; }
     .catalog-sidebar__label { display: none; }
     .catalog-sidebar__filters {
       flex-direction: row;

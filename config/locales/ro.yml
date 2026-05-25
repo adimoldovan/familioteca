@@ -27,6 +27,8 @@ ro:
   books:
     index:
       title: "Bibliotecă"
+      count: "%{filtered} / %{total}"
+      count_label: "%{filtered} din %{total} cărți"
       empty: "Niciun titlu disponibil"
       search:
         placeholder: "Caută…"
