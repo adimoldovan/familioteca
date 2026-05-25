@@ -68,7 +68,7 @@
                   id: "lang-filter-all",
                   data: { turbo_action: "replace" } do %>
               <span><%= t(".filters.all") %></span>
-              <span class="catalog-sidebar__filter-count"><%= @language_counts.values.sum %></span>
+              <span class="catalog-sidebar__filter-count"><%= @counts[:all] %></span>
             <% end %>
           </li>
           <% @available_languages.each do |language| %>

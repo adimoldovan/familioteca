@@ -286,6 +286,16 @@ class BooksControllerTest < ActionDispatch::IntegrationTest
     assert_select "#lang-filter-en .catalog-sidebar__filter-count", text: "1"
   end
 
+  test "All languages count includes books without a language" do
+    sign_in_as members(:ana)
+    Book.create!(title: "A", language: "ro", format: "epub", object_key: "k1", ingested_at: Time.current)
+    Book.create!(title: "B", language: nil, format: "epub", object_key: "k2", ingested_at: Time.current)
+
+    get root_path
+    assert_select "#lang-filter-all .catalog-sidebar__filter-count", text: "2"
+    assert_select "#lang-filter-ro .catalog-sidebar__filter-count", text: "1"
+  end
+
   test "language filter section is hidden when no books have languages" do
     sign_in_as members(:ana)
     Book.create!(title: "A", format: "epub", object_key: "k1", ingested_at: Time.current)
