@@ -404,6 +404,23 @@ class BooksControllerTest < ActionDispatch::IntegrationTest
     assert_no_match(/9781234567890/, response.body)
   end
 
+  test "show renders the Goodreads link when goodreads_url is present" do
+    sign_in_as members(:ana)
+    book = Book.create!(
+      title: "T", format: "epub", object_key: "k", ingested_at: Time.current,
+      goodreads_url: "https://www.goodreads.com/book/show/12345"
+    )
+    get book_path(book)
+    assert_select "a.book-detail__goodreads[href=?]", "https://www.goodreads.com/book/show/12345"
+  end
+
+  test "show omits the Goodreads link when goodreads_url is blank" do
+    sign_in_as members(:ana)
+    book = Book.create!(title: "T", format: "epub", object_key: "k", ingested_at: Time.current)
+    get book_path(book)
+    assert_select "a.book-detail__goodreads", false
+  end
+
   test "show omits the by-author eyebrow when author is blank" do
     sign_in_as members(:ana)
     book = Book.create!(

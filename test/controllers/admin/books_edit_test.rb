@@ -20,6 +20,31 @@ class Admin::BooksEditTest < ActionDispatch::IntegrationTest
     assert_equal "Autor", @book.author
   end
 
+  test "admin edits goodreads_url" do
+    sign_in_as members(:admin)
+    patch admin_book_path(@book), params: {
+      book: { goodreads_url: "https://www.goodreads.com/book/show/12345" }
+    }
+    assert_redirected_to admin_books_path
+    assert_equal "https://www.goodreads.com/book/show/12345", @book.reload.goodreads_url
+  end
+
+  test "admin edit form includes goodreads_url field" do
+    sign_in_as members(:admin)
+    get edit_admin_book_path(@book)
+    assert_select "form input[name='book[goodreads_url]']"
+  end
+
+  test "invalid goodreads_url re-renders form with 422" do
+    sign_in_as members(:admin)
+    patch admin_book_path(@book), params: {
+      book: { goodreads_url: "https://evil.example.com/book/show/1" }
+    }
+    assert_response :unprocessable_entity
+    assert_select "div.error-summary"
+    assert_nil @book.reload.goodreads_url
+  end
+
   test "invalid update re-renders form with 422" do
     sign_in_as members(:admin)
     patch admin_book_path(@book), params: { book: { title: "" } }

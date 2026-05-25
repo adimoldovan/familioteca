@@ -1,12 +1,15 @@
 module Admin
   class BooksController < BaseController
+    FILTER_OPTIONS = %w[needs_metadata needs_goodreads].freeze
+
     def index
-      scope = case params[:filter]
-      when "needs_metadata" then Book.needs_metadata
+      @filter = FILTER_OPTIONS.include?(params[:filter]) ? params[:filter] : nil
+      scope = case @filter
+      when "needs_metadata"  then Book.needs_metadata
+      when "needs_goodreads" then Book.needs_goodreads
       else Book.all
       end
       @books = scope.order(:sort_title)
-      @filter = params[:filter]
     end
 
     def edit
@@ -42,7 +45,7 @@ module Admin
 
     def book_params
       params.require(:book).permit(:title, :author, :language, :publisher,
-                                   :published_year, :isbn, :description)
+                                   :published_year, :isbn, :goodreads_url, :description)
     end
   end
 end

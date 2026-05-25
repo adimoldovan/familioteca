@@ -37,6 +37,7 @@ class ProcessBookFileJob < ApplicationJob
       publisher:      attrs[:publisher],
       published_year: attrs[:published_year],
       isbn:           attrs[:isbn],
+      goodreads_url:  attrs[:goodreads_url] || book.goodreads_url,
       description:    attrs[:description],
       format:         result[:format],
       file_size:      File.size(path),

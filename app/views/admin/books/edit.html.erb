@@ -30,6 +30,13 @@
 
   <div class="form-field">
     <div class="form-field__header">
+      <%= f.label :goodreads_url, t("admin.books.fields.goodreads_url"), class: "form-field__label" %>
+    </div>
+    <%= f.url_field :goodreads_url, class: "form-field__input", placeholder: "https://www.goodreads.com/book/show/..." %>
+  </div>
+
+  <div class="form-field">
+    <div class="form-field__header">
       <%= f.label :published_year, t("admin.books.fields.published_year"), class: "form-field__label" %>
     </div>
     <%= f.number_field :published_year, class: "form-field__input" %>

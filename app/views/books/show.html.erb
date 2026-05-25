@@ -36,7 +36,14 @@
     <% if @book.author.present? %>
       <p class="book-detail__eyebrow"><%= t(".by_author", author: @book.author) %></p>
     <% end %>
-    <h1 class="book-detail__title"><%= @book.title %></h1>
+    <div class="book-detail__title-row">
+      <h1 class="book-detail__title"><%= @book.title %></h1>
+      <% if @book.goodreads_url.present? %>
+        <%= link_to @book.goodreads_url, class: "book-detail__goodreads", target: "_blank", rel: "noopener noreferrer", aria: { label: "Goodreads" } do %>
+          <%= image_tag "goodreads.svg", alt: "Goodreads", class: "book-detail__goodreads-icon" %>
+        <% end %>
+      <% end %>
+    </div>
 
     <div class="book-detail__journal" id="book-journal" role="group" aria-label="<%= t(".rating.label") %>">
       <%= render "books/rating", book: @book, member_book: @member_book %>

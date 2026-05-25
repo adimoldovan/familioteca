@@ -91,6 +91,22 @@ module EbookFixtures
       book.ordered { book.add_item("ch1.xhtml", content: StringIO.new("<html><body>x</body></html>")) }
     end
 
+    write("goodreads-id.epub") do |book|
+      book.identifier = "https://www.goodreads.com/book/show/62024"
+      book.title      = "Carte cu Goodreads"
+      book.creator    = "Autor Test"
+      book.ordered { book.add_item("ch1.xhtml", content: StringIO.new("<html><body>x</body></html>")) }
+    end
+
+    write("goodreads-meta.epub") do |book|
+      book.identifier = "id:gr-meta"
+      book.title      = "Carte cu Goodreads Meta"
+      book.creator    = "Autor Test"
+      book.metadata.add_oldstyle_meta(nil, "name" => "goodreads-url",
+        "content" => "https://www.goodreads.com/book/show/221174391-viata-e-prea-scurt")
+      book.ordered { book.add_item("ch1.xhtml", content: StringIO.new("<html><body>x</body></html>")) }
+    end
+
     corrupt = DIR.join("corrupt.epub")
     File.binwrite(corrupt, "not actually an epub") unless File.exist?(corrupt)
   end

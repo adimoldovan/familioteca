@@ -13,11 +13,14 @@ class Book < ApplicationRecord
   validates :object_key, presence: true, uniqueness: true
   validates :format, presence: true, inclusion: { in: FORMATS }
   validates :ingested_at, presence: true
+  validates :goodreads_url, format: { with: %r{\Ahttps://www\.goodreads\.com/book/show/\S+\z}, message: :invalid },
+                            allow_blank: true
 
   before_validation :populate_search_columns
 
-  scope :visible,        -> { where(missing_since: nil).where(parse_error: nil) }
-  scope :needs_metadata, -> { where.not(parse_error: nil) }
+  scope :visible,          -> { where(missing_since: nil).where(parse_error: nil) }
+  scope :needs_metadata,   -> { where.not(parse_error: nil) }
+  scope :needs_goodreads,  -> { visible.where(goodreads_url: [ nil, "" ]) }
 
   scope :search, ->(query) {
     folded = DiacriticFolding.fold(query.to_s.strip)

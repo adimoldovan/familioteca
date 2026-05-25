@@ -104,6 +104,45 @@ class BookTest < ActiveSupport::TestCase
     refute_includes needs, good
   end
 
+  test "goodreads_url accepts valid Goodreads URLs" do
+    book = Book.new(title: "T", format: "epub", object_key: "k", ingested_at: Time.current,
+                    goodreads_url: "https://www.goodreads.com/book/show/12345")
+    assert book.valid?, book.errors.full_messages.inspect
+  end
+
+  test "goodreads_url rejects non-Goodreads URLs" do
+    book = Book.new(title: "T", format: "epub", object_key: "k", ingested_at: Time.current,
+                    goodreads_url: "https://example.com/book")
+    refute book.valid?
+    assert_includes book.errors[:goodreads_url], "este invalid"
+  end
+
+  test "goodreads_url rejects javascript: URI" do
+    book = Book.new(title: "T", format: "epub", object_key: "k", ingested_at: Time.current,
+                    goodreads_url: "javascript:alert(1)")
+    refute book.valid?
+    assert_includes book.errors[:goodreads_url], "este invalid"
+  end
+
+  test "goodreads_url allows blank" do
+    book = Book.new(title: "T", format: "epub", object_key: "k", ingested_at: Time.current,
+                    goodreads_url: "")
+    assert book.valid?, book.errors.full_messages.inspect
+  end
+
+  test "needs_goodreads scope returns visible books without a goodreads_url" do
+    with_url    = Book.create!(title: "A", format: "epub", object_key: "k1", ingested_at: Time.current,
+                               goodreads_url: "https://www.goodreads.com/book/show/1")
+    without_url = Book.create!(title: "B", format: "epub", object_key: "k2", ingested_at: Time.current)
+    hidden      = Book.create!(title: "C", format: "epub", object_key: "k3", ingested_at: Time.current,
+                               missing_since: Time.current)
+
+    needs = Book.needs_goodreads
+    assert_includes needs, without_url
+    refute_includes needs, with_url
+    refute_includes needs, hidden
+  end
+
   test "search scope matches diacritic-insensitively" do
     Book.create!(title: "Bizanț", format: "epub", object_key: "k1", ingested_at: Time.current)
     Book.create!(title: "Cluj",   format: "epub", object_key: "k2", ingested_at: Time.current)

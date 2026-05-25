@@ -92,6 +92,7 @@ ro:
           label: "Filtre"
           all: "Toate"
           needs_metadata: "Necesită metadate"
+          needs_goodreads: "Fără Goodreads"
         table:
           title: "Titlu"
           author: "Autor"
@@ -126,6 +127,7 @@ ro:
         published_year: "An apariție"
         isbn: "ISBN"
         description: "Descriere"
+        goodreads_url: "URL Goodreads"
 
   mailers:
     kindle:

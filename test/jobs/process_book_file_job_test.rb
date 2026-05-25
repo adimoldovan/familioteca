@@ -158,6 +158,29 @@ class ProcessBookFileJobTest < ActiveJob::TestCase
     refute book.reload.cover.attached?
   end
 
+  test "re-running preserves a manually-set goodreads_url when the EPUB has none" do
+    storage = stub_storage("k/gr.epub", FIXTURES.join("well-tagged.epub"))
+    ProcessBookFileJob.new.perform("k/gr.epub", storage: storage)
+    book = Book.find_by!(object_key: "k/gr.epub")
+    book.update!(goodreads_url: "https://www.goodreads.com/book/show/62024")
+
+    ProcessBookFileJob.new.perform("k/gr.epub", storage: storage)
+
+    assert_equal "https://www.goodreads.com/book/show/62024", book.reload.goodreads_url
+  end
+
+  test "re-running preserves goodreads_url when file becomes corrupt" do
+    good_storage = stub_storage("k/gr2.epub", FIXTURES.join("goodreads-id.epub"))
+    ProcessBookFileJob.new.perform("k/gr2.epub", storage: good_storage)
+    book = Book.find_by!(object_key: "k/gr2.epub")
+    assert_equal "https://www.goodreads.com/book/show/62024", book.goodreads_url
+
+    corrupt_storage = stub_storage("k/gr2.epub", FIXTURES.join("corrupt.epub"))
+    ProcessBookFileJob.new.perform("k/gr2.epub", storage: corrupt_storage)
+
+    assert_equal "https://www.goodreads.com/book/show/62024", book.reload.goodreads_url
+  end
+
   test "is idempotent — re-running clears missing_since but does not duplicate" do
     storage = stub_storage("k/a.epub", FIXTURES.join("well-tagged.epub"))
 

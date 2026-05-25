@@ -30,6 +30,19 @@ class Admin::BooksControllerTest < ActionDispatch::IntegrationTest
     assert_select "td", text: "broken.epub"
   end
 
+  test "admin can filter to needs-goodreads" do
+    sign_in_as members(:admin)
+    @ok.update!(goodreads_url: "https://www.goodreads.com/book/show/1")
+    no_url = Book.create!(title: "No URL", format: "epub", object_key: "k4", ingested_at: Time.current)
+    get admin_books_path(filter: "needs_goodreads")
+    assert_response :success
+    titles = css_select("td").map(&:text)
+    assert_includes titles, no_url.title
+    refute_includes titles, @ok.title
+    refute_includes titles, @broken.title
+    refute_includes titles, @missing.title
+  end
+
   test "admin can delete a book" do
     sign_in_as members(:admin)
     assert_difference("Book.count", -1) do

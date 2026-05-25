@@ -21,6 +21,7 @@ module Ebook
         publisher: first_string(book.publisher),
         published_year: extract_year(book.date),
         isbn: isbn,
+        goodreads_url: extract_goodreads_url(book),
         description: first_string(book.description)
       }.compact
 
@@ -50,6 +51,19 @@ module Ebook
         return match[1] if match
       end
       nil
+    end
+
+    GOODREADS_URL_PATTERN = %r{\Ahttps://www\.goodreads\.com/book/show/\S+\z}
+
+    def self.extract_goodreads_url(book)
+      book.identifier_list.each do |id|
+        str = first_string(id)
+        return str if str&.match?(GOODREADS_URL_PATTERN)
+      end
+
+      meta = book.metadata.oldstyle_meta.find { |m| m["name"] == "goodreads-url" }
+      url = meta && first_string(meta["content"])
+      url if url&.match?(GOODREADS_URL_PATTERN)
     end
 
     # "Bocai, Iulian" → "Iulian Bocai"; leaves normal names untouched.

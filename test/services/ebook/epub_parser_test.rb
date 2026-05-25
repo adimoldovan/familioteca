@@ -92,6 +92,21 @@ module Ebook
       assert_nil EpubParser.unsort_author_name(nil)
     end
 
+    test "extracts goodreads_url from identifier" do
+      result = EpubParser.call(FIXTURES.join("goodreads-id.epub").to_s)
+      assert_equal "https://www.goodreads.com/book/show/62024", result[:attributes][:goodreads_url]
+    end
+
+    test "extracts goodreads_url from oldstyle meta" do
+      result = EpubParser.call(FIXTURES.join("goodreads-meta.epub").to_s)
+      assert_equal "https://www.goodreads.com/book/show/221174391-viata-e-prea-scurt", result[:attributes][:goodreads_url]
+    end
+
+    test "goodreads_url is nil when no identifier matches" do
+      result = EpubParser.call(FIXTURES.join("well-tagged.epub").to_s)
+      assert_nil result[:attributes][:goodreads_url]
+    end
+
     test "raises on corrupt file" do
       assert_raises(Ebook::EpubParser::ParseError) do
         EpubParser.call(FIXTURES.join("corrupt.epub").to_s)

@@ -18,8 +18,26 @@
         "method": "perform"
       },
       "note": "False positive. BookStorage#download returns an OS-generated Tempfile path (see app/services/book_storage.rb#download — built via Tempfile.new); the input object_key only influences the extension. The path passed to File.delete is never derived from user-controlled input."
+    },
+    {
+      "warning_type": "Cross-Site Scripting",
+      "warning_code": 4,
+      "fingerprint": "6d07c3cbbe93ad439a9a58078c90ba72bf614547d2672b3ebc6959146ecdd510",
+      "check_name": "LinkToHref",
+      "message": "Potentially unsafe model attribute in `link_to` href",
+      "file": "app/views/books/show.html.erb",
+      "line": 42,
+      "link": "https://brakeman.readthedocs.io/en/latest/warning_types/link_to_href.html",
+      "code": null,
+      "render_path": null,
+      "user_input": null,
+      "location": {
+        "type": "template",
+        "template": "books/show"
+      },
+      "note": "False positive. goodreads_url is validated with a format regex anchored to https://www.goodreads.com/ — it cannot contain javascript: or data: URIs."
     }
   ],
-  "updated": "2026-05-23",
+  "updated": "2026-05-25",
   "brakeman_version": "8.0.4"
 }

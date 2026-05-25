@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_05_24_181340) do
+ActiveRecord::Schema[8.1].define(version: 2026_05_25_124651) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -45,6 +45,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_24_181340) do
     t.text "description"
     t.integer "file_size"
     t.string "format", null: false
+    t.string "goodreads_url"
     t.datetime "ingested_at", null: false
     t.string "isbn"
     t.string "language"
