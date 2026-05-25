@@ -56,7 +56,7 @@ class BookTest < ActiveSupport::TestCase
     assert_equal "tara de dincolo", book.sort_title
   end
 
-  test "searchable concatenates folded title, author, description" do
+  test "searchable concatenates folded title and author only" do
     book = Book.create!(
       title: "Cărți Bune",
       author: "Mihai Eminescu",
@@ -67,8 +67,8 @@ class BookTest < ActiveSupport::TestCase
     )
     assert_includes book.searchable, "carti bune"
     assert_includes book.searchable, "mihai eminescu"
-    assert_includes book.searchable, "bizant"
-    assert_includes book.searchable, "manastiri"
+    refute_includes book.searchable, "bizant"
+    refute_includes book.searchable, "manastiri"
   end
 
   test "sort_title and searchable refresh on update" do

@@ -62,7 +62,7 @@ class Book < ApplicationRecord
   def populate_search_columns
     self.sort_title = DiacriticFolding.fold(title.to_s)
     self.searchable = DiacriticFolding.fold(
-      [ title, author, description ].compact_blank.join(" ")
+      [ title, author ].compact_blank.join(" ")
     )
   end
 end
