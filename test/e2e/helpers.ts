@@ -88,3 +88,28 @@ export async function performEnqueuedJobs(page: Page, only?: string): Promise<Pe
   }
   return await response.json();
 }
+
+export interface PasswordResetTokenResult {
+  token: string;
+  email: string;
+}
+
+export async function getPasswordResetToken(page: Page, email: string): Promise<PasswordResetTokenResult> {
+  const response = await page.request.post('/e2e/password_reset_token', { data: { email } });
+  if (!response.ok()) {
+    throw new Error(`getPasswordResetToken failed: ${response.status()} ${await response.text()}`);
+  }
+  return await response.json();
+}
+
+export interface InviteCodeResult {
+  code: string;
+}
+
+export async function createInviteCode(page: Page): Promise<InviteCodeResult> {
+  const response = await page.request.post('/e2e/invite_code');
+  if (!response.ok()) {
+    throw new Error(`createInviteCode failed: ${response.status()} ${await response.text()}`);
+  }
+  return await response.json();
+}

@@ -34,6 +34,8 @@ Rails.application.routes.draw do
       post "seed_user", to: "seed_user#create"
       post "seed_book", to: "seed_book#create"
       post "perform_jobs", to: "perform_jobs#create"
+      post "password_reset_token", to: "password_reset_token#create"
+      post "invite_code", to: "invite_code#create"
     end
   end
 
