@@ -87,4 +87,30 @@ class MemberTest < ActiveSupport::TestCase
     )
     assert member.valid?
   end
+
+  test "generates a password_reset token that resolves back to the member" do
+    member = members(:ana)
+    token = member.generate_token_for(:password_reset)
+
+    assert_kind_of String, token
+    assert_equal member, Member.find_by_token_for(:password_reset, token)
+  end
+
+  test "password_reset token is invalid after password change" do
+    member = members(:ana)
+    token = member.generate_token_for(:password_reset)
+
+    member.update!(password: "newsecret999")
+
+    assert_nil Member.find_by_token_for(:password_reset, token)
+  end
+
+  test "password_reset token is invalid after 24 hours" do
+    member = members(:ana)
+    token = member.generate_token_for(:password_reset)
+
+    travel 25.hours do
+      assert_nil Member.find_by_token_for(:password_reset, token)
+    end
+  end
 end

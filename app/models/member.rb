@@ -2,6 +2,10 @@ class Member < ApplicationRecord
   EMAIL_FORMAT = URI::MailTo::EMAIL_REGEXP
 
   has_secure_password
+  generates_token_for :password_reset, expires_in: 24.hours do
+    password_salt&.last(10)
+  end
+
   has_many :sessions, dependent: :destroy
   has_many :member_books, dependent: :destroy
   has_many :kindle_deliveries, dependent: :destroy
