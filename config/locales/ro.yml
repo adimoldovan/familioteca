@@ -39,9 +39,9 @@ ro:
         unread: "Necitite"
         read: "Citite"
       sort:
-        recent: "Adăugate recent"
-        title: "Titlu A–Z"
-        author: "Autor A–Z"
+        date: "Dată adăugare"
+        title: "Titlu"
+        author: "Autor"
     show:
       download: "Descarcă fișierul"
       by_author: "de %{author}"
