@@ -7,14 +7,8 @@ class BooksController < ApplicationController
     @query = params[:q].to_s.strip
     @filter = params[:filter].to_s.presence || "all"
 
-    raw_sort = params[:sort].to_s
-    @sort = if raw_sort == "recent"
-      "date"
-    elsif SORT_OPTIONS.include?(raw_sort)
-      raw_sort
-    else
-      "date"
-    end
+    normalized = params[:sort].to_s.then { |s| s == "recent" ? "date" : s }
+    @sort = SORT_OPTIONS.include?(normalized) ? normalized : "date"
 
     @dir = DIR_OPTIONS.include?(params[:dir]) ? params[:dir] : SORT_DEFAULTS[@sort]
 
@@ -39,7 +33,8 @@ class BooksController < ApplicationController
     when "title"  then @books.order(sort_title: direction)
     when "author"
       coalesce = Arel::Nodes::NamedFunction.new("COALESCE", [ Book.arel_table[:author], Arel::Nodes.build_quoted("") ])
-      @books.order(coalesce.send(direction), sort_title: direction)
+      order_node = direction == :asc ? coalesce.asc : coalesce.desc
+      @books.order(order_node, sort_title: direction)
     else @books.order(ingested_at: direction)
     end
 
