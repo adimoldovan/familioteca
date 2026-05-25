@@ -25,6 +25,17 @@ ro:
     update:
       success: "Parola a fost schimbată. Te poți autentifica."
 
+  registrations:
+    new:
+      title: "Înregistrare"
+      name: "Nume"
+      email: "Email"
+      password: "Parolă"
+      password_confirmation: "Confirmă parola"
+      submit: "Creează cont"
+      errors_title: "Erori"
+    invalid_code: "Codul de invitație este invalid sau a fost deja folosit."
+
   sessions:
     new:
       title: "Autentificare"

@@ -7,6 +7,9 @@ Rails.application.routes.draw do
 
   resources :password_resets, only: %i[edit update], param: :token
 
+  get "register/:code", to: "registrations#new", as: :register
+  post "register/:code", to: "registrations#create"
+
   namespace :admin do
     resources :members, only: [ :index ] do
       post :reset_link, on: :member
