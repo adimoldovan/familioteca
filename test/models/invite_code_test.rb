@@ -71,4 +71,13 @@ class InviteCodeTest < ActiveSupport::TestCase
     assert_includes InviteCode.used, used
     refute_includes InviteCode.used, available
   end
+
+  test "DB nullifies used_by_member_id when member is deleted directly" do
+    code = InviteCode.create!
+    code.mark_used!(members(:ana))
+
+    Member.where(id: members(:ana).id).delete_all
+
+    assert_nil code.reload.used_by_member_id
+  end
 end
