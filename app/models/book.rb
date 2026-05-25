@@ -25,6 +25,16 @@ class Book < ApplicationRecord
     where("searchable LIKE ?", "%#{sanitize_sql_like(folded)}%")
   }
 
+  scope :by_language, ->(langs) {
+    langs = Array(langs).reject(&:blank?)
+    next all if langs.empty?
+    where(language: langs)
+  }
+
+  def self.available_languages
+    visible.where.not(language: [ nil, "" ]).distinct.pluck(:language).sort
+  end
+
   def member_book_for(member)
     member_books.find_or_initialize_by(member: member)
   end

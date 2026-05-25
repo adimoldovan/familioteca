@@ -1,0 +1,67 @@
+<h2>Sorting toolbar redesign</h2>
+<p class="subtitle">Current select dropdown → button group with separate direction toggle</p>
+
+<div class="section">
+  <h3>Current</h3>
+  <div class="mockup">
+    <div class="mockup-header">Catalog toolbar (right-aligned)</div>
+    <div class="mockup-body" style="display:flex;justify-content:flex-end;padding:16px 24px;">
+      <div style="position:relative;display:inline-flex;align-items:center;">
+        <select style="appearance:none;-webkit-appearance:none;background:#faf6ec;border:1px solid rgba(26,24,21,0.14);border-radius:999px;padding:7px 32px 7px 14px;font-family:system-ui;font-size:13px;font-weight:500;color:#1a1815;cursor:pointer;">
+          <option>Adăugate recent</option>
+          <option>Titlu A–Z</option>
+          <option>Autor A–Z</option>
+        </select>
+        <svg style="width:14px;height:14px;position:absolute;right:10px;pointer-events:none;color:#8a8378;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Proposed</h3>
+  <div class="mockup">
+    <div class="mockup-header">Catalog toolbar (right-aligned)</div>
+    <div class="mockup-body" style="display:flex;justify-content:flex-end;align-items:center;padding:16px 24px;gap:12px;">
+      <!-- Sort buttons group -->
+      <div style="display:inline-flex;gap:4px;">
+        <button style="background:transparent;border:1px solid rgba(26,24,21,0.14);border-radius:999px;padding:7px 14px;font-family:system-ui;font-size:13px;font-weight:500;color:#8a8378;cursor:pointer;">Adăugate recent</button>
+        <button style="background:#1a1815;border:1px solid #1a1815;border-radius:999px;padding:7px 14px;font-family:system-ui;font-size:13px;font-weight:500;color:#faf6ec;cursor:pointer;">Titlu</button>
+        <button style="background:transparent;border:1px solid rgba(26,24,21,0.14);border-radius:999px;padding:7px 14px;font-family:system-ui;font-size:13px;font-weight:500;color:#8a8378;cursor:pointer;">Autor</button>
+        <button style="background:transparent;border:1px solid rgba(26,24,21,0.14);border-radius:999px;padding:7px 14px;font-family:system-ui;font-size:13px;font-weight:500;color:#8a8378;cursor:pointer;">Dată adăugare</button>
+      </div>
+      <!-- Divider -->
+      <div style="width:1px;height:24px;background:rgba(26,24,21,0.14);"></div>
+      <!-- Direction toggle -->
+      <button style="background:transparent;border:1px solid rgba(26,24,21,0.14);border-radius:999px;width:34px;height:34px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;" title="A→Z (ascending)">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1a1815" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12l7-7 7 7"/></svg>
+      </button>
+    </div>
+  </div>
+  <p style="margin-top:8px;font-size:13px;color:#666;">Sort buttons: pill-shaped, active one filled. Divider separates sort field from direction toggle. Direction button shows ↑ (asc) or ↓ (desc) arrow, toggles on click.</p>
+</div>
+
+<h3 style="margin-top:32px;">Does this direction feel right?</h3>
+<div class="options">
+  <div class="option" data-choice="yes" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>Yes, looks good</h3>
+      <p>Proceed with this layout — buttons + divider + direction toggle</p>
+    </div>
+  </div>
+  <div class="option" data-choice="compact" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>More compact</h3>
+      <p>Use a connected button group (no gaps between sort buttons) instead of separate pills</p>
+    </div>
+  </div>
+  <div class="option" data-choice="different" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="content">
+      <h3>Different approach</h3>
+      <p>I have something else in mind — let me describe it</p>
+    </div>
+  </div>
+</div>

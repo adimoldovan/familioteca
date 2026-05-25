@@ -8,12 +8,15 @@ class BooksController < ApplicationController
     @query = params[:q].to_s.strip
     @filter = FILTER_OPTIONS.include?(params[:filter]) ? params[:filter] : "all"
 
+    @available_languages = Book.available_languages
+    @langs = Array(params[:lang]).select { |l| @available_languages.include?(l) }
+
     normalized = params[:sort].to_s.then { |s| s == "recent" ? "date" : s }
     @sort = SORT_OPTIONS.include?(normalized) ? normalized : "date"
 
     @dir = DIR_OPTIONS.include?(params[:dir]) ? params[:dir] : SORT_DEFAULTS[@sort]
 
-    base = Book.visible.with_attached_cover.search(@query)
+    base = Book.visible.with_attached_cover.search(@query).by_language(@langs)
     read_scope = current_member.member_books.where.not(read_at: nil).select(:book_id)
 
     @counts = {
@@ -22,7 +25,12 @@ class BooksController < ApplicationController
       read: base.where(id: read_scope).count
     }
 
-    @total_count = @query.blank? ? @counts[:all] : Book.visible.count
+    @total_count = @query.blank? && @langs.empty? ? @counts[:all] : Book.visible.count
+
+    @language_counts = Book.visible.search(@query)
+      .where(language: @available_languages)
+      .group(:language)
+      .count
 
     @books = case @filter
     when "read"  then base.where(id: read_scope)

@@ -112,6 +112,43 @@ class BookTest < ActiveSupport::TestCase
     assert_equal "Bizanț", results.first.title
   end
 
+  test "by_language scope filters by single language" do
+    Book.create!(title: "A", language: "ro", format: "epub", object_key: "k1", ingested_at: Time.current)
+    Book.create!(title: "B", language: "en", format: "epub", object_key: "k2", ingested_at: Time.current)
+    Book.create!(title: "C", language: nil,  format: "epub", object_key: "k3", ingested_at: Time.current)
+
+    assert_equal 1, Book.by_language("ro").count
+    assert_equal 1, Book.by_language("en").count
+  end
+
+  test "by_language scope filters by multiple languages" do
+    Book.create!(title: "A", language: "ro", format: "epub", object_key: "k1", ingested_at: Time.current)
+    Book.create!(title: "B", language: "en", format: "epub", object_key: "k2", ingested_at: Time.current)
+    Book.create!(title: "C", language: "fr", format: "epub", object_key: "k3", ingested_at: Time.current)
+
+    assert_equal 2, Book.by_language(%w[ro en]).count
+  end
+
+  test "by_language scope returns all when blank or empty" do
+    Book.create!(title: "A", language: "ro", format: "epub", object_key: "k1", ingested_at: Time.current)
+    Book.create!(title: "B", language: nil,  format: "epub", object_key: "k2", ingested_at: Time.current)
+
+    assert_equal 2, Book.by_language("").count
+    assert_equal 2, Book.by_language(nil).count
+    assert_equal 2, Book.by_language([]).count
+  end
+
+  test "available_languages returns sorted distinct languages from visible books" do
+    Book.create!(title: "A", language: "ro", format: "epub", object_key: "k1", ingested_at: Time.current)
+    Book.create!(title: "B", language: "en", format: "epub", object_key: "k2", ingested_at: Time.current)
+    Book.create!(title: "C", language: "ro", format: "epub", object_key: "k3", ingested_at: Time.current)
+    Book.create!(title: "D", language: nil,  format: "epub", object_key: "k4", ingested_at: Time.current)
+    Book.create!(title: "E", language: "fr", format: "epub", object_key: "k5", ingested_at: Time.current,
+                  missing_since: Time.current)
+
+    assert_equal %w[en ro], Book.available_languages
+  end
+
   test "search scope returns all books when query is blank" do
     Book.create!(title: "A", format: "epub", object_key: "k1", ingested_at: Time.current)
     Book.create!(title: "B", format: "epub", object_key: "k2", ingested_at: Time.current)

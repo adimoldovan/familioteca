@@ -1,0 +1,58 @@
+<h2>Direction button color options</h2>
+<p class="subtitle">Which color treatment fits best for the order toggle?</p>
+
+<div class="cards" style="grid-template-columns: repeat(3, 1fr);">
+
+  <div class="card" data-choice="muted" onclick="toggleSelect(this)">
+    <div class="card-image" style="display:flex;align-items:center;justify-content:center;padding:24px;background:#f5efe2;">
+      <!-- Sort buttons for context -->
+      <div style="display:inline-flex;gap:4px;align-items:center;">
+        <span style="background:#1a1815;border:1px solid #1a1815;border-radius:999px;padding:7px 14px;font-family:system-ui;font-size:13px;font-weight:500;color:#faf6ec;">Titlu</span>
+        <span style="background:transparent;border:1px solid rgba(26,24,21,0.14);border-radius:999px;padding:7px 14px;font-family:system-ui;font-size:13px;font-weight:500;color:#8a8378;">Autor</span>
+        <div style="width:1px;height:24px;background:rgba(26,24,21,0.14);margin:0 4px;"></div>
+        <span style="background:transparent;border:1px solid rgba(26,24,21,0.14);border-radius:999px;width:34px;height:34px;display:inline-flex;align-items:center;justify-content:center;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8a8378" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12l7-7 7 7"/></svg>
+        </span>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>A · Muted icon</h3>
+      <p>Arrow in <code style="font-size:11px;">#8a8378</code> (muted). Matches inactive button text. Subtle.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="ink" onclick="toggleSelect(this)">
+    <div class="card-image" style="display:flex;align-items:center;justify-content:center;padding:24px;background:#f5efe2;">
+      <div style="display:inline-flex;gap:4px;align-items:center;">
+        <span style="background:#1a1815;border:1px solid #1a1815;border-radius:999px;padding:7px 14px;font-family:system-ui;font-size:13px;font-weight:500;color:#faf6ec;">Titlu</span>
+        <span style="background:transparent;border:1px solid rgba(26,24,21,0.14);border-radius:999px;padding:7px 14px;font-family:system-ui;font-size:13px;font-weight:500;color:#8a8378;">Autor</span>
+        <div style="width:1px;height:24px;background:rgba(26,24,21,0.14);margin:0 4px;"></div>
+        <span style="background:transparent;border:1px solid rgba(26,24,21,0.14);border-radius:999px;width:34px;height:34px;display:inline-flex;align-items:center;justify-content:center;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1a1815" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12l7-7 7 7"/></svg>
+        </span>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>B · Ink icon</h3>
+      <p>Arrow in <code style="font-size:11px;">#1a1815</code> (ink). Stands out. Same as active button fill.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="filled" onclick="toggleSelect(this)">
+    <div class="card-image" style="display:flex;align-items:center;justify-content:center;padding:24px;background:#f5efe2;">
+      <div style="display:inline-flex;gap:4px;align-items:center;">
+        <span style="background:#1a1815;border:1px solid #1a1815;border-radius:999px;padding:7px 14px;font-family:system-ui;font-size:13px;font-weight:500;color:#faf6ec;">Titlu</span>
+        <span style="background:transparent;border:1px solid rgba(26,24,21,0.14);border-radius:999px;padding:7px 14px;font-family:system-ui;font-size:13px;font-weight:500;color:#8a8378;">Autor</span>
+        <div style="width:1px;height:24px;background:rgba(26,24,21,0.14);margin:0 4px;"></div>
+        <span style="background:#1a1815;border:1px solid #1a1815;border-radius:999px;width:34px;height:34px;display:inline-flex;align-items:center;justify-content:center;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#faf6ec" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12l7-7 7 7"/></svg>
+        </span>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>C · Filled (like active sort)</h3>
+      <p>Dark bg + light arrow. Same treatment as the active sort button. Always "on".</p>
+    </div>
+  </div>
+
+</div>

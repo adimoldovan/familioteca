@@ -234,6 +234,109 @@ class BooksControllerTest < ActionDispatch::IntegrationTest
     assert_equal [ "New", "Old" ], titles
   end
 
+  test "filter by single language" do
+    sign_in_as members(:ana)
+    Book.create!(title: "Romanian Book", language: "ro", format: "epub", object_key: "k1", ingested_at: Time.current)
+    Book.create!(title: "English Book",  language: "en", format: "epub", object_key: "k2", ingested_at: Time.current)
+
+    get root_path(lang: [ "ro" ])
+    assert_select ".book-card__title", count: 1, text: "Romanian Book"
+
+    get root_path(lang: [ "en" ])
+    assert_select ".book-card__title", count: 1, text: "English Book"
+  end
+
+  test "filter by multiple languages" do
+    sign_in_as members(:ana)
+    Book.create!(title: "A", language: "ro", format: "epub", object_key: "k1", ingested_at: Time.current)
+    Book.create!(title: "B", language: "en", format: "epub", object_key: "k2", ingested_at: Time.current)
+    Book.create!(title: "C", language: "fr", format: "epub", object_key: "k3", ingested_at: Time.current)
+
+    get root_path(lang: %w[ro en])
+    assert_select ".book-card__title", count: 2
+  end
+
+  test "language filter shows all books when no lang param" do
+    sign_in_as members(:ana)
+    Book.create!(title: "A", language: "ro", format: "epub", object_key: "k1", ingested_at: Time.current)
+    Book.create!(title: "B", language: "en", format: "epub", object_key: "k2", ingested_at: Time.current)
+
+    get root_path
+    assert_select ".book-card__title", count: 2
+  end
+
+  test "invalid lang param falls back to showing all books" do
+    sign_in_as members(:ana)
+    Book.create!(title: "A", language: "ro", format: "epub", object_key: "k1", ingested_at: Time.current)
+    Book.create!(title: "B", language: "en", format: "epub", object_key: "k2", ingested_at: Time.current)
+
+    get root_path(lang: [ "bogus" ])
+    assert_select ".book-card__title", count: 2
+  end
+
+  test "language filter section shows counts per language" do
+    sign_in_as members(:ana)
+    Book.create!(title: "A", language: "ro", format: "epub", object_key: "k1", ingested_at: Time.current)
+    Book.create!(title: "B", language: "ro", format: "epub", object_key: "k2", ingested_at: Time.current)
+    Book.create!(title: "C", language: "en", format: "epub", object_key: "k3", ingested_at: Time.current)
+
+    get root_path
+    assert_select "#lang-filter-all .catalog-sidebar__filter-count", text: "3"
+    assert_select "#lang-filter-ro .catalog-sidebar__filter-count", text: "2"
+    assert_select "#lang-filter-en .catalog-sidebar__filter-count", text: "1"
+  end
+
+  test "language filter section is hidden when no books have languages" do
+    sign_in_as members(:ana)
+    Book.create!(title: "A", format: "epub", object_key: "k1", ingested_at: Time.current)
+
+    get root_path
+    assert_select "#lang-filter-all", false
+  end
+
+  test "language filter combines with reading status filter" do
+    member = members(:ana)
+    sign_in_as member
+    b1 = Book.create!(title: "Read RO",   language: "ro", format: "epub", object_key: "k1", ingested_at: Time.current)
+    Book.create!(title: "Unread RO", language: "ro", format: "epub", object_key: "k2", ingested_at: Time.current)
+    Book.create!(title: "Read EN",   language: "en", format: "epub", object_key: "k3", ingested_at: Time.current)
+    MemberBook.create!(member: member, book: b1, read_at: Time.current)
+
+    get root_path(lang: [ "ro" ], filter: "read")
+    assert_select ".book-card__title", count: 1, text: "Read RO"
+  end
+
+  test "language filter combines with search" do
+    sign_in_as members(:ana)
+    Book.create!(title: "Amintiri", language: "ro", format: "epub", object_key: "k1", ingested_at: Time.current)
+    Book.create!(title: "Amintiri", language: "en", format: "epub", object_key: "k2", ingested_at: Time.current)
+
+    get root_path(lang: [ "ro" ], q: "amintiri")
+    assert_select ".book-card__title", count: 1
+  end
+
+  test "sidebar count total is absolute when language filter is active" do
+    sign_in_as members(:ana)
+    Book.create!(title: "A", language: "ro", format: "epub", object_key: "k1", ingested_at: Time.current)
+    Book.create!(title: "B", language: "en", format: "epub", object_key: "k2", ingested_at: Time.current)
+
+    get root_path(lang: [ "ro" ])
+    assert_select ".catalog-sidebar__count", text: "1 / 2"
+  end
+
+  test "multiple language filters highlight active languages" do
+    sign_in_as members(:ana)
+    Book.create!(title: "A", language: "ro", format: "epub", object_key: "k1", ingested_at: Time.current)
+    Book.create!(title: "B", language: "en", format: "epub", object_key: "k2", ingested_at: Time.current)
+    Book.create!(title: "C", language: "fr", format: "epub", object_key: "k3", ingested_at: Time.current)
+
+    get root_path(lang: %w[ro en])
+    assert_select "#lang-filter-ro.is-active"
+    assert_select "#lang-filter-en.is-active"
+    assert_select "#lang-filter-fr:not(.is-active)"
+    assert_select "#lang-filter-all:not(.is-active)"
+  end
+
   test "toolbar renders sort buttons and direction toggle" do
     sign_in_as members(:ana)
     Book.create!(title: "T", format: "epub", object_key: "k", ingested_at: Time.current)

@@ -37,6 +37,7 @@ ro:
       filters:
         label: "Filtre"
         reading_status: "Stare lectură"
+        language: "Limbă"
         all: "Toate"
         unread: "Necitite"
         read: "Citite"
