@@ -1264,6 +1264,31 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
     padding: 8px 16px;
   }
 
+  .admin-nav {
+    display: flex;
+    gap: 24px;
+    margin-bottom: 32px;
+    border-bottom: 1px solid var(--rule);
+    padding-bottom: 12px;
+  }
+
+  .admin-nav__link {
+    font-family: var(--sans);
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--muted);
+    text-decoration: none;
+    padding-bottom: 12px;
+    margin-bottom: -13px; /* padding-bottom + 1px to align link border with nav border */
+    border-bottom: 2px solid transparent;
+    transition: color 0.15s ease, border-color 0.15s ease;
+  }
+  .admin-nav__link:hover { color: var(--ink); }
+  .admin-nav__link--active {
+    color: var(--ink);
+    border-bottom-color: var(--ink);
+  }
+
   .admin-filter {
     display: flex;
     gap: 16px;

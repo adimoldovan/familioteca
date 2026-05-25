@@ -94,6 +94,11 @@ ro:
         oversize: "Cartea depășește 24MB și nu poate fi trimisă pe Kindle."
 
   admin:
+    nav:
+      label: "Navigare administrare"
+      books: "Cărți"
+      members: "Membri"
+      invite_codes: "Coduri de invitație"
     ingestions:
       scan_now: "Scanează acum"
       scanning: "Se scanează…"
@@ -111,7 +116,6 @@ ro:
         reset_link: "Resetare parolă"
         delete: "Șterge"
         delete_confirm: 'Sigur vrei să ștergi membrul „%{name}"?'
-        invite_codes_link: "Coduri de invitație"
       destroy:
         success: "Membrul a fost șters."
         self_delete: "Nu te poți șterge pe tine."

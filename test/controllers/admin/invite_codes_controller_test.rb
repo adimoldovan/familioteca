@@ -10,6 +10,9 @@ class Admin::InviteCodesControllerTest < ActionDispatch::IntegrationTest
     get admin_invite_codes_path
     assert_response :success
     assert_select "h1", "Coduri de invitație"
+    assert_select ".admin-nav a[href='#{admin_invite_codes_path}'].admin-nav__link--active"
+    assert_select ".admin-nav a[href='#{admin_books_path}']"
+    assert_select ".admin-nav a[href='#{admin_members_path}']"
     assert_select "table tbody tr", 2
     assert_select "td code", text: available.code
     assert_select "td", text: "Activ"

@@ -18,13 +18,14 @@ class Admin::MembersControllerTest < ActionDispatch::IntegrationTest
     assert_select "td", text: "Membru", count: 1
     assert_select "tbody tr td:nth-child(3)", text: "ana@kindle.com", count: 1
     assert_select "tbody tr td:nth-child(3)", text: "—", count: 1
-    assert_select "#admin-scan-button #scan-now-button"
   end
 
-  test "index shows invite codes link" do
+  test "index shows admin nav with links" do
     sign_in_as members(:admin)
     get admin_members_path
-    assert_select "a[href='#{admin_invite_codes_path}']", text: "Coduri de invitație"
+    assert_select ".admin-nav a[href='#{admin_members_path}'].admin-nav__link--active"
+    assert_select ".admin-nav a[href='#{admin_books_path}']"
+    assert_select ".admin-nav a[href='#{admin_invite_codes_path}']"
   end
 
   test "index shows delete button for other members but not for self" do

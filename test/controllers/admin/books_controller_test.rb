@@ -19,6 +19,9 @@ class Admin::BooksControllerTest < ActionDispatch::IntegrationTest
     sign_in_as members(:admin)
     get admin_books_path
     assert_response :success
+    assert_select ".admin-nav a[href='#{admin_books_path}'].admin-nav__link--active"
+    assert_select ".admin-nav a[href='#{admin_members_path}']"
+    assert_select ".admin-nav a[href='#{admin_invite_codes_path}']"
     assert_select "table tbody tr", 3
   end
 
