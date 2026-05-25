@@ -31,7 +31,7 @@ describe("LiveSearchController", () => {
     input.dispatchEvent(new Event("input", { bubbles: true }));
 
     expect(Turbo.visit).not.toHaveBeenCalled();
-    vi.advanceTimersByTime(300);
+    vi.advanceTimersByTime(500);
 
     expect(Turbo.visit).toHaveBeenCalledOnce();
     const url = new URL(Turbo.visit.mock.calls[0][0]);
@@ -56,7 +56,7 @@ describe("LiveSearchController", () => {
 
     input.value = "hob";
     input.dispatchEvent(new Event("input", { bubbles: true }));
-    vi.advanceTimersByTime(300);
+    vi.advanceTimersByTime(500);
 
     expect(Turbo.visit).toHaveBeenCalledOnce();
     const url = new URL(Turbo.visit.mock.calls[0][0]);
@@ -71,7 +71,7 @@ describe("LiveSearchController", () => {
     const input = document.querySelector("input");
     input.value = "  ";
     input.dispatchEvent(new Event("input", { bubbles: true }));
-    vi.advanceTimersByTime(300);
+    vi.advanceTimersByTime(500);
 
     expect(Turbo.visit).toHaveBeenCalledOnce();
     const url = new URL(Turbo.visit.mock.calls[0][0]);
@@ -88,7 +88,7 @@ describe("LiveSearchController", () => {
     document.querySelector("button").click();
 
     expect(input.value).toBe("");
-    vi.advanceTimersByTime(300);
+    vi.advanceTimersByTime(500);
 
     expect(Turbo.visit).toHaveBeenCalledOnce();
     const url = new URL(Turbo.visit.mock.calls[0][0]);
@@ -108,7 +108,7 @@ describe("LiveSearchController", () => {
     input.dispatchEvent(new Event("input", { bubbles: true }));
 
     ctrl.disconnect();
-    vi.advanceTimersByTime(300);
+    vi.advanceTimersByTime(500);
 
     expect(Turbo.visit).not.toHaveBeenCalled();
   });

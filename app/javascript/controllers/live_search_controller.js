@@ -14,7 +14,7 @@ export default class extends Controller {
         url.searchParams.delete("q")
       }
       Turbo.visit(url.toString(), { action: "replace" })
-    }, 300)
+    }, 500)
   }
 
   clear() {
