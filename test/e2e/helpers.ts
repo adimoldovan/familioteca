@@ -113,3 +113,18 @@ export async function createInviteCode(page: Page): Promise<InviteCodeResult> {
   }
   return await response.json();
 }
+
+// Seeds a member in a separate browser context so the calling page's session
+// cookie is not replaced. Use when an admin test needs a non-admin member to
+// exist without losing the admin session.
+export async function seedMemberInSeparateContext(page: Page, options: SeedUserOptions): Promise<SeedUserResult> {
+  const browser = page.context().browser();
+  if (!browser) throw new Error('seedMemberInSeparateContext: browser() returned null');
+  const ctx = await browser.newContext();
+  try {
+    const tmpPage = await ctx.newPage();
+    return await seedUser(tmpPage, options);
+  } finally {
+    await ctx.close();
+  }
+}
