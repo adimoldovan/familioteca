@@ -38,8 +38,8 @@ class BooksController < ApplicationController
     @books = case @sort
     when "title"  then @books.order(sort_title: direction)
     when "author"
-      dir_sql = @dir.upcase
-      @books.order(Arel.sql("COALESCE(books.author, '') #{dir_sql}, sort_title #{dir_sql}"))
+      coalesce = Arel::Nodes::NamedFunction.new("COALESCE", [ Book.arel_table[:author], Arel::Nodes.build_quoted("") ])
+      @books.order(coalesce.send(direction), sort_title: direction)
     else @books.order(ingested_at: direction)
     end
 
