@@ -517,6 +517,8 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
   .catalog-sidebar__search-input::placeholder { color: var(--muted); }
   .catalog-sidebar__search-input:hover { background: color-mix(in srgb, var(--ink) 9%, transparent); }
   .catalog-sidebar__search-input:focus { background: var(--surface); border-color: var(--rule-strong); }
+  .catalog-sidebar__search-input::-webkit-search-cancel-button,
+  .catalog-sidebar__search-input::-webkit-search-decoration { display: none; }
 
   .catalog-sidebar__search-clear {
     position: absolute;
