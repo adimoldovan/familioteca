@@ -91,6 +91,13 @@ module EbookFixtures
       book.ordered { book.add_item("ch1.xhtml", content: StringIO.new("<html><body>x</body></html>")) }
     end
 
+    write("sort-author.epub") do |book|
+      book.identifier = "id:sort-author"
+      book.title      = "Carte cu Autor Sortat"
+      book.creator    = "Bocai, Iulian"
+      book.ordered { book.add_item("ch1.xhtml", content: StringIO.new("<html><body>x</body></html>")) }
+    end
+
     write("goodreads-id.epub") do |book|
       book.identifier = "https://www.goodreads.com/book/show/62024"
       book.title      = "Carte cu Goodreads"
