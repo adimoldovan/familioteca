@@ -3,3 +3,5 @@ en:
     index:
       count: "%{filtered} / %{total}"
       count_label: "%{filtered} of %{total} books"
+    show:
+      by_author_html: "by %{author}"

@@ -34,7 +34,7 @@
 
   <div class="book-detail__info">
     <% if @book.author.present? %>
-      <p class="book-detail__eyebrow"><%= t(".by_author", author: @book.author) %></p>
+      <p class="book-detail__eyebrow"><%= t(".by_author_html", author: link_to(@book.author, root_path(q: @book.author), class: "book-detail__author-link")) %></p>
     <% end %>
     <div class="book-detail__title-row">
       <h1 class="book-detail__title"><%= @book.title %></h1>

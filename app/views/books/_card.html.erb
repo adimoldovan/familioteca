@@ -1,4 +1,4 @@
-<%= link_to book_path(book), class: "book-card", id: "book-card-#{book.id}" do %>
+<div class="book-card" id="book-card-<%= book.id %>">
   <div class="book-card__cover">
     <% if (thumb = book.cover_thumbnail) %>
       <%= image_tag thumb, class: "book-card__cover-img", alt: book.title, loading: "lazy" %>
@@ -9,9 +9,9 @@
     <% end %>
   </div>
   <div class="book-card__body">
-    <p class="book-card__title"><%= book.title %></p>
+    <p class="book-card__title"><%= link_to book.title, book_path(book), class: "book-card__link" %></p>
     <% if book.author.present? %>
-      <p class="book-card__author"><%= book.author %></p>
+      <p class="book-card__author"><%= link_to book.author, root_path(q: book.author), class: "book-card__author-link" %></p>
     <% end %>
   </div>
-<% end %>
+</div>

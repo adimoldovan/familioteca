@@ -49,7 +49,7 @@ ro:
         dir_desc: "Descrescător"
     show:
       download: "Descarcă fișierul"
-      by_author: "de %{author}"
+      by_author_html: "de %{author}"
       added_ago: "Adăugată acum %{when}"
       description_title: "Descriere"
       no_description: "Nicio descriere disponibilă."

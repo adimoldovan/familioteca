@@ -65,6 +65,22 @@ class BooksControllerTest < ActionDispatch::IntegrationTest
     assert_select ".book-card__title", count: 1, text: "Bizanț"
   end
 
+  test "book card author links to catalog filtered by author" do
+    sign_in_as members(:ana)
+    Book.create!(title: "T", author: "Jules Verne", format: "epub", object_key: "k1", ingested_at: Time.current)
+
+    get root_path
+    assert_select ".book-card__author-link[href=?]", "/?q=Jules+Verne", text: "Jules Verne"
+  end
+
+  test "book card omits author link when author is blank" do
+    sign_in_as members(:ana)
+    book = Book.create!(title: "T", format: "epub", object_key: "k1", ingested_at: Time.current)
+
+    get root_path
+    assert_select "#book-card-#{book.id} .book-card__author-link", false
+  end
+
   test "search renders a no-results message when nothing matches" do
     sign_in_as members(:ana)
     Book.create!(title: "Bizanț", format: "epub", object_key: "k1", ingested_at: Time.current)
@@ -407,6 +423,7 @@ class BooksControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "h1", text: /Doi Ani de Vacanță/
     assert_select ".book-detail__eyebrow", text: /Jules Verne/
+    assert_select ".book-detail__author-link[href=?]", "/?q=Jules+Verne"
     assert_select ".book-detail__desc-body", text: /Un grup de elevi/
     assert_select "dt", false
     assert_no_match(/Editura Test/, response.body)
