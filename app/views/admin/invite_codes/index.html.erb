@@ -8,6 +8,7 @@
   <thead>
     <tr>
       <th scope="col"><%= t(".code") %></th>
+      <th scope="col"><%= t(".registration_link") %></th>
       <th scope="col"><%= t(".status") %></th>
       <th scope="col"><%= t(".used_by") %></th>
       <th scope="col"><%= t(".created_at") %></th>
@@ -17,6 +18,18 @@
     <% @invite_codes.each do |invite_code| %>
       <tr>
         <td><code><%= invite_code.code %></code></td>
+        <td>
+          <% if invite_code.available? %>
+            <div data-controller="clipboard">
+              <input type="text" value="<%= register_url(invite_code.code) %>" readonly class="form-field__input invite-link-input" aria-label="<%= t(".registration_link") %> <%= invite_code.code %>" data-clipboard-target="source">
+              <button type="button" class="btn btn-sm" data-clipboard-target="button" data-action="clipboard#copy" data-copied-text="<%= t(".copied") %>" data-failed-text="<%= t(".copy_failed") %>">
+                <%= t(".copy") %>
+              </button>
+            </div>
+          <% else %>
+            —
+          <% end %>
+        </td>
         <td><%= invite_code.available? ? t(".active") : t(".used") %></td>
         <td><%= invite_code.used_by_member&.name || "—" %></td>
         <td><%= l(invite_code.created_at, format: :short) %></td>

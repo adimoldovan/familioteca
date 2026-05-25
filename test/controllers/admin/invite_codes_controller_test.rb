@@ -18,6 +18,9 @@ class Admin::InviteCodesControllerTest < ActionDispatch::IntegrationTest
     assert_select "td", text: "Activ"
     assert_select "td", text: "Folosit"
     assert_select "td", text: members(:ana).name
+    assert_select "input[readonly][value='#{register_url(available.code)}']"
+    assert_select "input[readonly]", count: 1
+    assert_select "button[data-action='clipboard#copy']", text: "Copiază"
   end
 
   test "create generates a new code and redirects with URL in flash" do
