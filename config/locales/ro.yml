@@ -140,6 +140,7 @@ ro:
         used: "Folosit"
       create:
         success: "Cod generat. Link de înregistrare: %{url}"
+        collision: "Nu s-a putut genera un cod unic. Te rugăm să încerci din nou."
     books:
       index:
         title: "Toate cărțile"

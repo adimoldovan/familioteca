@@ -16,6 +16,7 @@ en:
         used: "Used"
       create:
         success: "Code generated. Registration link: %{url}"
+        collision: "Could not generate a unique code. Please try again."
   books:
     index:
       count: "%{filtered} / %{total}"

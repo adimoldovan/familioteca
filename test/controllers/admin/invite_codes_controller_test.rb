@@ -36,6 +36,46 @@ class Admin::InviteCodesControllerTest < ActionDispatch::IntegrationTest
     assert_includes flash[:notice], register_url(code.code)
   end
 
+  test "create retries on code collision and succeeds" do
+    sign_in_as members(:admin)
+    existing = InviteCode.create!
+
+    call_count = 0
+    original = SecureRandom.method(:alphanumeric)
+    SecureRandom.define_singleton_method(:alphanumeric) do |*args|
+      call_count += 1
+      call_count == 1 ? existing.code : original.call(*args)
+    end
+
+    assert_difference "InviteCode.count", 1 do
+      post admin_invite_codes_path
+    end
+
+    assert_redirected_to admin_invite_codes_path
+    follow_redirect!
+    assert_includes flash[:notice], register_url(InviteCode.last.code)
+  ensure
+    SecureRandom.define_singleton_method(:alphanumeric, original)
+  end
+
+  test "create shows error after exhausting retries on code collision" do
+    sign_in_as members(:admin)
+    existing = InviteCode.create!
+
+    original = SecureRandom.method(:alphanumeric)
+    SecureRandom.define_singleton_method(:alphanumeric) { |*| existing.code }
+
+    assert_no_difference "InviteCode.count" do
+      post admin_invite_codes_path
+    end
+
+    assert_redirected_to admin_invite_codes_path
+    follow_redirect!
+    assert_select ".flash--alert", text: /încerci din nou/
+  ensure
+    SecureRandom.define_singleton_method(:alphanumeric, original)
+  end
+
   test "index denied for non-admin" do
     sign_in_as members(:ana)
     get admin_invite_codes_path
