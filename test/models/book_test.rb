@@ -152,24 +152,24 @@ class BookTest < ActiveSupport::TestCase
   end
 
   test "by_language scope filters by single language" do
-    Book.create!(title: "A", language: "ro", format: "epub", object_key: "k1", ingested_at: Time.current)
-    Book.create!(title: "B", language: "en", format: "epub", object_key: "k2", ingested_at: Time.current)
+    Book.create!(title: "A", language: "Romanian", format: "epub", object_key: "k1", ingested_at: Time.current)
+    Book.create!(title: "B", language: "English",  format: "epub", object_key: "k2", ingested_at: Time.current)
     Book.create!(title: "C", language: nil,  format: "epub", object_key: "k3", ingested_at: Time.current)
 
-    assert_equal 1, Book.by_language("ro").count
-    assert_equal 1, Book.by_language("en").count
+    assert_equal 1, Book.by_language("Romanian").count
+    assert_equal 1, Book.by_language("English").count
   end
 
   test "by_language scope filters by multiple languages" do
-    Book.create!(title: "A", language: "ro", format: "epub", object_key: "k1", ingested_at: Time.current)
-    Book.create!(title: "B", language: "en", format: "epub", object_key: "k2", ingested_at: Time.current)
-    Book.create!(title: "C", language: "fr", format: "epub", object_key: "k3", ingested_at: Time.current)
+    Book.create!(title: "A", language: "Romanian", format: "epub", object_key: "k1", ingested_at: Time.current)
+    Book.create!(title: "B", language: "English",  format: "epub", object_key: "k2", ingested_at: Time.current)
+    Book.create!(title: "C", language: "French",   format: "epub", object_key: "k3", ingested_at: Time.current)
 
-    assert_equal 2, Book.by_language(%w[ro en]).count
+    assert_equal 2, Book.by_language(%w[Romanian English]).count
   end
 
   test "by_language scope returns all when blank or empty" do
-    Book.create!(title: "A", language: "ro", format: "epub", object_key: "k1", ingested_at: Time.current)
+    Book.create!(title: "A", language: "Romanian", format: "epub", object_key: "k1", ingested_at: Time.current)
     Book.create!(title: "B", language: nil,  format: "epub", object_key: "k2", ingested_at: Time.current)
 
     assert_equal 2, Book.by_language("").count
@@ -177,15 +177,29 @@ class BookTest < ActiveSupport::TestCase
     assert_equal 2, Book.by_language([]).count
   end
 
-  test "available_languages returns sorted distinct languages from visible books" do
-    Book.create!(title: "A", language: "ro", format: "epub", object_key: "k1", ingested_at: Time.current)
-    Book.create!(title: "B", language: "en", format: "epub", object_key: "k2", ingested_at: Time.current)
-    Book.create!(title: "C", language: "ro", format: "epub", object_key: "k3", ingested_at: Time.current)
-    Book.create!(title: "D", language: nil,  format: "epub", object_key: "k4", ingested_at: Time.current)
-    Book.create!(title: "E", language: "fr", format: "epub", object_key: "k5", ingested_at: Time.current,
+  test "available_languages returns sorted distinct normalized languages from visible books" do
+    Book.create!(title: "A", language: "ro",    format: "epub", object_key: "k1", ingested_at: Time.current)
+    Book.create!(title: "B", language: "en",    format: "epub", object_key: "k2", ingested_at: Time.current)
+    Book.create!(title: "C", language: "ro-RO", format: "epub", object_key: "k3", ingested_at: Time.current)
+    Book.create!(title: "D", language: nil,     format: "epub", object_key: "k4", ingested_at: Time.current)
+    Book.create!(title: "E", language: "fr",    format: "epub", object_key: "k5", ingested_at: Time.current,
                   missing_since: Time.current)
 
-    assert_equal %w[en ro], Book.available_languages
+    assert_equal %w[English Romanian], Book.available_languages
+  end
+
+  test "normalizes language codes on save" do
+    book = Book.create!(title: "A", language: "ro", format: "epub", object_key: "k1", ingested_at: Time.current)
+    assert_equal "Romanian", book.language
+
+    book.update!(language: "en-US")
+    assert_equal "English", book.language
+
+    book.update!(language: "French")
+    assert_equal "French", book.language
+
+    book.update!(language: nil)
+    assert_nil book.language
   end
 
   test "search scope returns all books when query is blank" do

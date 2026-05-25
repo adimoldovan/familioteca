@@ -255,10 +255,10 @@ class BooksControllerTest < ActionDispatch::IntegrationTest
     Book.create!(title: "Romanian Book", language: "ro", format: "epub", object_key: "k1", ingested_at: Time.current)
     Book.create!(title: "English Book",  language: "en", format: "epub", object_key: "k2", ingested_at: Time.current)
 
-    get root_path(lang: [ "ro" ])
+    get root_path(lang: [ "Romanian" ])
     assert_select ".book-card__title", count: 1, text: "Romanian Book"
 
-    get root_path(lang: [ "en" ])
+    get root_path(lang: [ "English" ])
     assert_select ".book-card__title", count: 1, text: "English Book"
   end
 
@@ -268,7 +268,7 @@ class BooksControllerTest < ActionDispatch::IntegrationTest
     Book.create!(title: "B", language: "en", format: "epub", object_key: "k2", ingested_at: Time.current)
     Book.create!(title: "C", language: "fr", format: "epub", object_key: "k3", ingested_at: Time.current)
 
-    get root_path(lang: %w[ro en])
+    get root_path(lang: %w[Romanian English])
     assert_select ".book-card__title", count: 2
   end
 
@@ -298,8 +298,8 @@ class BooksControllerTest < ActionDispatch::IntegrationTest
 
     get root_path
     assert_select "#lang-filter-all .catalog-sidebar__filter-count", text: "3"
-    assert_select "#lang-filter-ro .catalog-sidebar__filter-count", text: "2"
-    assert_select "#lang-filter-en .catalog-sidebar__filter-count", text: "1"
+    assert_select "#lang-filter-romanian .catalog-sidebar__filter-count", text: "2"
+    assert_select "#lang-filter-english .catalog-sidebar__filter-count", text: "1"
   end
 
   test "All languages count includes books without a language" do
@@ -309,7 +309,7 @@ class BooksControllerTest < ActionDispatch::IntegrationTest
 
     get root_path
     assert_select "#lang-filter-all .catalog-sidebar__filter-count", text: "2"
-    assert_select "#lang-filter-ro .catalog-sidebar__filter-count", text: "1"
+    assert_select "#lang-filter-romanian .catalog-sidebar__filter-count", text: "1"
   end
 
   test "language filter section is hidden when no books have languages" do
@@ -328,7 +328,7 @@ class BooksControllerTest < ActionDispatch::IntegrationTest
     Book.create!(title: "Read EN",   language: "en", format: "epub", object_key: "k3", ingested_at: Time.current)
     MemberBook.create!(member: member, book: b1, read_at: Time.current)
 
-    get root_path(lang: [ "ro" ], filter: "read")
+    get root_path(lang: [ "Romanian" ], filter: "read")
     assert_select ".book-card__title", count: 1, text: "Read RO"
   end
 
@@ -337,7 +337,7 @@ class BooksControllerTest < ActionDispatch::IntegrationTest
     Book.create!(title: "Amintiri", language: "ro", format: "epub", object_key: "k1", ingested_at: Time.current)
     Book.create!(title: "Amintiri", language: "en", format: "epub", object_key: "k2", ingested_at: Time.current)
 
-    get root_path(lang: [ "ro" ], q: "amintiri")
+    get root_path(lang: [ "Romanian" ], q: "amintiri")
     assert_select ".book-card__title", count: 1
   end
 
@@ -346,7 +346,7 @@ class BooksControllerTest < ActionDispatch::IntegrationTest
     Book.create!(title: "A", language: "ro", format: "epub", object_key: "k1", ingested_at: Time.current)
     Book.create!(title: "B", language: "en", format: "epub", object_key: "k2", ingested_at: Time.current)
 
-    get root_path(lang: [ "ro" ])
+    get root_path(lang: [ "Romanian" ])
     assert_select ".catalog-sidebar__count", text: "1 / 2"
   end
 
@@ -356,10 +356,10 @@ class BooksControllerTest < ActionDispatch::IntegrationTest
     Book.create!(title: "B", language: "en", format: "epub", object_key: "k2", ingested_at: Time.current)
     Book.create!(title: "C", language: "fr", format: "epub", object_key: "k3", ingested_at: Time.current)
 
-    get root_path(lang: %w[ro en])
-    assert_select "#lang-filter-ro.is-active"
-    assert_select "#lang-filter-en.is-active"
-    assert_select "#lang-filter-fr:not(.is-active)"
+    get root_path(lang: %w[Romanian English])
+    assert_select "#lang-filter-romanian.is-active"
+    assert_select "#lang-filter-english.is-active"
+    assert_select "#lang-filter-french:not(.is-active)"
     assert_select "#lang-filter-all:not(.is-active)"
   end
 

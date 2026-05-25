@@ -16,6 +16,7 @@ class Book < ApplicationRecord
   validates :goodreads_url, format: { with: %r{\Ahttps://www\.goodreads\.com/book/show/\S+\z}, message: :invalid },
                             allow_blank: true
 
+  before_validation :normalize_language
   before_validation :populate_search_columns
 
   scope :visible,          -> { where(missing_since: nil).where(parse_error: nil) }
@@ -58,6 +59,10 @@ class Book < ApplicationRecord
   end
 
   private
+
+  def normalize_language
+    self.language = LanguageNormalizer.normalize(language)
+  end
 
   def populate_search_columns
     self.sort_title = DiacriticFolding.fold(title.to_s)
