@@ -1,0 +1,39 @@
+<main class="auth-minimal" aria-label="<%= t(".title") %>">
+  <div class="auth-minimal__nav">
+    <%= link_to t("app.name"), root_path, class: "brand__name" %>
+    <%= render "shared/theme_toggle" %>
+  </div>
+
+  <h1 class="t-headline"><%= t(".title") %></h1>
+
+  <% if @member.errors.any? %>
+    <div class="error-summary">
+      <h2 class="error-summary__title"><%= t(".errors_title") %></h2>
+      <ul class="error-summary__list">
+        <% @member.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <%= form_with model: @member, url: password_reset_path(token: params[:token]), method: :patch do |f| %>
+    <div class="form-field">
+      <div class="form-field__header">
+        <%= f.label :password, t(".password"), for: "reset-password", class: "form-field__label" %>
+      </div>
+      <%= f.password_field :password, id: "reset-password", required: true, autofocus: true,
+            class: "form-field__input" %>
+    </div>
+
+    <div class="form-field">
+      <div class="form-field__header">
+        <%= f.label :password_confirmation, t(".password_confirmation"), for: "reset-password-confirmation", class: "form-field__label" %>
+      </div>
+      <%= f.password_field :password_confirmation, id: "reset-password-confirmation", required: true,
+            class: "form-field__input" %>
+    </div>
+
+    <%= f.submit t(".submit"), id: "reset-submit", class: "btn btn-primary" %>
+  <% end %>
+</main>

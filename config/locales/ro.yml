@@ -14,6 +14,17 @@ ro:
     update:
       success: "Cont actualizat."
 
+  password_resets:
+    invalid_token: "Link-ul de resetare a expirat sau este invalid."
+    edit:
+      title: "Resetare parolă"
+      password: "Parolă nouă"
+      password_confirmation: "Confirmă parola"
+      errors_title: "Erori"
+      submit: "Salvează parola"
+    update:
+      success: "Parola a fost schimbată. Te poți autentifica."
+
   sessions:
     new:
       title: "Autentificare"

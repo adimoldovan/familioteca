@@ -5,6 +5,8 @@ Rails.application.routes.draw do
   post "session", to: "sessions#create", as: :session
   delete "session", to: "sessions#destroy"
 
+  resources :password_resets, only: %i[edit update], param: :token
+
   namespace :admin do
     resources :members, only: [ :index ]
     resources :ingestions, only: [ :create ]
