@@ -396,37 +396,53 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
     flex-wrap: wrap;
   }
 
-  .sort { display: inline-flex; align-items: center; gap: 10px; }
+  .sort { display: inline-flex; align-items: center; gap: 4px; }
 
-  .select-wrap {
-    position: relative;
+  .sort-btn {
     display: inline-flex;
     align-items: center;
-  }
-  .select-wrap select {
-    appearance: none;
-    -webkit-appearance: none;
     background: transparent;
     border: 1px solid var(--rule);
     border-radius: 999px;
-    padding: 7px 32px 7px 14px;
+    padding: 7px 14px;
     font-family: var(--sans);
     font-size: 13px;
     font-weight: 500;
-    color: var(--ink);
-    cursor: pointer;
-    transition: border-color 0.15s ease;
-  }
-  .select-wrap select:hover { border-color: var(--rule-strong); }
-  .select-wrap select:focus { outline: none; border-color: var(--ink); }
-  .select-wrap__caret {
-    width: 14px;
-    height: 14px;
-    position: absolute;
-    right: 10px;
-    pointer-events: none;
     color: var(--muted);
+    text-decoration: none;
+    cursor: pointer;
+    transition: border-color 0.15s ease, background 0.15s ease, color 0.15s ease;
   }
+  .sort-btn:hover { border-color: var(--rule-strong); }
+  .sort-btn.is-active {
+    background: var(--ink);
+    border-color: var(--ink);
+    color: var(--surface);
+  }
+  .sort-btn.is-active:hover { opacity: 0.85; }
+
+  .sort-divider {
+    width: 1px;
+    height: 24px;
+    background: var(--rule);
+    margin: 0 4px;
+  }
+
+  .sort-dir {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    background: var(--ink);
+    border: 1px solid var(--ink);
+    border-radius: 999px;
+    color: var(--surface);
+    text-decoration: none;
+    cursor: pointer;
+    transition: opacity 0.15s ease;
+  }
+  .sort-dir:hover { opacity: 0.85; }
 
   /* ---- CATALOG LAYOUT (sidebar + grid) ---- */
   .catalog-layout {
@@ -1181,7 +1197,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
     .book-card__title { font-size: 17px; }
 
     .catalog-toolbar { gap: 12px; margin-bottom: 16px; }
-    .sort { margin-left: auto; }
+    .sort { margin-left: auto; flex-wrap: wrap; gap: 4px; }
 
     .catalog-layout {
       grid-template-columns: 1fr;
