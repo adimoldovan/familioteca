@@ -27,13 +27,13 @@ gem "rails-i18n", "~> 8.0"
 gem "rack-attack", "~> 6.7"
 
 # EPUB metadata parsing
-gem "gepub", "~> 1.0"
+gem "gepub", "~> 2.0"
 
 # Object storage client (used against Cloudflare R2 via custom endpoint)
 gem "aws-sdk-s3", "~> 1.180", require: false
 
 # Image processing for Active Storage cover variants
-gem "image_processing", "~> 1.13"
+gem "image_processing", "~> 2.0"
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem "tzinfo-data", platforms: %i[ windows jruby ]
