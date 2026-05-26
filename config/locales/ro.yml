@@ -9,6 +9,19 @@ ro:
       name: "Nume"
       email: "Email"
       kindle_email: "Email Kindle"
+      kindle_sender_approved: "Am adăugat %{sender_email} în lista de expeditori aprobați din contul Amazon"
+      kindle_setup_link: "Cum configurez trimiterea pe Kindle?"
+      kindle_setup:
+        step1_title: "1. Găsește adresa ta Kindle"
+        step1_body: "Fiecare Kindle are o adresă de email unică (ex. nume_1234@kindle.com). O găsești în aplicația Kindle → Settings → Send-to-Kindle Email Address, sau pe amazon.com → Manage Your Content and Devices → Preferences → Personal Document Settings."
+        step2_title: "2. Aprobă expeditorul Familioteca"
+        step2_1: "Deschide amazon.com și autentifică-te."
+        step2_2_html: "Mergi la <strong>Manage Your Content and Devices → Preferences → Personal Document Settings</strong>."
+        step2_3: 'La secțiunea „Approved Personal Document E-mail List", apasă „Add a new approved e-mail address".'
+        step2_4: "Introdu adresa %{sender_email} și salvează."
+        step3_title: "3. Configurează în Familioteca"
+        step3_1: "Completează câmpul Email Kindle de mai sus cu adresa ta Kindle."
+        step3_2: "Bifează confirmarea că ai adăugat expeditorul aprobat, apoi salvează."
       errors_title: "Erori"
       submit: "Salvează"
     update:
@@ -89,6 +102,7 @@ ro:
         sent_with_time: "Trimisă acum %{when}"
         failed: "Eșuat — reîncearcă"
         no_kindle_email: "Adaugă un Email Kindle în cont pentru a trimite cărți."
+        no_sender_approved: "Aprobă expeditorul Familioteca în contul Amazon pentru a trimite cărți."
         oversize: "Cartea depășește 24MB și nu poate fi trimisă pe Kindle."
 
   admin:

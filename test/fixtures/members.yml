@@ -3,6 +3,7 @@ ana:
   password_digest: <%= BCrypt::Password.create("secret123", cost: BCrypt::Engine::MIN_COST) %>
   name: Ana
   kindle_email: ana@kindle.com
+  kindle_sender_approved: false
   admin: false
 
 admin:

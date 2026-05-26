@@ -26,4 +26,12 @@ class Member < ApplicationRecord
   validates :kindle_email,
     format: { with: EMAIL_FORMAT },
     allow_nil: true
+
+  before_save :clear_sender_approved_without_email
+
+  private
+
+  def clear_sender_approved_without_email
+    self.kindle_sender_approved = false if kindle_email.blank?
+  end
 end

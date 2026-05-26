@@ -37,6 +37,42 @@
     <%= f.email_field :kindle_email, class: "form-field__input", id: "account-kindle-email" %>
   </div>
 
+  <div class="form-field">
+    <label class="form-check" for="account-kindle-sender-approved">
+      <%= f.check_box :kindle_sender_approved, class: "form-check__input", id: "account-kindle-sender-approved" %>
+      <span class="form-check__label"><%= t("account.show.kindle_sender_approved", sender_email: @sender_email) %></span>
+    </label>
+
+    <details class="kindle-setup" id="kindle-setup-instructions">
+      <summary class="kindle-setup__summary"><%= t("account.show.kindle_setup_link") %></summary>
+
+      <div class="kindle-setup__body">
+        <section class="kindle-setup__section">
+          <h3 class="kindle-setup__heading"><%= t("account.show.kindle_setup.step1_title") %></h3>
+          <p><%= t("account.show.kindle_setup.step1_body") %></p>
+        </section>
+
+        <section class="kindle-setup__section">
+          <h3 class="kindle-setup__heading"><%= t("account.show.kindle_setup.step2_title") %></h3>
+          <ol class="kindle-setup__steps">
+            <li><%= t("account.show.kindle_setup.step2_1") %></li>
+            <li><%= t("account.show.kindle_setup.step2_2_html") %></li>
+            <li><%= t("account.show.kindle_setup.step2_3") %></li>
+            <li><%= t("account.show.kindle_setup.step2_4", sender_email: @sender_email) %></li>
+          </ol>
+        </section>
+
+        <section class="kindle-setup__section">
+          <h3 class="kindle-setup__heading"><%= t("account.show.kindle_setup.step3_title") %></h3>
+          <ol class="kindle-setup__steps">
+            <li><%= t("account.show.kindle_setup.step3_1") %></li>
+            <li><%= t("account.show.kindle_setup.step3_2") %></li>
+          </ol>
+        </section>
+      </div>
+    </details>
+  </div>
+
   <div class="content-form__actions">
     <%= f.submit t("account.show.submit"), class: "btn btn-primary", id: "account-submit" %>
   </div>

@@ -7,6 +7,11 @@ class KindleDeliveriesController < ApplicationController
       return render_show_with_status(book, :unprocessable_entity)
     end
 
+    unless current_member.kindle_sender_approved?
+      flash.now[:alert] = I18n.t("books.show.kindle.no_sender_approved")
+      return render_show_with_status(book, :unprocessable_entity)
+    end
+
     if book.oversize_for_kindle?
       flash.now[:alert] = I18n.t("books.show.kindle.oversize")
       return render_show_with_status(book, :unprocessable_entity)

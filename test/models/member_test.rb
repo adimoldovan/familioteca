@@ -78,6 +78,16 @@ class MemberTest < ActiveSupport::TestCase
     assert_includes member.errors[:kindle_email], "este invalid"
   end
 
+  test "clearing kindle_email resets kindle_sender_approved" do
+    member = Member.create!(
+      email: "new@example.com", password: "secret123", name: "Ana",
+      kindle_email: "ana@kindle.com", kindle_sender_approved: true
+    )
+    member.update!(kindle_email: "")
+    assert_nil member.kindle_email
+    assert_not member.kindle_sender_approved?
+  end
+
   test "kindle_email may be blank" do
     member = Member.new(
       email: "new@example.com",

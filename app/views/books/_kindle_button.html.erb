@@ -1,6 +1,8 @@
 <div id="book-kindle">
   <% if member.kindle_email.blank? %>
     <p class="kindle__notice" id="kindle-no-email"><%= link_to t("books.show.kindle.no_kindle_email"), account_path %></p>
+  <% elsif !member.kindle_sender_approved? %>
+    <p class="kindle__notice" id="kindle-no-sender"><%= link_to t("books.show.kindle.no_sender_approved"), account_path %></p>
   <% elsif book.oversize_for_kindle? %>
     <p class="kindle__notice" id="kindle-oversize"><%= t("books.show.kindle.oversize") %></p>
   <% else %>

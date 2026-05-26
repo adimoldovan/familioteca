@@ -21,7 +21,7 @@ type Fixtures = {
   authenticatedPage: Page;
   // Same as `authenticatedPage`, but the seeded member is an admin.
   adminPage: Page;
-  // Authenticated page with a kindle_email pre-set on the member.
+  // Authenticated page with kindle_email and kindle_sender_approved: true.
   kindleReadyPage: Page;
   // Bound helper for creating Book records inline within a spec.
   seedBook: (options?: SeedBookOptions) => Promise<SeedBookResult>;

@@ -8,7 +8,7 @@ class SendToKindleJobTest < ActiveJob::TestCase
 
   setup do
     @member = members(:ana)
-    @member.update!(kindle_email: "ana@kindle.com")
+    @member.update!(kindle_email: "ana@kindle.com", kindle_sender_approved: true)
     @book = Book.create!(
       title: "T", format: "epub", object_key: "verne/x.epub",
       ingested_at: Time.current, file_size: 1.megabyte

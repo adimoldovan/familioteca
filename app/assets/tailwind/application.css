@@ -1208,6 +1208,92 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
   }
   .error-summary__list li + li { margin-top: 4px; }
 
+  /* ---- FORM CHECKBOX ---- */
+  .form-check {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    cursor: pointer;
+    max-width: 400px;
+  }
+
+  .form-check__input {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+    margin-top: 2px;
+    accent-color: var(--ink);
+    cursor: pointer;
+  }
+
+  .form-check__label {
+    font-family: var(--sans);
+    font-size: 14px;
+    color: var(--ink);
+    line-height: 1.4;
+  }
+
+  /* ---- KINDLE SETUP (collapsible instructions) ---- */
+  .kindle-setup {
+    margin-top: 8px;
+    max-width: 400px;
+  }
+
+  .kindle-setup__summary {
+    font-family: var(--mono);
+    font-size: 12.5px;
+    color: var(--muted);
+    cursor: pointer;
+    list-style: none;
+    transition: color 0.15s ease;
+  }
+  .kindle-setup__summary::-webkit-details-marker { display: none; }
+  .kindle-setup__summary::before {
+    content: "▸ ";
+  }
+  .kindle-setup[open] > .kindle-setup__summary::before {
+    content: "▾ ";
+  }
+  .kindle-setup__summary:hover { color: var(--ink); }
+
+  .kindle-setup__body {
+    margin-top: 16px;
+    padding: 16px;
+    background: var(--chip);
+    border-radius: 8px;
+  }
+
+  .kindle-setup__section + .kindle-setup__section {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid var(--rule);
+  }
+
+  .kindle-setup__heading {
+    font-family: var(--sans);
+    font-size: 13px;
+    font-weight: 600;
+    margin: 0 0 8px;
+    color: var(--ink);
+  }
+
+  .kindle-setup__section p {
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--ink-soft);
+    margin: 0;
+  }
+
+  .kindle-setup__steps {
+    padding-left: 18px;
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--ink-soft);
+    margin: 0;
+  }
+  .kindle-setup__steps li + li { margin-top: 6px; }
+  .kindle-setup__steps strong { color: var(--ink); font-weight: 500; }
+
   .inline-form { display: inline; }
 
   .content-form { max-width: 100%; }

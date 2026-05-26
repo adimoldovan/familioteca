@@ -1,4 +1,6 @@
 class AccountsController < ApplicationController
+  before_action :set_sender_email, only: %i[show update]
+
   def show
     @member = current_member
   end
@@ -15,6 +17,10 @@ class AccountsController < ApplicationController
   private
 
   def account_params
-    params.require(:member).permit(:name, :kindle_email)
+    params.require(:member).permit(:name, :kindle_email, :kindle_sender_approved)
+  end
+
+  def set_sender_email
+    @sender_email = ApplicationMailer.default[:from]
   end
 end

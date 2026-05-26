@@ -6,6 +6,7 @@ export class AccountPage {
   readonly nameInput: Locator;
   readonly emailDisplay: Locator;
   readonly kindleEmailInput: Locator;
+  readonly kindleSenderApprovedCheckbox: Locator;
   readonly submitButton: Locator;
   readonly errorSummary: Locator;
   readonly flash: Locator;
@@ -16,6 +17,7 @@ export class AccountPage {
     this.nameInput = page.locator("#account-name");
     this.emailDisplay = page.locator("#account-email");
     this.kindleEmailInput = page.locator("#account-kindle-email");
+    this.kindleSenderApprovedCheckbox = page.locator("#account-kindle-sender-approved");
     this.submitButton = page.locator("#account-submit");
     this.errorSummary = page.locator(".error-summary");
     this.flash = page.locator(".flash--notice");

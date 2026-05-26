@@ -506,7 +506,7 @@ class BooksControllerTest < ActionDispatch::IntegrationTest
 
   test "show renders the Kindle button when the member has a kindle_email" do
     member = members(:ana)
-    member.update!(kindle_email: "ana@kindle.com")
+    member.update!(kindle_email: "ana@kindle.com", kindle_sender_approved: true)
     sign_in_as member
     book = Book.create!(title: "T", format: "epub", object_key: "k",
                         ingested_at: Time.current, file_size: 1.megabyte)
@@ -523,9 +523,18 @@ class BooksControllerTest < ActionDispatch::IntegrationTest
     assert_select "#book-kindle .kindle__notice", text: /Adaugă un Email Kindle/
   end
 
+  test "show renders the unapproved-sender notice when kindle_sender_approved is false" do
+    member = members(:ana)
+    member.update!(kindle_email: "ana@kindle.com", kindle_sender_approved: false)
+    sign_in_as member
+    book = Book.create!(title: "T", format: "epub", object_key: "k", ingested_at: Time.current, file_size: 1.megabyte)
+    get book_path(book)
+    assert_select "#book-kindle #kindle-no-sender"
+  end
+
   test "show renders the oversize notice instead of the button" do
     member = members(:ana)
-    member.update!(kindle_email: "ana@kindle.com")
+    member.update!(kindle_email: "ana@kindle.com", kindle_sender_approved: true)
     sign_in_as member
     book = Book.create!(title: "T", format: "epub", object_key: "k",
                         ingested_at: Time.current, file_size: 25.megabytes)
@@ -535,7 +544,7 @@ class BooksControllerTest < ActionDispatch::IntegrationTest
 
   test "show reflects a pending delivery" do
     member = members(:ana)
-    member.update!(kindle_email: "ana@kindle.com")
+    member.update!(kindle_email: "ana@kindle.com", kindle_sender_approved: true)
     sign_in_as member
     book = Book.create!(title: "T", format: "epub", object_key: "k",
                         ingested_at: Time.current, file_size: 1.megabyte)
@@ -546,7 +555,7 @@ class BooksControllerTest < ActionDispatch::IntegrationTest
 
   test "show reflects a sent delivery and allows retry" do
     member = members(:ana)
-    member.update!(kindle_email: "ana@kindle.com")
+    member.update!(kindle_email: "ana@kindle.com", kindle_sender_approved: true)
     sign_in_as member
     book = Book.create!(title: "T", format: "epub", object_key: "k",
                         ingested_at: Time.current, file_size: 1.megabyte)
@@ -558,7 +567,7 @@ class BooksControllerTest < ActionDispatch::IntegrationTest
 
   test "show reflects a failed delivery" do
     member = members(:ana)
-    member.update!(kindle_email: "ana@kindle.com")
+    member.update!(kindle_email: "ana@kindle.com", kindle_sender_approved: true)
     sign_in_as member
     book = Book.create!(title: "T", format: "epub", object_key: "k",
                         ingested_at: Time.current, file_size: 1.megabyte)

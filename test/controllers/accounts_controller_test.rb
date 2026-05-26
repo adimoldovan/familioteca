@@ -18,11 +18,11 @@ class AccountsControllerTest < ActionDispatch::IntegrationTest
     assert_select "#account-kindle-email[value=?]", member.kindle_email
   end
 
-  test "update saves name and kindle_email" do
+  test "update saves name, kindle_email, and kindle_sender_approved" do
     member = members(:ana)
     sign_in_as member
 
-    patch account_path, params: { member: { name: "Ana Maria", kindle_email: "new@kindle.com" } }
+    patch account_path, params: { member: { name: "Ana Maria", kindle_email: "new@kindle.com", kindle_sender_approved: "1" } }
     assert_redirected_to account_path
     follow_redirect!
     assert_select ".flash--notice", /Cont actualizat/
@@ -30,10 +30,12 @@ class AccountsControllerTest < ActionDispatch::IntegrationTest
     member.reload
     assert_equal "Ana Maria", member.name
     assert_equal "new@kindle.com", member.kindle_email
+    assert member.kindle_sender_approved?
   end
 
-  test "update clears kindle_email when blank" do
+  test "update clears kindle_email and resets kindle_sender_approved" do
     member = members(:ana)
+    member.update!(kindle_sender_approved: true)
     sign_in_as member
 
     patch account_path, params: { member: { name: "Ana", kindle_email: "" } }
@@ -41,6 +43,7 @@ class AccountsControllerTest < ActionDispatch::IntegrationTest
 
     member.reload
     assert_nil member.kindle_email
+    assert_not member.kindle_sender_approved?
   end
 
   test "update re-renders form with errors when name is blank" do

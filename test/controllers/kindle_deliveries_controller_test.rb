@@ -15,7 +15,7 @@ class KindleDeliveriesControllerTest < ActionDispatch::IntegrationTest
 
   test "creates a pending delivery and enqueues the job" do
     member = members(:ana)
-    member.update!(kindle_email: "ana@kindle.com")
+    member.update!(kindle_email: "ana@kindle.com", kindle_sender_approved: true)
     sign_in_as member
 
     assert_difference "KindleDelivery.count", 1 do
@@ -47,9 +47,21 @@ class KindleDeliveriesControllerTest < ActionDispatch::IntegrationTest
     assert_includes @response.body, I18n.t("books.show.kindle.no_kindle_email")
   end
 
+  test "422 when the member has not approved the sender" do
+    member = members(:ana)
+    member.update!(kindle_email: "ana@kindle.com", kindle_sender_approved: false)
+    sign_in_as member
+
+    assert_no_difference "KindleDelivery.count" do
+      post book_kindle_deliveries_path(@book)
+    end
+    assert_response :unprocessable_entity
+    assert_includes @response.body, I18n.t("books.show.kindle.no_sender_approved")
+  end
+
   test "422 when the book is oversize" do
     member = members(:ana)
-    member.update!(kindle_email: "ana@kindle.com")
+    member.update!(kindle_email: "ana@kindle.com", kindle_sender_approved: true)
     sign_in_as member
     @book.update!(file_size: 25.megabytes)
 
@@ -61,7 +73,7 @@ class KindleDeliveriesControllerTest < ActionDispatch::IntegrationTest
 
   test "404 when the book is missing" do
     member = members(:ana)
-    member.update!(kindle_email: "ana@kindle.com")
+    member.update!(kindle_email: "ana@kindle.com", kindle_sender_approved: true)
     sign_in_as member
     @book.update!(missing_since: Time.current)
 
