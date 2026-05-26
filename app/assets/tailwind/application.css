@@ -1499,7 +1499,6 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
       color: inherit;
       opacity: 0.85;
     }
-    .catalog-sidebar__checkbox { display: none; }
     .catalog-sidebar__filter-item--checkable { justify-content: center; }
 
     .book-detail { grid-template-columns: 1fr; gap: 32px; }
