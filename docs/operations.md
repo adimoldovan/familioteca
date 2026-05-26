@@ -212,3 +212,19 @@ The drill runs in a **dedicated `familioteca-restore` Fly app**, not in the live
 - **WAL checkpointing lag.** Litestream replicates the SQLite WAL incrementally; the last few seconds of writes may not be in the replica yet. Use `litestream snapshots` to confirm freshness before treating a restore as authoritative.
 - **Pin the Litestream version.** Local Litestream must match the Dockerfile pin. `brew install` follows the tap and may give a newer release — verify with `litestream version`.
 - **Tigris cred file naming.** `.gitignore` has `/.env*` rooted at the repo root. That covers `.env.litestream` but **not** other names like `.litestream.env`, which would slip past gitignore and could be committed. Stick with the `.env.<suffix>` shape and keep the file at the repo root.
+
+## Syncing books to R2
+
+`bin/sync-books` uploads a local folder of ebooks to the production R2 bucket. One-way sync — local files are uploaded but remote-only files are never deleted. The script warns about files present in the bucket but missing locally so you can investigate.
+
+```
+# Load the bucket credentials into a subshell so they don't persist
+(source .env.books && bin/sync-books --dry-run ~/books)
+
+# Upload
+(source .env.books && bin/sync-books ~/books)
+```
+
+Store your R2 credentials in `.env.books` at the repo root (covered by `.gitignore`'s `/.env*` pattern).
+
+`aws s3 sync` skips files when the remote size and last-modified timestamp both match. To force re-upload of a file whose content changed without changing its size, touch the file before syncing (`touch filename`).

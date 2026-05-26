@@ -1,0 +1,144 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+usage() {
+  cat <<EOF
+Usage: bin/sync-books [--dry-run] <local-folder>
+
+One-way sync: uploads new/changed files from <local-folder> to the R2 bucket.
+Does NOT delete remote files — but warns about files in the bucket that are
+missing locally so you can investigate.
+
+Requires these env vars (same ones the Rails app uses):
+  FAMILIOTECA_BUCKET_ENDPOINT
+  FAMILIOTECA_BUCKET_NAME
+  FAMILIOTECA_BUCKET_KEY_ID
+  FAMILIOTECA_BUCKET_SECRET
+
+Options:
+  --dry-run   Show what would be uploaded without actually uploading.
+
+Examples:
+  bin/sync-books ~/books
+  bin/sync-books --dry-run ~/books
+EOF
+  exit "${1:-1}"
+}
+
+if ! command -v aws &>/dev/null; then
+  echo "Error: aws CLI not found. Install it: brew install awscli" >&2
+  exit 1
+fi
+
+# --- Args ---
+
+[[ $# -lt 1 ]] && usage
+
+LOCAL_DIR=""
+dry_run_opts=()
+
+for arg in "$@"; do
+  case "$arg" in
+    --dry-run) dry_run_opts=(--dryrun) ;;
+    --help|-h) usage 0 ;;
+    --*) echo "Error: unknown option: $arg" >&2; usage ;;
+    *)
+      if [[ -n "$LOCAL_DIR" ]]; then
+        echo "Error: unexpected argument: $arg" >&2; usage
+      fi
+      LOCAL_DIR="$arg"
+      ;;
+  esac
+done
+
+if [[ -z "$LOCAL_DIR" ]]; then
+  echo "Error: no local folder specified." >&2
+  usage
+fi
+
+LOCAL_DIR="${LOCAL_DIR%/}"
+
+if [[ ! -d "$LOCAL_DIR" ]]; then
+  echo "Error: $LOCAL_DIR is not a directory." >&2
+  exit 1
+fi
+
+# --- Env vars ---
+
+for var in FAMILIOTECA_BUCKET_ENDPOINT FAMILIOTECA_BUCKET_NAME FAMILIOTECA_BUCKET_KEY_ID FAMILIOTECA_BUCKET_SECRET; do
+  if [[ -z "${!var:-}" ]]; then
+    echo "Error: $var is not set." >&2
+    exit 1
+  fi
+done
+
+BUCKET="$FAMILIOTECA_BUCKET_NAME"
+S3_URI="s3://$BUCKET"
+
+aws_opts=(--endpoint-url "$FAMILIOTECA_BUCKET_ENDPOINT" --region "${FAMILIOTECA_BUCKET_REGION:-auto}")
+aws_env=(
+  AWS_ACCESS_KEY_ID="$FAMILIOTECA_BUCKET_KEY_ID"
+  AWS_SECRET_ACCESS_KEY="$FAMILIOTECA_BUCKET_SECRET"
+)
+
+# --- Check for remote-only files ---
+
+echo "Checking for files in bucket not present locally..."
+
+if ! remote_keys=$(env "${aws_env[@]}" aws s3api list-objects-v2 \
+    "${aws_opts[@]}" --bucket "$BUCKET" --query "Contents[].Key" --output text); then
+  echo "WARNING: could not list remote bucket contents (see error above)" >&2
+  remote_keys=""
+fi
+
+orphan_count=0
+if [[ -n "$remote_keys" && "$remote_keys" != "None" ]]; then
+  while IFS= read -r key; do
+    [[ -z "$key" ]] && continue
+    if [[ "$key" == /* || "$key" =~ (^|/)\.\.(/|$) ]]; then
+      echo "WARNING: skipping suspicious key: $key" >&2
+      continue
+    fi
+    if [[ ! -f "$LOCAL_DIR/$key" ]]; then
+      if [[ $orphan_count -eq 0 ]]; then
+        echo ""
+        echo "WARNING: files in bucket but missing locally:"
+      fi
+      echo "  $key"
+      orphan_count=$((orphan_count + 1))
+    fi
+  done <<< "${remote_keys//$'\t'/$'\n'}"
+fi
+
+if [[ $orphan_count -gt 0 ]]; then
+  echo ""
+  echo "$orphan_count file(s) in bucket not found locally."
+  echo "These will NOT be deleted — review and add locally if needed."
+  echo ""
+else
+  echo "All remote files accounted for locally."
+  echo ""
+fi
+
+# --- Sync local → remote ---
+
+if [[ ${#dry_run_opts[@]} -gt 0 ]]; then
+  echo "Dry run — showing what would be uploaded:"
+fi
+
+echo "Syncing $LOCAL_DIR → $S3_URI ..."
+echo ""
+
+env "${aws_env[@]}" aws s3 sync "$LOCAL_DIR" "$S3_URI" "${aws_opts[@]}" "${dry_run_opts[@]}" \
+  --exclude ".DS_Store" --exclude "*/.DS_Store" \
+  --exclude "._*" --exclude "*/._*" \
+  --exclude ".Spotlight-V100/*" --exclude ".Trashes/*" \
+  --exclude ".fseventsd/*" --exclude ".TemporaryItems/*" \
+  --no-follow-symlinks
+
+echo ""
+if [[ ${#dry_run_opts[@]} -gt 0 ]]; then
+  echo "Dry run complete — nothing was uploaded."
+else
+  echo "Done."
+fi
