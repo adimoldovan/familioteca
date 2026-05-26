@@ -25,7 +25,7 @@
 
 <div class="catalog-layout">
   <aside class="catalog-sidebar" aria-label="<%= t(".filters.label") %>">
-    <p class="catalog-sidebar__count" aria-label="<%= t(".count_label", filtered: @counts[@filter.to_sym], total: @total_count) %>">
+    <p class="catalog-sidebar__count">
       <%= t(".count", filtered: @counts[@filter.to_sym], total: @total_count) %>
     </p>
 

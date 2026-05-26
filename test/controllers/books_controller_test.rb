@@ -123,7 +123,7 @@ class BooksControllerTest < ActionDispatch::IntegrationTest
     Book.create!(title: "B", format: "epub", object_key: "k2", ingested_at: Time.current)
 
     get root_path
-    assert_select ".catalog-sidebar__count", text: "2 / 2"
+    assert_select ".catalog-sidebar__count", text: "2 din 2 cărți"
   end
 
   test "sidebar count reflects filtered vs total" do
@@ -133,7 +133,7 @@ class BooksControllerTest < ActionDispatch::IntegrationTest
     Book.create!(title: "B", format: "epub", object_key: "k2", ingested_at: Time.current)
 
     get root_path(q: "A")
-    assert_select ".catalog-sidebar__count", text: "1 / 2"
+    assert_select ".catalog-sidebar__count", text: "1 din 2 cărți"
   end
 
   test "sidebar total excludes non-visible books" do
@@ -142,7 +142,7 @@ class BooksControllerTest < ActionDispatch::IntegrationTest
     Book.create!(title: "B", format: "epub", object_key: "k2", ingested_at: Time.current, missing_since: Time.current)
 
     get root_path
-    assert_select ".catalog-sidebar__count", text: /1 \/ 1/
+    assert_select ".catalog-sidebar__count", text: "1 din 1 cărți"
   end
 
   test "sidebar count reflects reading status filter" do
@@ -153,7 +153,7 @@ class BooksControllerTest < ActionDispatch::IntegrationTest
     MemberBook.create!(member: member, book: b1, read_at: Time.current)
 
     get root_path(filter: "read")
-    assert_select ".catalog-sidebar__count", text: "1 / 2"
+    assert_select ".catalog-sidebar__count", text: "1 din 2 cărți"
   end
 
   test "sidebar count total is absolute when search is active" do
@@ -165,7 +165,7 @@ class BooksControllerTest < ActionDispatch::IntegrationTest
     MemberBook.create!(member: member, book: b1, read_at: Time.current)
 
     get root_path(q: "A", filter: "read")
-    assert_select ".catalog-sidebar__count", text: "1 / 3"
+    assert_select ".catalog-sidebar__count", text: "1 din 3 cărți"
   end
 
   test "invalid filter param falls back to all" do
@@ -174,7 +174,7 @@ class BooksControllerTest < ActionDispatch::IntegrationTest
     Book.create!(title: "B", format: "epub", object_key: "k2", ingested_at: Time.current)
 
     get root_path(filter: "bogus")
-    assert_select ".catalog-sidebar__count", text: "2 / 2"
+    assert_select ".catalog-sidebar__count", text: "2 din 2 cărți"
     assert_select ".catalog-sidebar__filter-item.is-active", count: 1
   end
 
@@ -347,7 +347,7 @@ class BooksControllerTest < ActionDispatch::IntegrationTest
     Book.create!(title: "B", language: "en", format: "epub", object_key: "k2", ingested_at: Time.current)
 
     get root_path(lang: [ "Romanian" ])
-    assert_select ".catalog-sidebar__count", text: "1 / 2"
+    assert_select ".catalog-sidebar__count", text: "1 din 2 cărți"
   end
 
   test "multiple language filters highlight active languages" do
@@ -552,7 +552,7 @@ class BooksControllerTest < ActionDispatch::IntegrationTest
                         ingested_at: Time.current, file_size: 1.megabyte)
     KindleDelivery.create!(member: member, book: book, status: :sent, sent_at: 5.minutes.ago)
     get book_path(book)
-    assert_select "#book-kindle .kindle__status", text: /Trimisă/
+    assert_select "#book-kindle .kindle__status", text: /Trimisă acum/
     assert_select "#book-kindle #kindle-send-button"
   end
 

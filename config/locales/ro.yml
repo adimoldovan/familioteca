@@ -49,8 +49,7 @@ ro:
   books:
     index:
       title: "Bibliotecă"
-      count: "%{filtered} / %{total}"
-      count_label: "%{filtered} din %{total} cărți"
+      count: "%{filtered} din %{total} cărți"
       empty: "Niciun titlu disponibil"
       search:
         placeholder: "Caută…"
@@ -87,8 +86,7 @@ ro:
       kindle:
         send: "Trimite pe Kindle"
         sending: "Se trimite…"
-        sent: "Trimisă ✓"
-        sent_with_time: "Trimisă ✓ %{when}"
+        sent_with_time: "Trimisă acum %{when}"
         failed: "Eșuat — reîncearcă"
         no_kindle_email: "Adaugă un Email Kindle în cont pentru a trimite cărți."
         oversize: "Cartea depășește 24MB și nu poate fi trimisă pe Kindle."
