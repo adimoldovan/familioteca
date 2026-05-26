@@ -1,4 +1,52 @@
 ro:
+  datetime:
+    distance_in_words:
+      half_a_minute: "jumătate de minut"
+      less_than_x_seconds:
+        one: "mai puțin de o secundă"
+        few: "mai puțin de %{count} secunde"
+        other: "mai puțin de %{count} secunde"
+      x_seconds:
+        one: "o secundă"
+        few: "%{count} secunde"
+        other: "%{count} secunde"
+      less_than_x_minutes:
+        one: "mai puțin de un minut"
+        few: "mai puțin de %{count} minute"
+        other: "mai puțin de %{count} minute"
+      x_minutes:
+        one: "un minut"
+        few: "%{count} minute"
+        other: "%{count} minute"
+      about_x_hours:
+        one: "o oră"
+        few: "%{count} ore"
+        other: "%{count} ore"
+      x_days:
+        one: "o zi"
+        few: "%{count} zile"
+        other: "%{count} zile"
+      about_x_months:
+        one: "o lună"
+        few: "%{count} luni"
+        other: "%{count} luni"
+      x_months:
+        one: "o lună"
+        few: "%{count} luni"
+        other: "%{count} luni"
+      about_x_years:
+        one: "un an"
+        few: "%{count} ani"
+        other: "%{count} ani"
+      over_x_years:
+        one: "peste un an"
+        few: "peste %{count} ani"
+        other: "peste %{count} ani"
+      almost_x_years:
+        one: "aproape un an"
+        few: "aproape %{count} ani"
+        other: "aproape %{count} ani"
+
   app:
     name: "Familioteca"
     tagline: "Biblioteca de cărți a familiei"

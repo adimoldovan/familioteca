@@ -411,12 +411,13 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 
   .sort { display: inline-flex; align-items: center; gap: 4px; }
 
-  .sort-btn {
+  .sort-btn,
+  .catalog-sidebar__filter-item {
     display: inline-flex;
     align-items: center;
     background: transparent;
-    border: 1px solid var(--rule);
-    border-radius: 999px;
+    border: none;
+    border-radius: 6px;
     padding: 7px 14px;
     font-family: var(--sans);
     font-size: 13px;
@@ -424,15 +425,17 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
     color: var(--muted);
     text-decoration: none;
     cursor: pointer;
-    transition: border-color 0.15s ease, background 0.15s ease, color 0.15s ease;
+    transition: background 0.15s ease, color 0.15s ease;
   }
-  .sort-btn:hover { border-color: var(--rule-strong); }
-  .sort-btn.is-active {
+  .sort-btn:hover,
+  .catalog-sidebar__filter-item:hover { background: var(--chip); }
+  .sort-btn.is-active,
+  .catalog-sidebar__filter-item.is-active {
     background: var(--ink);
-    border-color: var(--ink);
     color: var(--surface);
   }
-  .sort-btn.is-active:hover { opacity: 0.85; }
+  .sort-btn.is-active:hover,
+  .catalog-sidebar__filter-item.is-active:hover { opacity: 0.85; }
 
   .sort-divider {
     width: 1px;
@@ -559,20 +562,10 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 
   .catalog-sidebar__filter-item {
     display: flex;
-    align-items: center;
     justify-content: space-between;
     gap: 10px;
     width: 100%;
-    padding: 8px 10px;
-    border-radius: 6px;
-    color: var(--ink-soft);
-    text-decoration: none;
-    font-family: var(--sans);
-    font-size: 14px;
-    font-weight: 500;
-    transition: background 0.12s ease, color 0.12s ease;
   }
-  .catalog-sidebar__filter-item:hover { background: var(--chip); color: var(--ink); }
 
   .catalog-sidebar__filter-count {
     font-size: 12px;
@@ -581,19 +574,12 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
     font-weight: 500;
   }
 
-  .catalog-sidebar__filter-item.is-active {
-    background: var(--chip);
-    color: var(--ink);
-    box-shadow: inset 2px 0 0 var(--ink);
-  }
-  .catalog-sidebar__filter-item.is-active .catalog-sidebar__filter-count { color: var(--ink); }
+  .catalog-sidebar__filter-item.is-active .catalog-sidebar__filter-count { color: inherit; }
 
   .catalog-sidebar__filter-item--checkable {
     justify-content: flex-start;
   }
-  .catalog-sidebar__filter-item--checkable.is-active {
-    box-shadow: none;
-  }
+
   .catalog-sidebar__filter-item--checkable .catalog-sidebar__filter-count {
     margin-left: auto;
   }
@@ -609,8 +595,8 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
     transition: background 0.12s ease, border-color 0.12s ease;
   }
   .catalog-sidebar__filter-item.is-active .catalog-sidebar__checkbox {
-    background: var(--ink);
-    border-color: var(--ink);
+    background: var(--surface);
+    border-color: var(--surface);
   }
   .catalog-sidebar__filter-item.is-active .catalog-sidebar__checkbox::after {
     content: "";
@@ -619,7 +605,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
     top: 1px;
     width: 5px;
     height: 9px;
-    border: solid var(--bg);
+    border: solid var(--ink);
     border-width: 0 2px 2px 0;
     transform: rotate(45deg);
   }
@@ -1455,23 +1441,29 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 
     .site-main { padding: 32px 20px 64px; }
 
-    .book-grid { grid-template-columns: repeat(2, 1fr); gap: 32px 16px; }
-    .book-card__title { font-size: 17px; }
+    .book-grid { grid-template-columns: repeat(2, 1fr); gap: 32px 14px; }
+    .book-card__title { font-size: 15px; margin-top: 10px; }
+    .book-card__author { font-size: 13px; }
 
-    .catalog-toolbar { gap: 12px; margin-bottom: 16px; }
+    .catalog-toolbar { gap: 8px; margin-bottom: 12px; }
     .sort { margin-left: auto; flex-wrap: wrap; gap: 4px; }
+    .sort-btn { padding: 6px 12px; font-size: 12px; }
+    .sort-dir { width: 30px; height: 30px; }
+    .sort-divider { height: 20px; margin: 0 2px; }
 
     .catalog-layout {
       grid-template-columns: 1fr;
-      gap: 20px;
+      gap: 24px;
     }
 
     .catalog-sidebar {
       position: static;
       margin: 0 -4px;
-      gap: 12px;
+      gap: 14px;
     }
-    .catalog-sidebar__label { display: none; }
+    .catalog-sidebar__count { font-size: 13px; order: 99; }
+    .catalog-sidebar__label { display: block; margin-bottom: 4px; padding: 0; font-size: 11px; }
+    .catalog-sidebar__section + .catalog-sidebar__section { margin-top: 0; }
     .catalog-sidebar__filters {
       flex-direction: row;
       overflow-x: auto;
@@ -1483,36 +1475,54 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
     .catalog-sidebar__filters::-webkit-scrollbar { display: none; }
     .catalog-sidebar__filters li { flex-shrink: 0; }
     .catalog-sidebar__filter-item {
-      gap: 8px;
-      padding: 7px 14px;
-      border-radius: 999px;
-      border: 1px solid var(--rule);
-      font-size: 13px;
-    }
-    .catalog-sidebar__filter-item.is-active {
-      background: var(--ink);
-      color: var(--bg);
-      border-color: var(--ink);
-      box-shadow: none;
-    }
-    .catalog-sidebar__filter-item.is-active .catalog-sidebar__filter-count {
-      color: inherit;
-      opacity: 0.85;
+      gap: 6px;
+      padding: 6px 12px;
+      font-size: 12px;
     }
     .catalog-sidebar__filter-item--checkable { justify-content: center; }
 
-    .book-detail { grid-template-columns: 1fr; gap: 32px; }
-    .book-detail__left { flex-direction: row; gap: 20px; align-items: flex-start; }
-    .book-detail__cover { width: 140px; flex-shrink: 0; }
-    .book-detail__actions { flex: 1; }
+    .book-detail { grid-template-columns: 1fr; gap: 0; }
+    .book-detail__left,
+    .book-detail__info { display: contents; }
+
+    .book-detail__eyebrow { order: 1; margin-bottom: -2px; }
+    .book-detail__title-row { order: 2; margin-bottom: 32px; }
+    .book-detail__cover { order: 3; width: 200px; max-width: 100%; justify-self: center; margin-bottom: 28px; }
+    .book-detail__actions {
+      order: 4;
+      flex-direction: row;
+      flex-wrap: wrap;
+      width: 100%;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+    #book-kindle { display: contents; }
+    .book-detail__action-btn {
+      flex: 1 1 140px;
+      width: auto;
+      padding: 10px 12px;
+      font-size: 13px;
+    }
+    .kindle__status,
+    .kindle__notice {
+      flex-basis: 100%;
+      order: 99;
+      font-size: 12px;
+    }
+    .book-detail__upload-meta { order: 5; width: 100%; margin-bottom: 32px; }
+    .book-detail__journal {
+      order: 6;
+      grid-template-columns: auto 1fr;
+      gap: 16px;
+      align-items: center;
+      margin-bottom: 32px;
+    }
+    #book-read-toggle { justify-self: end; }
+    .book-detail__description { order: 7; }
+
     .book-detail__title { font-size: 32px; }
     .book-detail__goodreads { margin-top: 4px; }
     .book-detail__goodreads-icon { width: 26px; height: 26px; }
-    .book-detail__journal {
-      grid-template-columns: 1fr;
-      gap: 16px;
-      align-items: flex-start;
-    }
     .journal__left { flex-wrap: wrap; }
     .book-detail__desc-body { font-size: 17px; }
   }
