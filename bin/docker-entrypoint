@@ -2,7 +2,26 @@
 
 # If running the rails server then create or migrate existing database
 if [ "${@: -2:1}" == "./bin/rails" ] && [ "${@: -1:1}" == "server" ]; then
+  # With Tigris credentials present, recover any database missing locally from
+  # its Litestream replica before preparing the schema, so a fresh Fly volume
+  # is restored from the bucket instead of starting empty. The two flags make
+  # this a no-op on a normal boot (db already on the volume) and on the first
+  # ever deploy (no replica yet).
+  if [ -n "${AWS_ENDPOINT_URL_S3}" ]; then
+    for db in production production_queue production_cache production_cable; do
+      litestream restore -config /rails/config/litestream.yml \
+        -if-db-not-exists -if-replica-exists \
+        "/rails/storage/${db}.sqlite3"
+    done
+  fi
+
   ./bin/rails db:prepare
+
+  # Run the server under Litestream so writes are continuously replicated to
+  # Tigris. Without credentials (e.g. a local docker run) start it directly.
+  if [ -n "${AWS_ENDPOINT_URL_S3}" ]; then
+    exec litestream replicate -config /rails/config/litestream.yml -exec "${*}"
+  fi
 fi
 
 exec "${@}"

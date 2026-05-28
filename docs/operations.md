@@ -92,13 +92,23 @@ The five `AWS_*` / `BUCKET_NAME` vars are for Litestream SQLite replication only
 
 ## Backup & Restore
 
-Production SQLite databases live on a Fly volume mounted at `/rails/storage` and are continuously replicated to a Tigris (S3-compatible) bucket via Litestream. The replica config is in `config/litestream.yml`; the entrypoint wires Litestream into the app boot when `AWS_ENDPOINT_URL_S3` is non-empty.
+Production SQLite databases live on a Fly volume mounted at `/rails/storage` and are continuously replicated to a Tigris (S3-compatible) bucket via Litestream. The replica config is in `config/litestream.yml` and the Litestream version is pinned in [`Dockerfile`](../Dockerfile) (`LITESTREAM_VERSION`). The entrypoint wires Litestream into the app boot when `AWS_ENDPOINT_URL_S3` is non-empty.
 
 Databases replicated:
 - `production.sqlite3` — app data
 - `production_queue.sqlite3` — Solid Queue
 - `production_cache.sqlite3` — Solid Cache
 - `production_cable.sqlite3` — Action Cable
+
+### Automatic restore on boot
+
+When `AWS_ENDPOINT_URL_S3` is set, the entrypoint runs `litestream restore` for each database **before** `db:prepare`, guarded by `-if-db-not-exists -if-replica-exists`. So:
+
+- **Normal boot** (databases already on the volume) — restore is a no-op; replication resumes.
+- **Fresh/empty volume** (volume lost or replaced, replica exists) — each database is restored from Tigris, so the app recovers automatically instead of booting empty and clobbering the replica lineage.
+- **First ever deploy** (no replica yet) — restore is a no-op; `db:prepare` creates the databases and replication begins.
+
+The manual procedures below remain the way to verify replica health, rehearse recovery, and restore to a point in time.
 
 ### Restore locally
 

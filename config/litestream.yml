@@ -1,0 +1,40 @@
+# Litestream continuously replicates the production SQLite databases to a
+# Tigris (S3-compatible) bucket. See docs/operations.md for backup & restore.
+#
+# Credentials and target are read from the env vars set by `fly storage create`:
+# BUCKET_NAME, AWS_ENDPOINT_URL_S3, AWS_REGION, AWS_ACCESS_KEY_ID,
+# AWS_SECRET_ACCESS_KEY. The access key/secret come from the AWS default
+# credential chain, so they're not referenced here.
+
+dbs:
+  - path: /rails/storage/production.sqlite3
+    replica:
+      type: s3
+      bucket: ${BUCKET_NAME}
+      path: production
+      endpoint: ${AWS_ENDPOINT_URL_S3}
+      region: ${AWS_REGION}
+
+  - path: /rails/storage/production_queue.sqlite3
+    replica:
+      type: s3
+      bucket: ${BUCKET_NAME}
+      path: production_queue
+      endpoint: ${AWS_ENDPOINT_URL_S3}
+      region: ${AWS_REGION}
+
+  - path: /rails/storage/production_cache.sqlite3
+    replica:
+      type: s3
+      bucket: ${BUCKET_NAME}
+      path: production_cache
+      endpoint: ${AWS_ENDPOINT_URL_S3}
+      region: ${AWS_REGION}
+
+  - path: /rails/storage/production_cable.sqlite3
+    replica:
+      type: s3
+      bucket: ${BUCKET_NAME}
+      path: production_cable
+      endpoint: ${AWS_ENDPOINT_URL_S3}
+      region: ${AWS_REGION}

@@ -20,6 +20,22 @@ RUN apt-get update -qq && \
     ln -s /usr/lib/$(uname -m)-linux-gnu/libjemalloc.so.2 /usr/local/lib/libjemalloc.so && \
     rm -rf /var/lib/apt/lists /var/cache/apt/archives
 
+# Install Litestream for continuous SQLite replication to Tigris (see config/litestream.yml)
+ARG LITESTREAM_VERSION=0.5.11
+RUN set -eux; \
+    case "$(dpkg --print-architecture)" in \
+      amd64) ls_arch=x86_64 ;; \
+      arm64) ls_arch=arm64 ;; \
+      *) echo "unsupported architecture: $(dpkg --print-architecture)" >&2; exit 1 ;; \
+    esac; \
+    base_url="https://github.com/benbjohnson/litestream/releases/download/v${LITESTREAM_VERSION}"; \
+    deb="litestream-${LITESTREAM_VERSION}-linux-${ls_arch}.deb"; \
+    curl -fsSL "${base_url}/${deb}" -o "/tmp/${deb}"; \
+    curl -fsSL "${base_url}/checksums.txt" -o /tmp/checksums.txt; \
+    (cd /tmp && sha256sum --ignore-missing -c checksums.txt); \
+    dpkg -i "/tmp/${deb}"; \
+    rm "/tmp/${deb}" /tmp/checksums.txt
+
 # Set production environment variables and enable jemalloc for reduced memory usage and latency.
 ENV RAILS_ENV="production" \
     BUNDLE_DEPLOYMENT="1" \
