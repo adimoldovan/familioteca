@@ -253,6 +253,10 @@ ro:
         title: "Editează cartea"
         cancel: "Anulează"
         submit: "Salvează"
+        save_and_next: "Salvează și deschide următoarea"
+        nav_label: "Navigare cărți"
+        previous: "← Anterioara"
+        next: "Următoarea →"
         errors_title: "Erori"
       destroy:
         success: "Carte ștearsă."

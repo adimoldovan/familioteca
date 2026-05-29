@@ -1,6 +1,18 @@
-<h1 id="book-edit-heading" class="t-headline"><%= t(".title") %></h1>
+<div class="content-form__header">
+  <h1 id="book-edit-heading" class="t-headline"><%= t(".title") %></h1>
+  <% if @prev_book_id || @next_book_id %>
+    <nav class="book-edit-nav" aria-label="<%= t(".nav_label") %>">
+      <% if @prev_book_id %>
+        <%= link_to t(".previous"), edit_admin_book_path(@prev_book_id, filter: @filter), class: "btn btn-secondary" %>
+      <% end %>
+      <% if @next_book_id %>
+        <%= link_to t(".next"), edit_admin_book_path(@next_book_id, filter: @filter), class: "btn btn-secondary" %>
+      <% end %>
+    </nav>
+  <% end %>
+</div>
 
-<%= form_with model: @book, url: admin_book_path(@book), method: :patch, id: "book-edit-form", class: "content-form" do |f| %>
+<%= form_with model: @book, url: admin_book_path(@book, filter: @filter), method: :patch, id: "book-edit-form", class: "content-form" do |f| %>
   <% if @book.errors.any? %>
     <div class="error-summary">
       <h2 class="error-summary__title"><%= t(".errors_title") %></h2>
@@ -63,8 +75,13 @@
     <%= f.text_area :description, class: "form-field__input", rows: 6 %>
   </div>
 
+  <%= hidden_field_tag :next_book_id, @next_book_id if @next_book_id %>
+
   <div class="content-form__actions">
-    <%= link_to t(".cancel"), admin_books_path, class: "btn btn-secondary" %>
+    <%= link_to t(".cancel"), admin_books_path(filter: @filter), class: "btn btn-secondary" %>
     <%= f.submit t(".submit"), class: "btn btn-primary" %>
+    <% if @next_book_id %>
+      <%= button_tag t(".save_and_next"), type: "submit", name: "save_action", value: "next", class: "btn btn-primary" %>
+    <% end %>
   </div>
 <% end %>

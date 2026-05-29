@@ -1329,6 +1329,19 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 
   .content-form { max-width: 100%; }
 
+  .content-form__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  .book-edit-nav {
+    display: flex;
+    gap: 8px;
+  }
+
   .content-form__actions {
     display: flex;
     gap: 12px;
