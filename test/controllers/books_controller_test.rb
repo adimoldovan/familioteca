@@ -388,6 +388,19 @@ class BooksControllerTest < ActionDispatch::IntegrationTest
     assert_equal "/?q=verne&sort=title", session[:catalog_url]
   end
 
+  test "index does not store the catalog path for Turbo prefetch requests" do
+    sign_in_as members(:ana)
+    get root_path(q: "verne")
+    get root_path(q: "hovered author"), headers: { "X-Sec-Purpose" => "prefetch" }
+    assert_equal "/?q=verne", session[:catalog_url]
+  end
+
+  test "index does not set the catalog path when the only request is a prefetch" do
+    sign_in_as members(:ana)
+    get root_path(q: "hovered author"), headers: { "X-Sec-Purpose" => "prefetch" }
+    assert_nil session[:catalog_url]
+  end
+
   test "show breadcrumb links to stored catalog path" do
     sign_in_as members(:ana)
     get root_path(q: "verne")

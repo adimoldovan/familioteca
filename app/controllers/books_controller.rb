@@ -49,7 +49,7 @@ class BooksController < ApplicationController
     else @books.order(ingested_at: direction)
     end
 
-    session[:catalog_url] = request.fullpath if request.format.html?
+    session[:catalog_url] = request.fullpath if store_catalog_url?
   end
 
   def show
@@ -58,5 +58,14 @@ class BooksController < ApplicationController
     @latest_delivery = KindleDelivery.latest_for(current_member, @book)
     url = session[:catalog_url]
     @catalog_url = url&.match?(%r{\A/[^/]}) ? url : root_path
+  end
+
+  private
+
+  # Turbo prefetches links on hover (e.g. a book's author link), which fires a
+  # GET to #index. Recording that as the catalog URL would corrupt the book-page
+  # breadcrumb, so skip prefetch requests and only store real HTML navigations.
+  def store_catalog_url?
+    request.format.html? && !request.headers["X-Sec-Purpose"].to_s.start_with?("prefetch")
   end
 end
