@@ -18,9 +18,12 @@ class BooksController < ApplicationController
 
     @dir = DIR_OPTIONS.include?(params[:dir]) ? params[:dir] : SORT_DEFAULTS[@sort]
 
-    base = Book.visible.with_attached_cover.search(@query).by_language(@langs).by_category(@categories)
     read_scope = current_member.member_books.where.not(read_at: nil).select(:book_id)
+    searched = Book.visible.search(@query)
 
+    # Reading-status counts reflect the active language + category selections, but
+    # not the reading-status filter itself, so all three options stay visible.
+    base = searched.by_language(@langs).by_category(@categories)
     @counts = {
       all: base.count,
       unread: base.where.not(id: read_scope).count,
@@ -29,22 +32,30 @@ class BooksController < ApplicationController
 
     @total_count = @query.blank? && @langs.empty? && @categories.empty? ? @counts[:all] : Book.visible.count
 
-    # Facet counts reflect the search query only, independent of the other
-    # facets' active selections (language counts ignore @categories and vice versa).
-    @language_counts = Book.visible.search(@query)
+    # Each facet's counts reflect the OTHER active filters (search, reading status,
+    # and the sibling facet), but not its own selection, so the user sees how many
+    # books each option would add.
+    reading_filtered = filter_by_reading_status(searched, read_scope)
+
+    language_base = reading_filtered.by_category(@categories)
+    @language_all_count = language_base.count
+    @language_counts = language_base
       .where(language: @available_languages)
       .group(:language)
       .count
 
+    category_base = reading_filtered.by_language(@langs)
+    @category_all_count = category_base.count
     @category_counts = BookCategory
-      .where(book_id: Book.visible.search(@query).select(:id))
+      .where(book_id: category_base.select(:id))
       .group(:category)
       .count
 
+    rendered = base.with_attached_cover
     @books = case @filter
-    when "read"  then base.where(id: read_scope)
-    when "unread" then base.where.not(id: read_scope)
-    else base
+    when "read"  then rendered.where(id: read_scope)
+    when "unread" then rendered.where.not(id: read_scope)
+    else rendered
     end
 
     direction = @dir.to_sym
@@ -70,6 +81,16 @@ class BooksController < ApplicationController
   end
 
   private
+
+  # Restrict a scope to the active reading-status filter (read/unread), or leave
+  # it unchanged for "all".
+  def filter_by_reading_status(scope, read_scope)
+    case @filter
+    when "read"   then scope.where(id: read_scope)
+    when "unread" then scope.where.not(id: read_scope)
+    else scope
+    end
+  end
 
   # Turbo prefetches links on hover (e.g. a book's author link), which fires a
   # GET to #index. Recording that as the catalog URL would corrupt the book-page

@@ -372,6 +372,105 @@ class BooksControllerTest < ActionDispatch::IntegrationTest
     assert_select "#lang-filter-romanian .catalog-sidebar__filter-count", text: "1"
   end
 
+  test "language counts reflect the selected category" do
+    sign_in_as members(:ana)
+    ro_fic = Book.create!(title: "RO Fic", language: "ro", format: "epub", object_key: "k1", ingested_at: Time.current)
+    ro_fic.sync_categories(%w[fiction])
+    ro_bio = Book.create!(title: "RO Bio", language: "ro", format: "epub", object_key: "k2", ingested_at: Time.current)
+    ro_bio.sync_categories(%w[biography])
+    en_fic = Book.create!(title: "EN Fic", language: "en", format: "epub", object_key: "k3", ingested_at: Time.current)
+    en_fic.sync_categories(%w[fiction])
+
+    get root_path(category: "fiction")
+    assert_select "#lang-filter-all .catalog-sidebar__filter-count", text: "2"
+    assert_select "#lang-filter-romanian .catalog-sidebar__filter-count", text: "1"
+    assert_select "#lang-filter-english .catalog-sidebar__filter-count", text: "1"
+  end
+
+  test "language counts reflect the reading-status filter" do
+    member = members(:ana)
+    sign_in_as member
+    ro_read = Book.create!(title: "RO Read", language: "ro", format: "epub", object_key: "k1", ingested_at: Time.current)
+    Book.create!(title: "RO Unread", language: "ro", format: "epub", object_key: "k2", ingested_at: Time.current)
+    en_read = Book.create!(title: "EN Read", language: "en", format: "epub", object_key: "k3", ingested_at: Time.current)
+    MemberBook.create!(member: member, book: ro_read, read_at: Time.current)
+    MemberBook.create!(member: member, book: en_read, read_at: Time.current)
+
+    get root_path(filter: "read")
+    assert_select "#lang-filter-all .catalog-sidebar__filter-count", text: "2"
+    assert_select "#lang-filter-romanian .catalog-sidebar__filter-count", text: "1"
+    assert_select "#lang-filter-english .catalog-sidebar__filter-count", text: "1"
+  end
+
+  test "category counts reflect the selected language" do
+    sign_in_as members(:ana)
+    ro_fic = Book.create!(title: "RO Fic", language: "ro", format: "epub", object_key: "k1", ingested_at: Time.current)
+    ro_fic.sync_categories(%w[fiction])
+    en_fic = Book.create!(title: "EN Fic", language: "en", format: "epub", object_key: "k2", ingested_at: Time.current)
+    en_fic.sync_categories(%w[fiction])
+    en_bio = Book.create!(title: "EN Bio", language: "en", format: "epub", object_key: "k3", ingested_at: Time.current)
+    en_bio.sync_categories(%w[biography])
+
+    get root_path(lang: [ "Romanian" ])
+    assert_select "#category-filter-all .catalog-sidebar__filter-count", text: "1"
+    assert_select "#category-filter-fiction .catalog-sidebar__filter-count", text: "1"
+    assert_select "#category-filter-biography .catalog-sidebar__filter-count", text: "0"
+  end
+
+  test "category counts reflect the reading-status filter" do
+    member = members(:ana)
+    sign_in_as member
+    fic_read = Book.create!(title: "Fic Read", format: "epub", object_key: "k1", ingested_at: Time.current)
+    fic_read.sync_categories(%w[fiction])
+    fic_unread = Book.create!(title: "Fic Unread", format: "epub", object_key: "k2", ingested_at: Time.current)
+    fic_unread.sync_categories(%w[fiction])
+    bio_read = Book.create!(title: "Bio Read", format: "epub", object_key: "k3", ingested_at: Time.current)
+    bio_read.sync_categories(%w[biography])
+    MemberBook.create!(member: member, book: fic_read, read_at: Time.current)
+    MemberBook.create!(member: member, book: bio_read, read_at: Time.current)
+
+    get root_path(filter: "read")
+    assert_select "#category-filter-all .catalog-sidebar__filter-count", text: "2"
+    assert_select "#category-filter-fiction .catalog-sidebar__filter-count", text: "1"
+    assert_select "#category-filter-biography .catalog-sidebar__filter-count", text: "1"
+  end
+
+  test "language all count includes unlanguaged books under an active category" do
+    sign_in_as members(:ana)
+    ro_fic = Book.create!(title: "RO Fic", language: "ro", format: "epub", object_key: "k1", ingested_at: Time.current)
+    ro_fic.sync_categories(%w[fiction])
+    none_fic = Book.create!(title: "No Lang Fic", language: nil, format: "epub", object_key: "k2", ingested_at: Time.current)
+    none_fic.sync_categories(%w[fiction])
+    ro_bio = Book.create!(title: "RO Bio", language: "ro", format: "epub", object_key: "k3", ingested_at: Time.current)
+    ro_bio.sync_categories(%w[biography])
+
+    get root_path(category: "fiction")
+    # Two fiction books (one Romanian, one unlanguaged); the per-language entry only counts the Romanian one.
+    assert_select "#lang-filter-all .catalog-sidebar__filter-count", text: "2"
+    assert_select "#lang-filter-romanian .catalog-sidebar__filter-count", text: "1"
+  end
+
+  test "facet counts combine search, language, and category filters" do
+    sign_in_as members(:ana)
+    match = Book.create!(title: "Amintiri", language: "ro", format: "epub", object_key: "k1", ingested_at: Time.current)
+    match.sync_categories(%w[biography])
+    other_cat = Book.create!(title: "Amintiri", language: "ro", format: "epub", object_key: "k2", ingested_at: Time.current)
+    other_cat.sync_categories(%w[fiction])
+    other_lang = Book.create!(title: "Amintiri", language: "en", format: "epub", object_key: "k3", ingested_at: Time.current)
+    other_lang.sync_categories(%w[biography])
+    no_match = Book.create!(title: "Altceva", language: "ro", format: "epub", object_key: "k4", ingested_at: Time.current)
+    no_match.sync_categories(%w[biography])
+
+    get root_path(q: "amintiri", lang: [ "Romanian" ], category: "biography")
+    assert_select ".book-card__title", count: 1, text: "Amintiri"
+    # Category counts reflect search + Romanian language (ignore the category selection).
+    assert_select "#category-filter-biography .catalog-sidebar__filter-count", text: "1"
+    assert_select "#category-filter-fiction .catalog-sidebar__filter-count", text: "1"
+    # Language counts reflect search + biography category (ignore the language selection).
+    assert_select "#lang-filter-romanian .catalog-sidebar__filter-count", text: "1"
+    assert_select "#lang-filter-english .catalog-sidebar__filter-count", text: "1"
+  end
+
   test "language filter section is hidden when no books have languages" do
     sign_in_as members(:ana)
     Book.create!(title: "A", format: "epub", object_key: "k1", ingested_at: Time.current)

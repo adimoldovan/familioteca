@@ -68,7 +68,7 @@
                   id: "lang-filter-all",
                   data: { turbo_action: "replace" } do %>
               <span><%= t(".filters.all") %></span>
-              <span class="catalog-sidebar__filter-count"><%= @counts[:all] %></span>
+              <span class="catalog-sidebar__filter-count"><%= @language_all_count %></span>
             <% end %>
           </li>
           <% @available_languages.each do |language| %>
@@ -98,7 +98,7 @@
                 id: "category-filter-all",
                 data: { turbo_action: "replace" } do %>
             <span><%= t(".filters.all") %></span>
-            <span class="catalog-sidebar__filter-count"><%= @counts[:all] %></span>
+            <span class="catalog-sidebar__filter-count"><%= @category_all_count %></span>
           <% end %>
         </li>
         <% Book::CATEGORIES.each do |category| %>
