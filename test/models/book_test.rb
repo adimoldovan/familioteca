@@ -277,6 +277,21 @@ class BookTest < ActiveSupport::TestCase
     refute book.oversize_for_kindle?
   end
 
+  test "reading_minutes rounds up to whole minutes" do
+    book = Book.new(word_count: 500)
+    assert_equal 3, book.reading_minutes(200) # 2.5 → 3
+  end
+
+  test "reading_minutes is nil without a word count" do
+    assert_nil Book.new(word_count: nil).reading_minutes(200)
+  end
+
+  test "reading_minutes is nil for a non-positive reading speed" do
+    book = Book.new(word_count: 500)
+    assert_nil book.reading_minutes(0)
+    assert_nil book.reading_minutes(-100)
+  end
+
   test "book has many kindle_deliveries and destroys them when the book is destroyed" do
     book = Book.create!(title: "T", format: "epub", object_key: "kindle-assoc", ingested_at: Time.current)
     KindleDelivery.create!(member: members(:ana), book: book)

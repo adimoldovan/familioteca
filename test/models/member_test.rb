@@ -9,6 +9,24 @@ class MemberTest < ActiveSupport::TestCase
     assert with_kindle.valid?, with_kindle.errors.full_messages.inspect
   end
 
+  test "reading_speed_wpm defaults to 200" do
+    member = Member.create!(email: "new@example.com", password: "secret123", name: "Ana")
+    assert_equal Member::DEFAULT_READING_SPEED_WPM, member.reading_speed_wpm
+  end
+
+  test "reading_speed_wpm must be a positive integer within range" do
+    member = Member.new(email: "new@example.com", password: "secret123", name: "Ana")
+
+    member.reading_speed_wpm = 0
+    refute member.valid?
+
+    member.reading_speed_wpm = 3000
+    refute member.valid?
+
+    member.reading_speed_wpm = 250
+    assert member.valid?, member.errors.full_messages.inspect
+  end
+
   test "admin defaults to false" do
     member = Member.create!(
       email: "new@example.com",

@@ -59,6 +59,11 @@ module Ebook
       assert_equal "Iulian Bocai", result[:attributes][:author]
     end
 
+    test "counts words across spine documents, excluding scripts" do
+      result = EpubParser.call(FIXTURES.join("word-count.epub").to_s)
+      assert_equal 15, result[:word_count]
+    end
+
     test "unsort_author_name reverses Last, First" do
       assert_equal "Iulian Bocai", EpubParser.unsort_author_name("Bocai, Iulian")
     end

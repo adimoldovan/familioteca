@@ -32,6 +32,15 @@
 
   <div class="form-field">
     <div class="form-field__header">
+      <%= f.label :reading_speed_wpm, t("account.show.reading_speed_wpm"), class: "form-field__label" %>
+    </div>
+    <%= f.number_field :reading_speed_wpm, class: "form-field__input", id: "account-reading-speed",
+          min: Member::READING_SPEED_RANGE.min, max: Member::READING_SPEED_RANGE.max, step: 1 %>
+    <p class="form-field__hint"><%= t("account.show.reading_speed_hint", wpm: Member::DEFAULT_READING_SPEED_WPM) %></p>
+  </div>
+
+  <div class="form-field">
+    <div class="form-field__header">
       <%= f.label :kindle_email, t("account.show.kindle_email"), class: "form-field__label" %>
     </div>
     <%= f.email_field :kindle_email, class: "form-field__input", id: "account-kindle-email" %>

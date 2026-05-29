@@ -53,6 +53,14 @@ class Book < ApplicationRecord
     missing_since.present?
   end
 
+  # Estimated reading time in whole minutes at the given words-per-minute
+  # speed, or nil when the book has no parsed word count (non-EPUB formats
+  # and parse failures). Rounds up so short books still read as "1 min".
+  def reading_minutes(wpm)
+    return nil if word_count.nil? || wpm.to_i <= 0
+    (word_count / wpm.to_f).ceil
+  end
+
   def cover_thumbnail
     return nil unless cover.attached? && cover.variable?
     cover.variant(:thumbnail)

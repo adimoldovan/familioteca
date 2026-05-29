@@ -758,8 +758,15 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
     font-size: 12px;
     color: var(--muted);
     display: flex;
-    justify-content: space-between;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    gap: 4px 8px;
     padding: 0 2px;
+  }
+
+  .book-detail__upload-meta > span:not(:first-child)::before {
+    content: "·";
+    margin-right: 8px;
   }
 
   .book-detail__eyebrow {

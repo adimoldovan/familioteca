@@ -5,9 +5,11 @@ ana:
   kindle_email: ana@kindle.com
   kindle_sender_approved: false
   admin: false
+  reading_speed_wpm: 200
 
 admin:
   email: admin@example.com
   password_digest: <%= BCrypt::Password.create("admin1234", cost: BCrypt::Engine::MIN_COST) %>
   name: Administrator
   admin: true
+  reading_speed_wpm: 200

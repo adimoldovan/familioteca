@@ -47,6 +47,24 @@ module EbookFixtures
       book.ordered { book.add_item("ch1.xhtml", content: StringIO.new("<html><body><h1>Cap. 1</h1></body></html>")) }
     end
 
+    # Two spine documents with known word counts (10 + 5 = 15). The <script>
+    # block exists to prove embedded code is excluded from the count.
+    write("word-count.epub") do |book|
+      book.identifier = "id:word-count"
+      book.title      = "Carte cu Cuvinte"
+      book.creator    = "Autor Test"
+      book.language   = "ro"
+      book.ordered do
+        book.add_item("ch1.xhtml", content: StringIO.new(
+          "<html><head><script>var ignored = 'one two three';</script></head>" \
+          "<body><p>unu doi trei patru cinci</p><p>șase șapte opt nouă zece</p></body></html>"
+        ))
+        book.add_item("ch2.xhtml", content: StringIO.new(
+          "<html><body><p>unsprezece doisprezece treisprezece paisprezece cincisprezece</p></body></html>"
+        ))
+      end
+    end
+
     write("no-cover.epub") do |book|
       book.identifier = "id:no-cover"
       book.title      = "Fără Copertă"

@@ -1,4 +1,5 @@
 require "gepub"
+require "nokogiri"
 
 module Ebook
   module EpubParser
@@ -25,11 +26,38 @@ module Ebook
         description: first_string(book.description)
       }.compact
 
-      { attributes: attrs }.merge(extract_cover(book))
+      { attributes: attrs, word_count: extract_word_count(book) }.merge(extract_cover(book))
     rescue ParseError
       raise
     rescue StandardError => e
       raise ParseError, "Could not parse EPUB: #{e.message}"
+    end
+
+    # Counts words across the spine (the reading order). Each content
+    # document is parsed as XHTML; script/style nodes are dropped before we
+    # take the text so embedded code never inflates the count. A failure on
+    # any single document is swallowed so a malformed chapter can't sink the
+    # whole parse — we'd rather report a slightly low count than none.
+    def self.extract_word_count(book)
+      total = book.spine_items.sum do |item|
+        # XML parser (not HTML): EPUB content documents are XHTML, so this
+        # reads the charset from the XML declaration — important for Romanian
+        # diacritics — and recovers from minor markup errors by default.
+        doc = Nokogiri::XML(item.content.to_s)
+        # Strip the XHTML namespace so a plain //body xpath matches regardless
+        # of whether the document declares xmlns (real EPUBs do; fixtures may not).
+        doc.remove_namespaces!
+        doc.css("script, style").each(&:remove)
+        # Count only the body so <head>/<title> metadata stays out. Join text
+        # nodes with a space: a plain #text would glue text across element
+        # boundaries ("cinci</p><p>șase" → "cincișase"), merging the last word
+        # of one block with the first of the next.
+        text = doc.xpath("//body//text()").map(&:text).join(" ")
+        text.scan(/\p{Word}+/).size
+      rescue StandardError
+        0
+      end
+      total.positive? ? total : nil
     end
 
     def self.first_string(value)

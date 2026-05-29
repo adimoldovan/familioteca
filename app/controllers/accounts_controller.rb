@@ -17,7 +17,7 @@ class AccountsController < ApplicationController
   private
 
   def account_params
-    params.require(:member).permit(:name, :kindle_email, :kindle_sender_approved)
+    params.require(:member).permit(:name, :kindle_email, :kindle_sender_approved, :reading_speed_wpm)
   end
 
   def set_sender_email

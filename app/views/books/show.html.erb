@@ -28,7 +28,14 @@
     </div>
     <div class="book-detail__upload-meta">
       <span><%= t(".added_ago", when: time_ago_in_words(@book.ingested_at)) %></span>
-      <span><%= @book.format.upcase %><%= " · #{@book.language}" if @book.language.present? %></span>
+      <span><%= @book.format.upcase %></span>
+      <% if @book.language.present? %>
+        <span><%= @book.language %></span>
+      <% end %>
+      <% reading_time = format_reading_time(@book.reading_minutes(current_member.reading_speed_wpm)) %>
+      <% if reading_time %>
+        <span id="book-reading-time"><%= t(".reading_time", time: reading_time) %></span>
+      <% end %>
     </div>
   </div>
 

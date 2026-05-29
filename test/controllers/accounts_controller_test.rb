@@ -16,6 +16,8 @@ class AccountsControllerTest < ActionDispatch::IntegrationTest
     assert_select "#account-name[value=?]", member.name
     assert_select "#account-email[value=?]", member.email
     assert_select "#account-kindle-email[value=?]", member.kindle_email
+    assert_select "#account-reading-speed[value=?]", member.reading_speed_wpm.to_s
+    assert_select ".form-field__hint", text: /Implicit 200/
   end
 
   test "update saves name, kindle_email, and kindle_sender_approved" do
@@ -44,6 +46,26 @@ class AccountsControllerTest < ActionDispatch::IntegrationTest
     member.reload
     assert_nil member.kindle_email
     assert_not member.kindle_sender_approved?
+  end
+
+  test "update saves reading_speed_wpm" do
+    member = members(:ana)
+    sign_in_as member
+
+    patch account_path, params: { member: { name: member.name, reading_speed_wpm: "300" } }
+    assert_redirected_to account_path
+
+    member.reload
+    assert_equal 300, member.reading_speed_wpm
+  end
+
+  test "update re-renders form with errors when reading_speed_wpm is out of range" do
+    member = members(:ana)
+    sign_in_as member
+
+    patch account_path, params: { member: { name: member.name, reading_speed_wpm: "0" } }
+    assert_response :unprocessable_entity
+    assert_select ".error-summary"
   end
 
   test "update re-renders form with errors when name is blank" do

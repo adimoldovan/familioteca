@@ -22,6 +22,15 @@ class ProcessBookFileJobTest < ActiveJob::TestCase
     assert_nil book.parse_error
   end
 
+  test "stores the parsed word_count" do
+    storage = stub_storage("wc/book.epub", FIXTURES.join("word-count.epub"))
+
+    ProcessBookFileJob.new.perform("wc/book.epub", storage: storage)
+
+    book = Book.find_by!(object_key: "wc/book.epub")
+    assert_equal 15, book.word_count
+  end
+
   test "attaches JPEG covers with the right content_type and extension" do
     storage = stub_storage("test/jpeg.epub", FIXTURES.join("jpeg-cover.epub"))
 

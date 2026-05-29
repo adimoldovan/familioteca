@@ -10,11 +10,17 @@ module Ebook
       assert_equal "epub", result[:format]
     end
 
+    test "passes EPUB word_count through" do
+      result = Parser.call(FIXTURES.join("word-count.epub").to_s)
+      assert_equal 15, result[:word_count]
+    end
+
     test "dispatches .mobi to FilenameParser" do
       result = Parser.call("/tmp/Jules Verne - Insula misterioasă.mobi")
       assert_equal "Insula misterioasă", result[:attributes][:title]
       assert_equal "Jules Verne", result[:attributes][:author]
       assert_equal "mobi", result[:format]
+      assert_nil result[:word_count]
     end
 
     test "dispatches .pdf to FilenameParser" do

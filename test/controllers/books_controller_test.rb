@@ -444,6 +444,31 @@ class BooksControllerTest < ActionDispatch::IntegrationTest
     assert_no_match(/9781234567890/, response.body)
   end
 
+  test "show renders reading time estimated from the member's reading speed" do
+    sign_in_as members(:ana) # reading_speed_wpm: 200 (fixture)
+    # 12000 words at 200 wpm → 60 minutes → "o oră"
+    book = Book.create!(title: "T", format: "epub", object_key: "k", ingested_at: Time.current, word_count: 12_000)
+
+    get book_path(book)
+    assert_select "#book-reading-time", text: /o oră/
+  end
+
+  test "show omits reading time when the book has no word count" do
+    sign_in_as members(:ana)
+    book = Book.create!(title: "T", format: "epub", object_key: "k", ingested_at: Time.current, word_count: nil)
+
+    get book_path(book)
+    assert_select "#book-reading-time", false
+  end
+
+  test "show renders language as its own meta span when present" do
+    sign_in_as members(:ana)
+    book = Book.create!(title: "T", format: "epub", object_key: "k", ingested_at: Time.current, language: "ro")
+
+    get book_path(book)
+    assert_select ".book-detail__upload-meta > span", text: book.language # normalized to "Romanian"
+  end
+
   test "show renders the Goodreads link when goodreads_url is present" do
     sign_in_as members(:ana)
     book = Book.create!(

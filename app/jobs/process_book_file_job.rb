@@ -39,6 +39,7 @@ class ProcessBookFileJob < ApplicationJob
       isbn:           attrs[:isbn],
       goodreads_url:  attrs[:goodreads_url] || book.goodreads_url,
       description:    attrs[:description],
+      word_count:     result[:word_count],
       format:         result[:format],
       file_size:      File.size(path),
       ingested_at:    Time.current,
