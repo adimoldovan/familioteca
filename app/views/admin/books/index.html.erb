@@ -10,6 +10,8 @@
         class: "admin-filter__link #{'admin-filter__link--active' if @filter == 'needs_metadata'}" %>
   <%= link_to t(".filter.needs_goodreads"), admin_books_path(filter: "needs_goodreads"),
         class: "admin-filter__link #{'admin-filter__link--active' if @filter == 'needs_goodreads'}" %>
+  <%= link_to t(".filter.missing_category"), admin_books_path(filter: "missing_category"),
+        class: "admin-filter__link #{'admin-filter__link--active' if @filter == 'missing_category'}" %>
 </nav>
 
 <table class="data-table" aria-labelledby="books-heading">

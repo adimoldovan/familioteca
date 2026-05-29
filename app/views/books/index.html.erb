@@ -2,7 +2,7 @@
   <div class="sort">
     <% %w[date title author].each do |s| %>
       <%= link_to t(".sort.#{s}"),
-            url_for(sort: s, dir: s == @sort ? @dir : nil, q: @query.presence, filter: @filter == "all" ? nil : @filter, lang: @langs.presence),
+            url_for(sort: s, dir: s == @sort ? @dir : nil, q: @query.presence, filter: @filter == "all" ? nil : @filter, lang: @langs.presence, category: @categories.presence),
             class: class_names("sort-btn", "is-active" => @sort == s),
             data: { turbo_action: "replace" } %>
     <% end %>
@@ -10,7 +10,7 @@
     <span class="sort-divider" aria-hidden="true"></span>
 
     <% flipped = @dir == "asc" ? "desc" : "asc" %>
-    <%= link_to url_for(sort: @sort, dir: flipped, q: @query.presence, filter: @filter == "all" ? nil : @filter, lang: @langs.presence),
+    <%= link_to url_for(sort: @sort, dir: flipped, q: @query.presence, filter: @filter == "all" ? nil : @filter, lang: @langs.presence, category: @categories.presence),
           class: "sort-dir",
           aria: { label: t(".sort.dir_#{flipped}") },
           data: { turbo_action: "replace" } do %>
@@ -47,7 +47,7 @@
       <ul class="catalog-sidebar__filters" role="group">
         <% %w[all unread read].each do |f| %>
           <li>
-            <%= link_to url_for(filter: f, q: @query.presence, sort: @sort, dir: @dir, lang: @langs.presence),
+            <%= link_to url_for(filter: f, q: @query.presence, sort: @sort, dir: @dir, lang: @langs.presence, category: @categories.presence),
                   class: class_names("catalog-sidebar__filter-item", "is-active" => @filter == f),
                   data: { turbo_action: "replace" } do %>
               <span><%= t(".filters.#{f}") %></span>
@@ -63,7 +63,7 @@
         <p class="catalog-sidebar__label"><%= t(".filters.language") %></p>
         <ul class="catalog-sidebar__filters" role="group">
           <li>
-            <%= link_to url_for(lang: nil, q: @query.presence, filter: @filter == "all" ? nil : @filter, sort: @sort, dir: @dir),
+            <%= link_to url_for(lang: nil, q: @query.presence, filter: @filter == "all" ? nil : @filter, sort: @sort, dir: @dir, category: @categories.presence),
                   class: class_names("catalog-sidebar__filter-item", "is-active" => @langs.empty?),
                   id: "lang-filter-all",
                   data: { turbo_action: "replace" } do %>
@@ -74,7 +74,7 @@
           <% @available_languages.each do |language| %>
             <% toggled = @langs.include?(language) ? @langs - [language] : @langs + [language] %>
             <li>
-              <%= link_to url_for(lang: toggled.presence, q: @query.presence, filter: @filter == "all" ? nil : @filter, sort: @sort, dir: @dir),
+              <%= link_to url_for(lang: toggled.presence, q: @query.presence, filter: @filter == "all" ? nil : @filter, sort: @sort, dir: @dir, category: @categories.presence),
                     class: class_names("catalog-sidebar__filter-item", "catalog-sidebar__filter-item--checkable", "is-active" => @langs.include?(language)),
                     id: "lang-filter-#{language.parameterize}",
                     aria: { current: ("true" if @langs.include?(language)) },
@@ -88,6 +88,35 @@
         </ul>
       </div>
     <% end %>
+
+    <div class="catalog-sidebar__section">
+      <p class="catalog-sidebar__label"><%= t(".filters.category") %></p>
+      <ul class="catalog-sidebar__filters" role="group">
+        <li>
+          <%= link_to url_for(category: nil, q: @query.presence, filter: @filter == "all" ? nil : @filter, sort: @sort, dir: @dir, lang: @langs.presence),
+                class: class_names("catalog-sidebar__filter-item", "is-active" => @categories.empty?),
+                id: "category-filter-all",
+                data: { turbo_action: "replace" } do %>
+            <span><%= t(".filters.all") %></span>
+            <span class="catalog-sidebar__filter-count"><%= @counts[:all] %></span>
+          <% end %>
+        </li>
+        <% Book::CATEGORIES.each do |category| %>
+          <% toggled = @categories.include?(category) ? @categories - [category] : @categories + [category] %>
+          <li>
+            <%= link_to url_for(category: toggled.presence, q: @query.presence, filter: @filter == "all" ? nil : @filter, sort: @sort, dir: @dir, lang: @langs.presence),
+                  class: class_names("catalog-sidebar__filter-item", "catalog-sidebar__filter-item--checkable", "is-active" => @categories.include?(category)),
+                  id: "category-filter-#{category.dasherize}",
+                  aria: { current: ("true" if @categories.include?(category)) },
+                  data: { turbo_action: "replace" } do %>
+              <span class="catalog-sidebar__checkbox" aria-hidden="true"></span>
+              <span><%= t("books.categories.#{category}") %></span>
+              <span class="catalog-sidebar__filter-count"><%= @category_counts.fetch(category, 0) %></span>
+            <% end %>
+          </li>
+        <% end %>
+      </ul>
+    </div>
   </aside>
 
   <% if @books.empty? %>

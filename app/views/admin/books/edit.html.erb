@@ -42,6 +42,20 @@
     <%= f.number_field :published_year, class: "form-field__input" %>
   </div>
 
+  <fieldset class="form-field form-fieldset">
+    <legend class="form-field__label form-fieldset__legend"><%= t("admin.books.fields.categories") %></legend>
+    <%# Prefer submitted values so a validation-failure re-render keeps the user's selection,
+        including when all boxes were cleared (params[:book] present but category_keys absent). %>
+    <% selected = params.key?(:book) ? Array(params.dig(:book, :category_keys)) : @book.category_keys %>
+    <% Book::CATEGORIES.each do |category| %>
+      <label class="form-check form-fieldset__option">
+        <%= check_box_tag "book[category_keys][]", category, selected.include?(category),
+              id: "book_category_keys_#{category}", class: "form-check__input" %>
+        <span class="form-check__label"><%= t("books.categories.#{category}") %></span>
+      </label>
+    <% end %>
+  </fieldset>
+
   <div class="form-field">
     <div class="form-field__header">
       <%= f.label :description, t("admin.books.fields.description"), class: "form-field__label" %>

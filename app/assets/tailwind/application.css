@@ -769,6 +769,26 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
     margin-right: 8px;
   }
 
+  .book-detail__categories {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+
+  .book-detail__category a {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 11.5px;
+    letter-spacing: 0.04em;
+    color: var(--ink-soft);
+    background: var(--chip);
+    border-radius: 999px;
+    padding: 4px 12px;
+    transition: background 0.15s ease;
+  }
+  .book-detail__category a:hover { background: color-mix(in srgb, var(--ink) 12%, transparent); }
+
   .book-detail__eyebrow {
     font-size: 14px;
     font-weight: 500;
@@ -1225,6 +1245,10 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
     color: var(--ink);
     line-height: 1.4;
   }
+
+  .form-fieldset { border: 0; padding: 0; }
+  .form-fieldset__legend { margin-bottom: 12px; }
+  .form-fieldset__option + .form-fieldset__option { margin-top: 10px; }
 
   /* ---- KINDLE SETUP (collapsible instructions) ---- */
   .kindle-setup {

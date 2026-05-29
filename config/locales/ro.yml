@@ -123,6 +123,10 @@ ro:
       link: "Deconectare"
 
   books:
+    categories:
+      fiction: "Ficțiune"
+      non_fiction: "Non-ficțiune"
+      biography: "Biografii, Memorii și Jurnale"
     index:
       title: "Bibliotecă"
       count: "%{filtered} din %{total} cărți"
@@ -135,6 +139,7 @@ ro:
         label: "Filtre"
         reading_status: "Stare lectură"
         language: "Limbă"
+        category: "Categorie"
         all: "Toate"
         unread: "Necitite"
         read: "Citite"
@@ -225,6 +230,7 @@ ro:
           all: "Toate"
           needs_metadata: "Necesită metadate"
           needs_goodreads: "Fără Goodreads"
+          missing_category: "Fără categorie"
         table:
           title: "Titlu"
           author: "Autor"
@@ -254,6 +260,7 @@ ro:
       fields:
         title: "Titlu"
         author: "Autor"
+        categories: "Categorii"
         language: "Limbă"
         publisher: "Editură"
         published_year: "An apariție"

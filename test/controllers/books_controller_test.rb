@@ -175,7 +175,8 @@ class BooksControllerTest < ActionDispatch::IntegrationTest
 
     get root_path(filter: "bogus")
     assert_select ".catalog-sidebar__count", text: "2 din 2 cărți"
-    assert_select ".catalog-sidebar__filter-item.is-active", count: 1
+    reading_status = css_select(".catalog-sidebar__filters").first
+    assert_equal 1, reading_status.css(".catalog-sidebar__filter-item.is-active").size
   end
 
   test "sidebar shows filter counts" do
@@ -186,8 +187,67 @@ class BooksControllerTest < ActionDispatch::IntegrationTest
     MemberBook.create!(member: member, book: b1, read_at: Time.current)
 
     get root_path
-    counts = css_select(".catalog-sidebar__filter-count").map(&:text)
+    counts = css_select(".catalog-sidebar__filters").first.css(".catalog-sidebar__filter-count").map(&:text)
     assert_equal %w[2 1 1], counts
+  end
+
+  test "filter by category narrows the catalog" do
+    sign_in_as members(:ana)
+    fic = Book.create!(title: "Fic", format: "epub", object_key: "k1", ingested_at: Time.current)
+    fic.sync_categories(%w[fiction])
+    bio = Book.create!(title: "Bio", format: "epub", object_key: "k2", ingested_at: Time.current)
+    bio.sync_categories(%w[biography])
+
+    get root_path(category: "fiction")
+    assert_select ".book-card__title", count: 1, text: "Fic"
+  end
+
+  test "category filter accepts multiple categories" do
+    sign_in_as members(:ana)
+    fic = Book.create!(title: "Fic", format: "epub", object_key: "k1", ingested_at: Time.current)
+    fic.sync_categories(%w[fiction])
+    bio = Book.create!(title: "Bio", format: "epub", object_key: "k2", ingested_at: Time.current)
+    bio.sync_categories(%w[biography])
+    Book.create!(title: "None", format: "epub", object_key: "k3", ingested_at: Time.current)
+
+    get root_path(category: %w[fiction biography])
+    titles = css_select(".book-card__title").map(&:text)
+    assert_equal %w[Bio Fic], titles.sort
+  end
+
+  test "sidebar shows category counts" do
+    sign_in_as members(:ana)
+    fic = Book.create!(title: "Fic", format: "epub", object_key: "k1", ingested_at: Time.current)
+    fic.sync_categories(%w[fiction])
+
+    get root_path
+    assert_select "#category-filter-fiction .catalog-sidebar__filter-count", text: "1"
+    assert_select "#category-filter-non-fiction .catalog-sidebar__filter-count", text: "0"
+    assert_select "#category-filter-biography .catalog-sidebar__filter-count", text: "0"
+  end
+
+  test "invalid category param is ignored" do
+    sign_in_as members(:ana)
+    Book.create!(title: "A", format: "epub", object_key: "k1", ingested_at: Time.current)
+
+    get root_path(category: "bogus")
+    assert_select ".book-card__title", count: 1
+    assert_select ".catalog-sidebar__count", text: "1 din 1 cărți"
+  end
+
+  test "category filter has an all entry that clears the category selection" do
+    sign_in_as members(:ana)
+    fic = Book.create!(title: "Fic", format: "epub", object_key: "k1", ingested_at: Time.current)
+    fic.sync_categories(%w[fiction])
+
+    get root_path(category: "fiction")
+    # The "all" entry is inactive while a category is selected and links back to no category.
+    assert_select "#category-filter-all:not(.is-active)"
+    all_href = css_select("#category-filter-all").first["href"]
+    assert_no_match(/category=/, all_href)
+
+    get root_path
+    assert_select "#category-filter-all.is-active"
   end
 
   test "sorts by date ascending when dir=asc" do
@@ -442,6 +502,24 @@ class BooksControllerTest < ActionDispatch::IntegrationTest
     assert_no_match(/Editura Test/, response.body)
     assert_no_match(/1888/, response.body)
     assert_no_match(/9781234567890/, response.body)
+  end
+
+  test "show renders the book's categories as filter links" do
+    sign_in_as members(:ana)
+    book = Book.create!(title: "T", format: "epub", object_key: "k", ingested_at: Time.current)
+    book.sync_categories(%w[fiction biography])
+
+    get book_path(book)
+    assert_select "#book-categories .book-detail__category", count: 2
+    assert_select "#book-categories a[href=?]", "/?category=fiction", text: "Ficțiune"
+  end
+
+  test "show omits the categories list when the book has none" do
+    sign_in_as members(:ana)
+    book = Book.create!(title: "T", format: "epub", object_key: "k", ingested_at: Time.current)
+
+    get book_path(book)
+    assert_select "#book-categories", false
   end
 
   test "show renders reading time estimated from the member's reading speed" do

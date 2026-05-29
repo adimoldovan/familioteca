@@ -11,12 +11,14 @@ class BooksController < ApplicationController
     @available_languages = Book.available_languages
     @langs = Array(params[:lang]).select { |l| @available_languages.include?(l) }
 
+    @categories = Array(params[:category]).select { |c| Book::CATEGORIES.include?(c) }
+
     normalized = params[:sort].to_s.then { |s| s == "recent" ? "date" : s }
     @sort = SORT_OPTIONS.include?(normalized) ? normalized : "date"
 
     @dir = DIR_OPTIONS.include?(params[:dir]) ? params[:dir] : SORT_DEFAULTS[@sort]
 
-    base = Book.visible.with_attached_cover.search(@query).by_language(@langs)
+    base = Book.visible.with_attached_cover.search(@query).by_language(@langs).by_category(@categories)
     read_scope = current_member.member_books.where.not(read_at: nil).select(:book_id)
 
     @counts = {
@@ -25,11 +27,18 @@ class BooksController < ApplicationController
       read: base.where(id: read_scope).count
     }
 
-    @total_count = @query.blank? && @langs.empty? ? @counts[:all] : Book.visible.count
+    @total_count = @query.blank? && @langs.empty? && @categories.empty? ? @counts[:all] : Book.visible.count
 
+    # Facet counts reflect the search query only, independent of the other
+    # facets' active selections (language counts ignore @categories and vice versa).
     @language_counts = Book.visible.search(@query)
       .where(language: @available_languages)
       .group(:language)
+      .count
+
+    @category_counts = BookCategory
+      .where(book_id: Book.visible.search(@query).select(:id))
+      .group(:category)
       .count
 
     @books = case @filter
@@ -53,7 +62,7 @@ class BooksController < ApplicationController
   end
 
   def show
-    @book = Book.visible.with_attached_cover.find(params[:id])
+    @book = Book.visible.with_attached_cover.includes(:book_categories).find(params[:id])
     @member_book = @book.member_book_for(current_member)
     @latest_delivery = KindleDelivery.latest_for(current_member, @book)
     url = session[:catalog_url]

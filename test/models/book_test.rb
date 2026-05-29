@@ -300,4 +300,83 @@ class BookTest < ActiveSupport::TestCase
       book.destroy
     end
   end
+
+  test "sync_categories sets the book's categories" do
+    book = Book.create!(title: "T", format: "epub", object_key: "cat-1", ingested_at: Time.current)
+    book.sync_categories(%w[fiction biography])
+    assert_equal %w[biography fiction], book.category_keys.sort
+  end
+
+  test "sync_categories adds and removes only what changed, keeping kept rows" do
+    book = Book.create!(title: "T", format: "epub", object_key: "cat-2", ingested_at: Time.current)
+    book.sync_categories(%w[fiction non_fiction])
+    kept = book.book_categories.find_by(category: "fiction")
+
+    book.sync_categories(%w[fiction biography])
+
+    assert_equal %w[biography fiction], book.category_keys.sort
+    assert_equal kept.id, book.book_categories.find_by(category: "fiction").id
+  end
+
+  test "sync_categories is correct even when the association is already loaded" do
+    book = Book.create!(title: "T", format: "epub", object_key: "cat-stale", ingested_at: Time.current)
+    book.sync_categories(%w[fiction])
+    book.category_keys # force-load the association cache
+
+    book.sync_categories(%w[fiction biography])
+    assert_equal %w[biography fiction], book.category_keys.sort
+  end
+
+  test "sync_categories ignores unknown keys and clears on empty" do
+    book = Book.create!(title: "T", format: "epub", object_key: "cat-3", ingested_at: Time.current)
+    book.sync_categories(%w[fiction bogus])
+    assert_equal %w[fiction], book.category_keys
+
+    book.sync_categories([])
+    assert_empty book.category_keys
+  end
+
+  test "destroying a book destroys its categories" do
+    book = Book.create!(title: "T", format: "epub", object_key: "cat-4", ingested_at: Time.current)
+    book.sync_categories(%w[fiction])
+    assert_difference "BookCategory.count", -1 do
+      book.destroy
+    end
+  end
+
+  test "without_category returns only visible books with no categories" do
+    with = Book.create!(title: "With", format: "epub", object_key: "cat-5", ingested_at: Time.current)
+    with.sync_categories(%w[fiction])
+    without = Book.create!(title: "Without", format: "epub", object_key: "cat-6", ingested_at: Time.current)
+    missing = Book.create!(title: "Missing", format: "epub", object_key: "cat-5b", ingested_at: Time.current,
+                           missing_since: Time.current)
+
+    assert_includes Book.without_category, without
+    refute_includes Book.without_category, with     # has a category
+    refute_includes Book.without_category, missing  # not visible
+  end
+
+  test "by_category matches books in any of the given categories" do
+    fic = Book.create!(title: "Fic", format: "epub", object_key: "cat-7", ingested_at: Time.current)
+    fic.sync_categories(%w[fiction])
+    bio = Book.create!(title: "Bio", format: "epub", object_key: "cat-8", ingested_at: Time.current)
+    bio.sync_categories(%w[biography])
+
+    result = Book.by_category(%w[fiction biography])
+    assert_includes result, fic
+    assert_includes result, bio
+  end
+
+  test "by_category with no valid categories returns all books" do
+    book = Book.create!(title: "T", format: "epub", object_key: "cat-9", ingested_at: Time.current)
+    assert_includes Book.by_category([]), book
+    assert_includes Book.by_category(%w[bogus]), book
+  end
+
+  test "BookCategory rejects duplicates and unknown categories" do
+    book = Book.create!(title: "T", format: "epub", object_key: "cat-10", ingested_at: Time.current)
+    book.book_categories.create!(category: "fiction")
+    assert_not book.book_categories.build(category: "fiction").valid?
+    assert_not book.book_categories.build(category: "bogus").valid?
+  end
 end

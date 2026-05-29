@@ -22,11 +22,11 @@
     {
       "warning_type": "Cross-Site Scripting",
       "warning_code": 4,
-      "fingerprint": "6d07c3cbbe93ad439a9a58078c90ba72bf614547d2672b3ebc6959146ecdd510",
+      "fingerprint": "2648e47cff9dfff17a3b2ecbe0ddb00341c453f7dda452ff4c043bb2afc3d490",
       "check_name": "LinkToHref",
       "message": "Potentially unsafe model attribute in `link_to` href",
       "file": "app/views/books/show.html.erb",
-      "line": 42,
+      "line": 49,
       "link": "https://brakeman.readthedocs.io/en/latest/warning_types/link_to_href.html",
       "code": null,
       "render_path": null,

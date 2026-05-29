@@ -46,6 +46,20 @@ class Admin::BooksControllerTest < ActionDispatch::IntegrationTest
     refute_includes titles, @missing.title
   end
 
+  test "admin can filter to visible books missing a category" do
+    sign_in_as members(:admin)
+    @ok.sync_categories(%w[fiction])
+    uncategorized = Book.create!(title: "No category", format: "epub", object_key: "k4", ingested_at: Time.current)
+
+    get admin_books_path(filter: "missing_category")
+    assert_response :success
+    titles = css_select("td").map(&:text)
+    assert_includes titles, uncategorized.title
+    refute_includes titles, @ok.title      # has a category
+    refute_includes titles, @missing.title # not visible (missing from archive)
+    refute_includes titles, @broken.title  # not visible (parse error)
+  end
+
   test "admin can delete a book" do
     sign_in_as members(:admin)
     assert_difference("Book.count", -1) do

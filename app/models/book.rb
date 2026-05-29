@@ -1,5 +1,6 @@
 class Book < ApplicationRecord
   FORMATS = %w[epub mobi pdf].freeze
+  CATEGORIES = %w[fiction non_fiction biography].freeze
   KINDLE_MAX_SIZE = 24.megabytes
 
   has_one_attached :cover do |attachable|
@@ -8,6 +9,7 @@ class Book < ApplicationRecord
 
   has_many :member_books, dependent: :destroy
   has_many :kindle_deliveries, dependent: :destroy
+  has_many :book_categories, dependent: :destroy
 
   validates :title, presence: true
   validates :object_key, presence: true, uniqueness: true
@@ -35,8 +37,32 @@ class Book < ApplicationRecord
     where(language: langs)
   }
 
+  scope :without_category, -> { visible.where.missing(:book_categories) }
+
+  scope :by_category, ->(cats) {
+    cats = Array(cats).select { |c| CATEGORIES.include?(c) }
+    next all if cats.empty?
+    where(id: BookCategory.where(category: cats).select(:book_id))
+  }
+
   def self.available_languages
     visible.where.not(language: [ nil, "" ]).distinct.pluck(:language).sort
+  end
+
+  def category_keys
+    book_categories.map(&:category)
+  end
+
+  # Replace this book's categories with the given keys (unknown keys ignored).
+  # Adds/removes only what changed so existing rows keep their timestamps.
+  def sync_categories(keys)
+    desired = Array(keys).map(&:to_s).select { |k| CATEGORIES.include?(k) }.uniq
+    current = category_keys # snapshot before mutating, the cache can go stale
+    transaction do
+      book_categories.where.not(category: desired).destroy_all
+      (desired - current).each { |k| book_categories.create!(category: k) }
+    end
+    book_categories.reset
   end
 
   def member_book_for(member)

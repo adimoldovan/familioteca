@@ -52,6 +52,15 @@
       <% end %>
     </div>
 
+    <% categories = @book.category_keys %>
+    <% if categories.any? %>
+      <ul class="book-detail__categories" id="book-categories">
+        <% categories.each do |category| %>
+          <li class="book-detail__category"><%= link_to t("books.categories.#{category}"), root_path(category: category) %></li>
+        <% end %>
+      </ul>
+    <% end %>
+
     <div class="book-detail__journal" id="book-journal" role="group" aria-label="<%= t(".rating.label") %>">
       <%= render "books/rating", book: @book, member_book: @member_book %>
       <%= render "books/read_toggle", book: @book, member_book: @member_book %>
