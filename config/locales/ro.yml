@@ -143,6 +143,7 @@ ro:
         all: "Toate"
         unread: "Necitite"
         read: "Citite"
+        clear_all: "Șterge filtrele"
       sort:
         date: "Dată adăugare"
         title: "Titlu"

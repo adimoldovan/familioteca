@@ -539,6 +539,20 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
   .catalog-sidebar__search-clear:hover { background: var(--chip); color: var(--ink); }
   .catalog-sidebar__search-clear svg { width: 12px; height: 12px; }
 
+  .catalog-sidebar__clear {
+    align-self: center;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    color: var(--muted);
+    transition: background 0.12s ease, color 0.12s ease;
+  }
+  .catalog-sidebar__clear:hover { background: var(--chip); color: var(--ink); }
+  .catalog-sidebar__clear svg { width: 12px; height: 12px; }
+
   .catalog-sidebar__section + .catalog-sidebar__section { margin-top: 28px; }
 
   .catalog-sidebar__label {

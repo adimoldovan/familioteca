@@ -250,6 +250,38 @@ class BooksControllerTest < ActionDispatch::IntegrationTest
     assert_select "#category-filter-all.is-active"
   end
 
+  test "clear filters link is hidden when no filter is active" do
+    sign_in_as members(:ana)
+    Book.create!(title: "Fic", format: "epub", object_key: "k1", ingested_at: Time.current)
+
+    get root_path
+    assert_select "#clear-filters", count: 0
+  end
+
+  test "clear filters link appears when a filter is active and resets every filter" do
+    sign_in_as members(:ana)
+    fic = Book.create!(title: "Fic", format: "epub", object_key: "k1", ingested_at: Time.current,
+                        language: "Romanian")
+    fic.sync_categories(%w[fiction])
+
+    get root_path(q: "Fic", filter: "unread", lang: [ "Romanian" ], category: [ "fiction" ])
+    href = css_select("#clear-filters").first["href"]
+    assert_no_match(/[?&]q=/, href)
+    assert_no_match(/filter=/, href)
+    assert_no_match(/lang/, href)
+    assert_no_match(/category/, href)
+  end
+
+  test "clear filters link preserves the current sort and direction" do
+    sign_in_as members(:ana)
+    Book.create!(title: "Fic", format: "epub", object_key: "k1", ingested_at: Time.current)
+
+    get root_path(filter: "unread", sort: "title", dir: "desc")
+    href = css_select("#clear-filters").first["href"]
+    assert_match(/sort=title/, href)
+    assert_match(/dir=desc/, href)
+  end
+
   test "sorts by date ascending when dir=asc" do
     sign_in_as members(:ana)
     Book.create!(title: "Old", format: "epub", object_key: "k1", ingested_at: 1.day.ago)
