@@ -254,6 +254,7 @@ ro:
         cancel: "Anulează"
         submit: "Salvează"
         save_and_next: "Salvează și deschide următoarea"
+        save_and_next_hotkey: "%{label} (S)"
         nav_label: "Navigare cărți"
         previous: "← Anterioara"
         next: "Următoarea →"

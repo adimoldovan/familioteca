@@ -187,7 +187,8 @@ class Admin::BooksEditTest < ActionDispatch::IntegrationTest
     sign_in_as members(:admin)
 
     get edit_admin_book_path(@book) # "Old" sorts before "Zzz", so a next exists
-    assert_select "button[name=save_action][value=next]"
+    assert_select "button[name=save_action][value=next][data-controller=hotkey][aria-keyshortcuts=s]" \
+                  "[title=?]", "Salvează și deschide următoarea (S)"
     assert_select "input[type=hidden][name=next_book_id]"
   end
 
