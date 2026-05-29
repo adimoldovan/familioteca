@@ -30,6 +30,10 @@ class ProcessBookFileJob < ApplicationJob
     attrs = result[:attributes]
 
     book = Book.find_or_initialize_by(object_key: object_key)
+    # ingested_at marks when the book first entered the library and powers the
+    # "added X ago" label and the date-added sort. Set it only on first ingest
+    # so re-scans don't make an old book look freshly added.
+    book.ingested_at ||= Time.current
     book.assign_attributes(
       title:          attrs[:title] || File.basename(object_key, ".*"),
       author:         attrs[:author],
@@ -42,7 +46,6 @@ class ProcessBookFileJob < ApplicationJob
       word_count:     result[:word_count],
       format:         result[:format],
       file_size:      File.size(path),
-      ingested_at:    Time.current,
       missing_since:  nil,
       parse_error:    result[:parse_error]
     )

@@ -190,6 +190,18 @@ class ProcessBookFileJobTest < ActiveJob::TestCase
     assert_equal "https://www.goodreads.com/book/show/62024", book.reload.goodreads_url
   end
 
+  test "re-running preserves the original ingested_at" do
+    storage = stub_storage("k/ts.epub", FIXTURES.join("well-tagged.epub"))
+    ProcessBookFileJob.new.perform("k/ts.epub", storage: storage)
+    book = Book.find_by!(object_key: "k/ts.epub")
+    original = 3.months.ago
+    book.update!(ingested_at: original)
+
+    ProcessBookFileJob.new.perform("k/ts.epub", storage: storage)
+
+    assert_in_delta original, book.reload.ingested_at, 1.second
+  end
+
   test "is idempotent — re-running clears missing_since but does not duplicate" do
     storage = stub_storage("k/a.epub", FIXTURES.join("well-tagged.epub"))
 
