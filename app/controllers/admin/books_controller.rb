@@ -5,6 +5,7 @@ module Admin
     def index
       @filter = current_filter
       @books = filtered_books(@filter)
+      @counts = ([ nil ] + FILTER_OPTIONS).index_with { |f| books_for(f).count }
     end
 
     def edit
@@ -51,13 +52,18 @@ module Admin
     end
 
     def filtered_books(filter)
-      scope = case filter
+      books_for(filter).order(:sort_title)
+    end
+
+    # Scope for a filter without ordering, so count queries don't carry a
+    # pointless ORDER BY.
+    def books_for(filter)
+      case filter
       when "needs_metadata"   then Book.needs_metadata
       when "needs_goodreads"  then Book.needs_goodreads
       when "missing_category" then Book.without_category
       else Book.all
       end
-      scope.order(:sort_title)
     end
 
     # Neighbours within the current filter, captured at page-load while the book

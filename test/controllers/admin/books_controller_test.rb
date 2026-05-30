@@ -23,6 +23,19 @@ class Admin::BooksControllerTest < ActionDispatch::IntegrationTest
     assert_select ".admin-nav a[href='#{admin_members_path}']"
     assert_select ".admin-nav a[href='#{admin_invite_codes_path}']"
     assert_select "table tbody tr", 3
+
+    # the active tab is marked for assistive tech
+    assert_select "a.admin-filter__link--active[aria-current='page']"
+
+    # filter tabs show counts; action tabs highlight when > 0, "all" never does
+    assert_select "a[href=?] .admin-filter__count", admin_books_path, text: "3"
+    assert_select "a[href=?] .admin-filter__count.admin-filter__count--alert", admin_books_path, false
+    assert_select "a[href=?] .admin-filter__count.admin-filter__count--alert",
+                  admin_books_path(filter: "needs_metadata"), text: "1"
+    assert_select "a[href=?] .admin-filter__count.admin-filter__count--alert",
+                  admin_books_path(filter: "needs_goodreads"), text: "1"
+    assert_select "a[href=?] .admin-filter__count.admin-filter__count--alert",
+                  admin_books_path(filter: "missing_category"), text: "1"
   end
 
   test "admin can filter to needs-metadata" do
@@ -85,5 +98,17 @@ class Admin::BooksControllerTest < ActionDispatch::IntegrationTest
       delete admin_book_path(@ok)
     end
     assert_redirected_to admin_books_path
+  end
+
+  test "action filter tab with no items shows zero without highlight" do
+    sign_in_as members(:admin)
+    @broken.update!(parse_error: nil) # nothing needs metadata anymore
+
+    get admin_books_path
+    assert_response :success
+    assert_select "a[href=?] .admin-filter__count",
+                  admin_books_path(filter: "needs_metadata"), text: "0"
+    assert_select "a[href=?] .admin-filter__count.admin-filter__count--alert",
+                  admin_books_path(filter: "needs_metadata"), false
   end
 end

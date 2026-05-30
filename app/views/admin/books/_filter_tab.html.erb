@@ -1,0 +1,7 @@
+<%# locals: (label:, filter:, count:, active:, alert:) %>
+<%= link_to admin_books_path(filter: filter),
+      class: class_names("admin-filter__link", "admin-filter__link--active" => active),
+      aria: { current: ("page" if active) } do %>
+  <%= label %>
+  <span class="<%= class_names("admin-filter__count", "admin-filter__count--alert" => alert && count.positive?) %>"><%= count %></span>
+<% end %>

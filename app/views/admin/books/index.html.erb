@@ -4,14 +4,10 @@
 <h1 id="books-heading" class="t-headline"><%= t(".title") %></h1>
 
 <nav class="admin-filter" aria-label="<%= t(".filter.label") %>">
-  <%= link_to t(".filter.all"), admin_books_path,
-        class: "admin-filter__link #{'admin-filter__link--active' if @filter.blank?}" %>
-  <%= link_to t(".filter.needs_metadata"), admin_books_path(filter: "needs_metadata"),
-        class: "admin-filter__link #{'admin-filter__link--active' if @filter == 'needs_metadata'}" %>
-  <%= link_to t(".filter.needs_goodreads"), admin_books_path(filter: "needs_goodreads"),
-        class: "admin-filter__link #{'admin-filter__link--active' if @filter == 'needs_goodreads'}" %>
-  <%= link_to t(".filter.missing_category"), admin_books_path(filter: "missing_category"),
-        class: "admin-filter__link #{'admin-filter__link--active' if @filter == 'missing_category'}" %>
+  <%= render "filter_tab", label: t(".filter.all"), filter: nil, count: @counts[nil], active: @filter.nil?, alert: false %>
+  <%= render "filter_tab", label: t(".filter.needs_metadata"), filter: "needs_metadata", count: @counts["needs_metadata"], active: @filter == "needs_metadata", alert: true %>
+  <%= render "filter_tab", label: t(".filter.needs_goodreads"), filter: "needs_goodreads", count: @counts["needs_goodreads"], active: @filter == "needs_goodreads", alert: true %>
+  <%= render "filter_tab", label: t(".filter.missing_category"), filter: "missing_category", count: @counts["missing_category"], active: @filter == "missing_category", alert: true %>
 </nav>
 
 <table class="data-table" aria-labelledby="books-heading">

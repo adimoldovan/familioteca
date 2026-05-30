@@ -1476,6 +1476,15 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
     border-bottom-color: var(--accent);
   }
 
+  .admin-filter__count {
+    margin-inline-start: 6px;
+    color: var(--muted);
+  }
+  .admin-filter__count--alert {
+    color: var(--warn);
+    font-weight: 600;
+  }
+
   .invite-link-input {
     width: auto;
     min-width: 32ch;
