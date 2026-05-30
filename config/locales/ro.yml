@@ -156,6 +156,7 @@ ro:
       by_author_html: "de %{author}"
       added_ago: "Adăugată acum %{when}"
       reading_time: "~%{time} de lectură"
+      edit: "Editează"
       description_title: "Descriere"
       no_description: "Nicio descriere disponibilă."
       rating:

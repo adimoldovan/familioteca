@@ -679,6 +679,23 @@ class BooksControllerTest < ActionDispatch::IntegrationTest
     assert_select ".book-detail__upload-meta > span", text: book.language # normalized to "Romanian"
   end
 
+  test "show renders an edit link in the upload meta for admins" do
+    sign_in_as members(:admin)
+    book = Book.create!(title: "T", format: "epub", object_key: "k", ingested_at: Time.current)
+
+    get book_path(book)
+    assert_select ".book-detail__upload-meta a#book-edit-link[href=?]", edit_admin_book_path(book),
+      text: I18n.t("books.show.edit")
+  end
+
+  test "show omits the edit link for non-admin members" do
+    sign_in_as members(:ana)
+    book = Book.create!(title: "T", format: "epub", object_key: "k", ingested_at: Time.current)
+
+    get book_path(book)
+    assert_select "#book-edit-link", false
+  end
+
   test "show renders the Goodreads link when goodreads_url is present" do
     sign_in_as members(:ana)
     book = Book.create!(

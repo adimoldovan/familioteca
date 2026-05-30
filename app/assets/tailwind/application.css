@@ -783,6 +783,14 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
     margin-right: 8px;
   }
 
+  .book-detail__edit-link {
+    color: inherit;
+    text-decoration: none;
+  }
+  .book-detail__edit-link:hover {
+    text-decoration: underline;
+  }
+
   .book-detail__categories {
     display: flex;
     flex-wrap: wrap;

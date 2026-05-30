@@ -36,6 +36,9 @@
       <% if reading_time %>
         <span id="book-reading-time"><%= t(".reading_time", time: reading_time) %></span>
       <% end %>
+      <% if current_member.admin? %>
+        <span><%= link_to t(".edit"), edit_admin_book_path(@book), class: "book-detail__edit-link", id: "book-edit-link" %></span>
+      <% end %>
     </div>
   </div>
 
