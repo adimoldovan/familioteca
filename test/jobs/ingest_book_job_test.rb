@@ -50,11 +50,60 @@ class IngestBookJobTest < ActiveJob::TestCase
     assert_nil book.reload.missing_since
   end
 
+  test "records the storage last-modified time on present books" do
+    modified = Time.utc(2026, 5, 1, 12, 0, 0)
+    book = Book.create!(title: "A", format: "epub", object_key: "a.epub", ingested_at: Time.current)
+    storage = build_storage("a.epub" => modified)
+
+    IngestBookJob.new.perform(storage: storage)
+
+    assert_equal modified.to_i, book.reload.file_modified_at.to_i
+  end
+
+  test "recording the file time does not bump updated_at" do
+    book = Book.create!(title: "A", format: "epub", object_key: "a.epub", ingested_at: Time.current)
+    storage = build_storage("a.epub" => Time.utc(2026, 5, 1, 12, 0, 0))
+
+    # Advance the clock so a stray save! would produce a visibly newer
+    # updated_at; update_all must leave it untouched.
+    travel 1.hour do
+      IngestBookJob.new.perform(storage: storage)
+    end
+
+    assert_equal book.updated_at.to_i, book.reload.updated_at.to_i
+  end
+
+  test "does not rewrite books whose file time already matches" do
+    modified = Time.utc(2026, 5, 1, 12, 0, 0)
+    Book.create!(title: "A", format: "epub", object_key: "a.epub", ingested_at: Time.current,
+                 file_modified_at: modified)
+    storage = build_storage("a.epub" => modified)
+
+    assert_no_queries_match(/update .*file_modified_at/i) do
+      IngestBookJob.new.perform(storage: storage)
+    end
+    assert_equal modified.to_i, Book.find_by!(object_key: "a.epub").file_modified_at.to_i
+  end
+
+  test "a file modified after the last DB write is flagged for rescan" do
+    book = Book.create!(title: "A", format: "epub", object_key: "a.epub", ingested_at: 1.week.ago)
+    storage = build_storage("a.epub" => 1.minute.from_now)
+
+    IngestBookJob.new.perform(storage: storage)
+
+    assert_includes Book.needs_rescan, book.reload
+  end
+
   private
 
-  def build_storage(keys)
+  # Accepts a list of keys (each gets a default modified time) or a
+  # key => last_modified hash, and yields BookStorage::Entry structs from #list.
+  def build_storage(keys_or_times)
+    entries = Array(keys_or_times).map do |key, time|
+      BookStorage::Entry.new(key, time || Time.current)
+    end
     storage = Object.new
-    storage.define_singleton_method(:list) { keys }
+    storage.define_singleton_method(:list) { entries }
     storage
   end
 end

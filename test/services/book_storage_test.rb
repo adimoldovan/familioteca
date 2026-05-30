@@ -6,23 +6,26 @@ class BookStorageTest < ActiveSupport::TestCase
     @client  = @storage.send(:client)
   end
 
-  test "#list returns all object keys, paginating through continuation tokens" do
+  test "#list returns each object's key and last-modified time, paginating through continuation tokens" do
+    modified = Time.utc(2026, 1, 2, 3, 4, 5)
     @client.stub_responses(
       :list_objects_v2,
       [
         {
-          contents: [ { key: "a.epub" }, { key: "b.epub" } ],
+          contents: [ { key: "a.epub", last_modified: modified }, { key: "b.epub", last_modified: modified } ],
           is_truncated: true,
           next_continuation_token: "cursor1"
         },
         {
-          contents: [ { key: "c.epub" } ],
+          contents: [ { key: "c.epub", last_modified: modified } ],
           is_truncated: false
         }
       ]
     )
 
-    assert_equal %w[a.epub b.epub c.epub], @storage.list
+    entries = @storage.list
+    assert_equal %w[a.epub b.epub c.epub], entries.map(&:key)
+    assert_equal [ modified, modified, modified ], entries.map(&:last_modified)
   end
 
   test "#download writes the object body to a temp file and returns the path" do

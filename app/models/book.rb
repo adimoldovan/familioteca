@@ -25,6 +25,12 @@ class Book < ApplicationRecord
   scope :needs_metadata,   -> { where.not(parse_error: nil) }
   scope :needs_goodreads,  -> { visible.where(goodreads_url: [ nil, "" ]) }
 
+  # The storage file changed after our last DB write, so a rescan would pull in
+  # updates we'd otherwise miss. file_modified_at is recorded during the scan;
+  # updated_at moves whenever we process the file or an admin edits the book, so
+  # a manual edit naturally clears the flag without clobbering the edit.
+  scope :needs_rescan,     -> { visible.where("books.file_modified_at > books.updated_at") }
+
   scope :search, ->(query) {
     folded = DiacriticFolding.fold(query.to_s.strip)
     next all if folded.blank?
@@ -77,6 +83,14 @@ class Book < ApplicationRecord
 
   def missing?
     missing_since.present?
+  end
+
+  # Mirrors the needs_rescan scope (visible books only) so a book's row badge
+  # never disagrees with the filter tab.
+  def needs_rescan?
+    return false if missing_since.present? || parse_error.present?
+    return false if file_modified_at.nil? || updated_at.nil?
+    file_modified_at > updated_at
   end
 
   # Estimated reading time in whole minutes at the given words-per-minute

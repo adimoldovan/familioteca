@@ -1,6 +1,6 @@
 module Admin
   class BooksController < BaseController
-    FILTER_OPTIONS = %w[needs_metadata needs_goodreads missing_category].freeze
+    FILTER_OPTIONS = %w[needs_metadata needs_goodreads missing_category needs_rescan].freeze
 
     def index
       @filter = current_filter
@@ -59,6 +59,7 @@ module Admin
       when "needs_metadata"   then Book.needs_metadata
       when "needs_goodreads"  then Book.needs_goodreads
       when "missing_category" then Book.without_category
+      when "needs_rescan"     then Book.needs_rescan
       else Book.all
       end
     end

@@ -8,6 +8,7 @@
   <%= render "filter_tab", label: t(".filter.needs_metadata"), filter: "needs_metadata", count: @counts["needs_metadata"], active: @filter == "needs_metadata", alert: true %>
   <%= render "filter_tab", label: t(".filter.needs_goodreads"), filter: "needs_goodreads", count: @counts["needs_goodreads"], active: @filter == "needs_goodreads", alert: true %>
   <%= render "filter_tab", label: t(".filter.missing_category"), filter: "missing_category", count: @counts["missing_category"], active: @filter == "missing_category", alert: true %>
+  <%= render "filter_tab", label: t(".filter.needs_rescan"), filter: "needs_rescan", count: @counts["needs_rescan"], active: @filter == "needs_rescan", alert: true %>
 </nav>
 
 <table class="data-table" aria-labelledby="books-heading">
@@ -31,6 +32,8 @@
             <%= t(".status.missing") %>
           <% elsif book.parse_error.present? %>
             <%= t(".status.needs_metadata") %>
+          <% elsif book.needs_rescan? %>
+            <%= t(".status.needs_rescan") %>
           <% else %>
             <%= t(".status.ok") %>
           <% end %>

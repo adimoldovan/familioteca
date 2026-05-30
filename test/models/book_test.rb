@@ -104,6 +104,41 @@ class BookTest < ActiveSupport::TestCase
     refute_includes needs, good
   end
 
+  test "needs_rescan scope returns visible books whose file changed after the last DB write" do
+    stale  = Book.create!(title: "Stale", format: "epub", object_key: "k1", ingested_at: 1.week.ago,
+                          file_modified_at: 1.minute.from_now)
+    fresh  = Book.create!(title: "Fresh", format: "epub", object_key: "k2", ingested_at: 1.week.ago,
+                          file_modified_at: 1.minute.ago)
+    never  = Book.create!(title: "Never", format: "epub", object_key: "k3", ingested_at: Time.current)
+    hidden = Book.create!(title: "Hidden", format: "epub", object_key: "k4", ingested_at: 1.week.ago,
+                          file_modified_at: 1.minute.from_now, missing_since: Time.current)
+
+    needs = Book.needs_rescan
+    assert_includes needs, stale
+    refute_includes needs, fresh  # file older than the last DB write
+    refute_includes needs, never  # no recorded file time yet
+    refute_includes needs, hidden # not visible (missing from archive)
+  end
+
+  test "needs_rescan? is false without a recorded file time" do
+    book = Book.new(title: "T", format: "epub", object_key: "k", ingested_at: Time.current)
+    refute book.needs_rescan?
+  end
+
+  test "a DB write later than the file time clears needs_rescan" do
+    book = Book.create!(title: "Stale", format: "epub", object_key: "k1", ingested_at: 1.week.ago,
+                        file_modified_at: 1.minute.from_now)
+    assert book.needs_rescan?, "precondition: book should start flagged"
+
+    # A rescan (or any save) moves updated_at past the file time, clearing the flag.
+    travel 2.minutes do
+      book.touch
+    end
+
+    refute book.reload.needs_rescan?
+    refute_includes Book.needs_rescan, book
+  end
+
   test "goodreads_url accepts valid Goodreads URLs" do
     book = Book.new(title: "T", format: "epub", object_key: "k", ingested_at: Time.current,
                     goodreads_url: "https://www.goodreads.com/book/show/12345")

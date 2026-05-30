@@ -234,6 +234,7 @@ ro:
           needs_metadata: "Necesită metadate"
           needs_goodreads: "Fără Goodreads"
           missing_category: "Fără categorie"
+          needs_rescan: "Necesită rescanare"
         table:
           title: "Titlu"
           author: "Autor"
@@ -244,6 +245,7 @@ ro:
           ok: "OK"
           missing: "Lipsește din arhivă"
           needs_metadata: "Date incomplete"
+          needs_rescan: "Fișier actualizat"
         edit_link: "Editează"
         delete_link: "Șterge"
         delete_confirm: 'Sigur vrei să ștergi „%{title}"? Cartea va fi readăugată la următoarea scanare.'

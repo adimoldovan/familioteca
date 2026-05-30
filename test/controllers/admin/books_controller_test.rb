@@ -36,6 +36,10 @@ class Admin::BooksControllerTest < ActionDispatch::IntegrationTest
                   admin_books_path(filter: "needs_goodreads"), text: "1"
     assert_select "a[href=?] .admin-filter__count.admin-filter__count--alert",
                   admin_books_path(filter: "missing_category"), text: "1"
+    # nothing needs a rescan in the fixture set, so the tab shows zero unhighlighted
+    assert_select "a[href=?] .admin-filter__count", admin_books_path(filter: "needs_rescan"), text: "0"
+    assert_select "a[href=?] .admin-filter__count.admin-filter__count--alert",
+                  admin_books_path(filter: "needs_rescan"), false
   end
 
   test "the book list no longer offers a rescan action" do
@@ -75,6 +79,20 @@ class Admin::BooksControllerTest < ActionDispatch::IntegrationTest
     titles = css_select("td").map(&:text)
     assert_includes titles, uncategorized.title
     refute_includes titles, @ok.title      # has a category
+    refute_includes titles, @missing.title # not visible (missing from archive)
+    refute_includes titles, @broken.title  # not visible (parse error)
+  end
+
+  test "admin can filter to books whose storage file is newer than the DB" do
+    sign_in_as members(:admin)
+    stale = Book.create!(title: "Stale", format: "epub", object_key: "k5", ingested_at: 1.week.ago,
+                         file_modified_at: 1.minute.from_now)
+
+    get admin_books_path(filter: "needs_rescan")
+    assert_response :success
+    titles = css_select("td").map(&:text)
+    assert_includes titles, stale.title
+    refute_includes titles, @ok.title      # file not newer than DB
     refute_includes titles, @missing.title # not visible (missing from archive)
     refute_includes titles, @broken.title  # not visible (parse error)
   end

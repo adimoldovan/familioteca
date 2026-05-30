@@ -2,6 +2,11 @@ require "aws-sdk-s3"
 require "tempfile"
 
 class BookStorage
+  # One stored object: its key plus the storage-side last-modified time. The
+  # scan compares last_modified against each book's recorded file_modified_at
+  # to flag files that changed after we last ingested them.
+  Entry = Struct.new(:key, :last_modified)
+
   # Memoized at the class level — fine because the underlying Aws::S3::Client
   # is thread-safe and tests inject their own stub via the `storage:` kwarg
   # on jobs rather than touching `.default`. If a future test calls `.default`
@@ -23,17 +28,17 @@ class BookStorage
   end
 
   def list
-    keys = []
+    entries = []
     continuation = nil
     loop do
       params = { bucket: @bucket }
       params[:continuation_token] = continuation if continuation
       response = @client.list_objects_v2(**params)
-      response.contents.each { |obj| keys << obj.key }
+      response.contents.each { |obj| entries << Entry.new(obj.key, obj.last_modified) }
       break unless response.is_truncated
       continuation = response.next_continuation_token
     end
-    keys
+    entries
   end
 
   # Returns a path. The caller owns the file and must delete it.
