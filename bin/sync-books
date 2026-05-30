@@ -35,11 +35,11 @@ fi
 [[ $# -lt 1 ]] && usage
 
 LOCAL_DIR=""
-dry_run_opts=()
+dry_run=0
 
 for arg in "$@"; do
   case "$arg" in
-    --dry-run) dry_run_opts=(--dryrun) ;;
+    --dry-run) dry_run=1 ;;
     --help|-h) usage 0 ;;
     --*) echo "Error: unknown option: $arg" >&2; usage ;;
     *)
@@ -81,34 +81,65 @@ aws_env=(
   AWS_SECRET_ACCESS_KEY="$FAMILIOTECA_BUCKET_SECRET"
 )
 
+# Portable size + md5 helpers (BSD/macOS vs GNU/Linux).
+if stat -f %z /dev/null >/dev/null 2>&1; then
+  file_size() { stat -f %z "$1"; }
+else
+  file_size() { stat -c %s "$1"; }
+fi
+if command -v md5 &>/dev/null; then
+  file_md5() { md5 -q "$1"; }
+else
+  file_md5() { md5sum "$1" | cut -d' ' -f1; }
+fi
+
+# --- Fetch remote inventory (one listing, reused for both checks) ---
+#
+# We deliberately do NOT use `aws s3 sync` here. Its comparator is a streaming
+# merge-join that assumes the bucket lists keys in the same byte order the CLI
+# sorts local files. Cloudflare R2 orders decomposed-Unicode (NFD) keys by their
+# composed (NFC) form, so the two orderings disagree and unchanged files with
+# diacritics (e.g. "Bătrânul…") get re-uploaded every run. Comparing each file by
+# exact key → size → ETag/MD5 is order-independent and avoids that bug.
+
+echo "Fetching remote inventory..."
+
+# Tab-separated rows: <key>\t<size>\t<etag>
+if ! remote_inv=$(env "${aws_env[@]}" aws s3api list-objects-v2 \
+    "${aws_opts[@]}" --bucket "$BUCKET" \
+    --query "Contents[].[Key,Size,ETag]" --output text); then
+  echo "Error: could not list remote bucket contents (see error above)." >&2
+  echo "Aborting: without the remote inventory every local file looks new and" >&2
+  echo "would be re-uploaded. Fix the listing error and retry." >&2
+  exit 1
+fi
+
+declare -A remote_size remote_etag
+while IFS=$'\t' read -r key size etag; do
+  [[ -z "$key" || "$key" == "None" ]] && continue
+  if [[ "$key" == /* || "$key" =~ (^|/)\.\.(/|$) ]]; then
+    echo "WARNING: skipping suspicious key: $key" >&2
+    continue
+  fi
+  remote_size["$key"]=$size
+  remote_etag["$key"]=${etag//\"/}   # strip the quotes ListObjects wraps ETags in
+done <<< "$remote_inv"
+
 # --- Check for remote-only files ---
 
 echo "Checking for files in bucket not present locally..."
 
-if ! remote_keys=$(env "${aws_env[@]}" aws s3api list-objects-v2 \
-    "${aws_opts[@]}" --bucket "$BUCKET" --query "Contents[].Key" --output text); then
-  echo "WARNING: could not list remote bucket contents (see error above)" >&2
-  remote_keys=""
-fi
-
 orphan_count=0
-if [[ -n "$remote_keys" && "$remote_keys" != "None" ]]; then
-  while IFS= read -r key; do
-    [[ -z "$key" ]] && continue
-    if [[ "$key" == /* || "$key" =~ (^|/)\.\.(/|$) ]]; then
-      echo "WARNING: skipping suspicious key: $key" >&2
-      continue
+for key in "${!remote_size[@]}"; do
+  if [[ ! -f "$LOCAL_DIR/$key" ]]; then
+    if [[ $orphan_count -eq 0 ]]; then
+      echo ""
+      echo "WARNING: files in bucket but missing locally:"
     fi
-    if [[ ! -f "$LOCAL_DIR/$key" ]]; then
-      if [[ $orphan_count -eq 0 ]]; then
-        echo ""
-        echo "WARNING: files in bucket but missing locally:"
-      fi
-      echo "  $key"
-      orphan_count=$((orphan_count + 1))
-    fi
-  done <<< "${remote_keys//$'\t'/$'\n'}"
-fi
+    echo "  $key"
+    orphan_count=$((orphan_count + 1))
+  fi
+done
 
 if [[ $orphan_count -gt 0 ]]; then
   echo ""
@@ -120,25 +151,64 @@ else
   echo ""
 fi
 
-# --- Sync local → remote ---
+# --- Sync local → remote (content-based, order-independent) ---
 
-if [[ ${#dry_run_opts[@]} -gt 0 ]]; then
+if [[ $dry_run -eq 1 ]]; then
   echo "Dry run — showing what would be uploaded:"
 fi
 
 echo "Syncing $LOCAL_DIR → $S3_URI ..."
 echo ""
 
-env "${aws_env[@]}" aws s3 sync "$LOCAL_DIR" "$S3_URI" "${aws_opts[@]}" "${dry_run_opts[@]}" \
-  --exclude ".DS_Store" --exclude "*/.DS_Store" \
-  --exclude "._*" --exclude "*/._*" \
-  --exclude ".Spotlight-V100/*" --exclude ".Trashes/*" \
-  --exclude ".fseventsd/*" --exclude ".TemporaryItems/*" \
-  --no-follow-symlinks
+upload_count=0
+upload_errors=0
+while IFS= read -r -d '' path; do
+  base=${path##*/}
+  rel=${path#"$LOCAL_DIR"/}
+
+  # Same exclusions aws s3 sync used.
+  case "$base" in
+    .DS_Store|._*) continue ;;
+  esac
+  case "$rel" in
+    .Spotlight-V100/*|.Trashes/*|.fseventsd/*|.TemporaryItems/*) continue ;;
+  esac
+
+  lsize=$(file_size "$path")
+  reason=""
+  if [[ -z "${remote_size[$rel]+set}" ]]; then
+    reason="new"
+  elif [[ "$lsize" != "${remote_size[$rel]}" ]]; then
+    reason="size changed"
+  elif [[ "${remote_etag[$rel]}" == *-* ]]; then
+    : # multipart ETag isn't a plain MD5; size matched, treat as unchanged
+  elif [[ "$(file_md5 "$path")" != "${remote_etag[$rel]}" ]]; then
+    reason="content changed"
+  fi
+  [[ -z "$reason" ]] && continue
+
+  if [[ $dry_run -eq 1 ]]; then
+    echo "(dryrun) upload: $rel ($reason)"
+    upload_count=$((upload_count + 1))
+  else
+    echo "upload: $rel ($reason)"
+    # Don't let one failed upload abort the whole sync — report and keep going.
+    if env "${aws_env[@]}" aws s3 cp "$path" "$S3_URI/$rel" "${aws_opts[@]}" --only-show-errors; then
+      upload_count=$((upload_count + 1))
+    else
+      echo "ERROR: failed to upload: $rel" >&2
+      upload_errors=$((upload_errors + 1))
+    fi
+  fi
+done < <(find "$LOCAL_DIR" -type f -print0)
 
 echo ""
-if [[ ${#dry_run_opts[@]} -gt 0 ]]; then
-  echo "Dry run complete — nothing was uploaded."
+if [[ $dry_run -eq 1 ]]; then
+  echo "Dry run complete — $upload_count file(s) would be uploaded."
 else
-  echo "Done."
+  echo "Done — $upload_count file(s) uploaded."
+  if [[ $upload_errors -gt 0 ]]; then
+    echo "$upload_errors file(s) failed to upload — see errors above." >&2
+    exit 1
+  fi
 fi
