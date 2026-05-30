@@ -1,6 +1,6 @@
 class Book < ApplicationRecord
   FORMATS = %w[epub mobi pdf].freeze
-  CATEGORIES = %w[fiction non_fiction biography].freeze
+  CATEGORIES = %w[fiction non_fiction biography essays].freeze
   KINDLE_MAX_SIZE = 24.megabytes
 
   has_one_attached :cover do |attachable|

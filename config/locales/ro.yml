@@ -127,6 +127,7 @@ ro:
       fiction: "Ficțiune"
       non_fiction: "Non-ficțiune"
       biography: "Biografii, Memorii și Jurnale"
+      essays: "Eseuri"
     index:
       title: "Bibliotecă"
       count: "%{filtered} din %{total} cărți"

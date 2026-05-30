@@ -67,6 +67,7 @@ class Admin::BooksEditTest < ActionDispatch::IntegrationTest
     assert_select "input[type=checkbox][name='book[category_keys][]'][value=fiction]"
     assert_select "input[type=checkbox][name='book[category_keys][]'][value=non_fiction]"
     assert_select "input[type=checkbox][name='book[category_keys][]'][value=biography]"
+    assert_select "input[type=checkbox][name='book[category_keys][]'][value=essays]"
   end
 
   test "admin assigns categories on update" do

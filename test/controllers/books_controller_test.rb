@@ -224,6 +224,7 @@ class BooksControllerTest < ActionDispatch::IntegrationTest
     assert_select "#category-filter-fiction .catalog-sidebar__filter-count", text: "1"
     assert_select "#category-filter-non-fiction .catalog-sidebar__filter-count", text: "0"
     assert_select "#category-filter-biography .catalog-sidebar__filter-count", text: "0"
+    assert_select "#category-filter-essays .catalog-sidebar__filter-count", text: "0"
   end
 
   test "invalid category param is ignored" do
