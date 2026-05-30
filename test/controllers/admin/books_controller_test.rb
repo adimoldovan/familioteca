@@ -38,6 +38,12 @@ class Admin::BooksControllerTest < ActionDispatch::IntegrationTest
                   admin_books_path(filter: "missing_category"), text: "1"
   end
 
+  test "the book list no longer offers a rescan action" do
+    sign_in_as members(:admin)
+    get admin_books_path
+    assert_select "form[action=?]", rescan_admin_book_path(@ok), false
+  end
+
   test "admin can filter to needs-metadata" do
     sign_in_as members(:admin)
     get admin_books_path(filter: "needs_metadata")

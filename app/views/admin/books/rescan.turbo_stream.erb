@@ -1,5 +1,0 @@
-<%= turbo_stream.replace dom_id(@book, :actions) do %>
-  <%= render layout: "admin/books/book_actions", locals: { book: @book } do %>
-    <span class="scan-button__status"><%= t("admin.books.index.rescanning") %></span>
-  <% end %>
-<% end %>

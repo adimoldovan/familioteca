@@ -76,14 +76,18 @@
   </div>
 
   <%= hidden_field_tag :next_book_id, @next_book_id if @next_book_id %>
-
-  <div class="content-form__actions">
-    <%= link_to t(".cancel"), admin_books_path(filter: @filter), class: "btn btn-secondary" %>
-    <%= f.submit t(".submit"), class: "btn btn-primary" %>
-    <% if @next_book_id %>
-      <%= button_tag t(".save_and_next"), type: "submit", name: "save_action", value: "next", class: "btn btn-primary",
-            title: t(".save_and_next_hotkey", label: t(".save_and_next")), aria: { keyshortcuts: "s" },
-            data: { controller: "hotkey", hotkey_key_value: "s" } %>
-    <% end %>
-  </div>
 <% end %>
+
+<%# Actions live outside the form so the rescan button_to (its own <form>) does not
+    nest inside the edit form. The submit buttons stay wired to it via form="book-edit-form". %>
+<div class="content-form__actions content-form__actions--fill">
+  <%= link_to t(".cancel"), admin_books_path(filter: @filter), class: "btn btn-secondary" %>
+  <%= button_tag t(".submit"), type: "submit", form: "book-edit-form", class: "btn btn-primary" %>
+  <% if @next_book_id %>
+    <%= button_tag t(".save_and_next"), type: "submit", form: "book-edit-form", name: "save_action", value: "next", class: "btn btn-primary",
+          title: t(".save_and_next_hotkey", label: t(".save_and_next")), aria: { keyshortcuts: "s" },
+          data: { controller: "hotkey", hotkey_key_value: "s" } %>
+  <% end %>
+  <%= button_to t(".rescan_link"), rescan_admin_book_path(@book, filter: @filter),
+        method: :post, class: "btn btn-secondary", form_class: "content-form__action-form" %>
+</div>

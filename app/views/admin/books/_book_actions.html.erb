@@ -1,9 +1,0 @@
-<td id="<%= dom_id(book, :actions) %>">
-  <%= link_to t("admin.books.index.edit_link"), edit_admin_book_path(book, filter: @filter), class: "link-accent" %>
-  <%= yield %>
-  <%= button_to t("admin.books.index.delete_link"), admin_book_path(book),
-        method: :delete,
-        class: "link-danger",
-        data: { turbo_confirm: t("admin.books.index.delete_confirm", title: book.title) },
-        form: { class: "inline-form" } %>
-</td>

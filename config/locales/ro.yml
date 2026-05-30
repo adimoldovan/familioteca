@@ -244,8 +244,6 @@ ro:
           missing: "Lipsește din arhivă"
           needs_metadata: "Date incomplete"
         edit_link: "Editează"
-        rescan_link: "Rescanează"
-        rescanning: "Se rescanează…"
         delete_link: "Șterge"
         delete_confirm: 'Sigur vrei să ștergi „%{title}"? Cartea va fi readăugată la următoarea scanare.'
       rescan:
@@ -254,6 +252,7 @@ ro:
         title: "Editează cartea"
         cancel: "Anulează"
         submit: "Salvează"
+        rescan_link: "Rescanează linkul cărții"
         save_and_next: "Salvează și deschide următoarea"
         save_and_next_hotkey: "%{label} (S)"
         nav_label: "Navigare cărți"

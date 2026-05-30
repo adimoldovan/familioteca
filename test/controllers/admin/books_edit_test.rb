@@ -193,6 +193,20 @@ class Admin::BooksEditTest < ActionDispatch::IntegrationTest
     assert_select "input[type=hidden][name=next_book_id]"
   end
 
+  test "the edit form offers a rescan action that posts outside the edit form" do
+    sign_in_as members(:admin)
+    get edit_admin_book_path(@book)
+    # button_to renders its own form, so it must sit outside #book-edit-form.
+    assert_select "#book-edit-form form[action=?]", rescan_admin_book_path(@book), false
+    assert_select "form[action=?] button", rescan_admin_book_path(@book), text: "Rescanează linkul cărții"
+  end
+
+  test "the submit buttons stay wired to the edit form when rendered outside it" do
+    sign_in_as members(:admin)
+    get edit_admin_book_path(@book)
+    assert_select "button[type=submit][form=book-edit-form]"
+  end
+
   test "non-admin gets 404 on edit" do
     sign_in_as members(:ana)
     get edit_admin_book_path(@book)

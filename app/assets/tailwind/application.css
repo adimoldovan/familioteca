@@ -1349,6 +1349,20 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
     margin-top: 24px;
   }
 
+  /* Equal-width action buttons that fill the row. Grid auto-columns keep the
+     columns equal regardless of label length; minmax(0, 1fr) lets long labels
+     wrap instead of stretching their column. */
+  .content-form__actions--fill {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(0, 1fr);
+  }
+  .content-form__actions--fill .btn { white-space: normal; }
+  /* button_to wraps its button in a <form>; make the wrapper fill its grid
+     column so the button matches the other actions' width. */
+  .content-form__actions--fill .content-form__action-form { display: flex; }
+  .content-form__actions--fill .content-form__action-form .btn { width: 100%; }
+
   .dateline {
     display: flex;
     align-items: center;

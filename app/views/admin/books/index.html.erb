@@ -35,13 +35,14 @@
             <%= t(".status.ok") %>
           <% end %>
         </td>
-        <%= render layout: "admin/books/book_actions", locals: { book: book } do %>
-          <%= button_to t(".rescan_link"), rescan_admin_book_path(book),
-                method: :post,
-                class: "link-accent",
-                data: { turbo_submits_with: t(".rescanning") },
-                form: { class: "inline-form", data: { turbo_stream: true } } %>
-        <% end %>
+        <td>
+          <%= link_to t(".edit_link"), edit_admin_book_path(book, filter: @filter), class: "link-accent" %>
+          <%= button_to t(".delete_link"), admin_book_path(book),
+                method: :delete,
+                class: "link-danger",
+                data: { turbo_confirm: t(".delete_confirm", title: book.title) },
+                form: { class: "inline-form" } %>
+        </td>
       </tr>
     <% end %>
   </tbody>

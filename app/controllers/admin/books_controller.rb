@@ -32,11 +32,8 @@ module Admin
     def rescan
       @book = Book.find(params[:id])
       ProcessBookFileJob.perform_later(@book.object_key)
-
-      respond_to do |format|
-        format.turbo_stream
-        format.html { redirect_to admin_books_path, notice: t("admin.books.rescan.queued") }
-      end
+      redirect_to edit_admin_book_path(@book, filter: current_filter),
+                  notice: t("admin.books.rescan.queued")
     end
 
     def destroy

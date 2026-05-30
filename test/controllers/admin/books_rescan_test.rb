@@ -5,24 +5,19 @@ class Admin::BooksRescanTest < ActionDispatch::IntegrationTest
     @book = Book.create!(title: "Rescannable", format: "epub", object_key: "rescan.epub", ingested_at: Time.current)
   end
 
-  test "admin enqueues ProcessBookFileJob and gets turbo stream" do
-    sign_in_as members(:admin)
-    assert_enqueued_with(job: ProcessBookFileJob, args: [ @book.object_key ]) do
-      post rescan_admin_book_path(@book), headers: { "Accept" => "text/vnd.turbo-stream.html" }
-    end
-    assert_response :success
-    assert_select "turbo-stream[action='replace'][target='#{dom_id(@book, :actions)}']" do
-      assert_select ".scan-button__status", text: I18n.t("admin.books.index.rescanning")
-    end
-  end
-
-  test "admin html fallback redirects with queued notice" do
+  test "admin enqueues ProcessBookFileJob and redirects to edit with queued notice" do
     sign_in_as members(:admin)
     assert_enqueued_with(job: ProcessBookFileJob, args: [ @book.object_key ]) do
       post rescan_admin_book_path(@book)
     end
-    assert_redirected_to admin_books_path
+    assert_redirected_to edit_admin_book_path(@book)
     assert_equal I18n.t("admin.books.rescan.queued"), flash[:notice]
+  end
+
+  test "rescan preserves the active filter in the redirect" do
+    sign_in_as members(:admin)
+    post rescan_admin_book_path(@book, filter: "needs_metadata")
+    assert_redirected_to edit_admin_book_path(@book, filter: "needs_metadata")
   end
 
   test "non-admin gets 404" do
